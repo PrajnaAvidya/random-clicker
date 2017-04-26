@@ -31,7 +31,7 @@
                     <h3>Buildings</h3>
 
                     <div class="row building" v-for="building in buildings" v-if="building.owned > 0 || showBuilding(building)">
-                        <div class="col-xs-3">
+                        <div class="col-xs-4">
 
                             <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{ building.name }} ({{
                             building.owned }})
@@ -48,7 +48,7 @@
                     <h3>Upgrades</h3>
 
                     <div class="row upgrade" v-for="upgrade in orderBy(upgrades, 'cost')" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
-                        <div class="col-xs-6">
+                        <div class="col-xs-12">
                             <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                             <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.name }} ({{ upgrade.cost }})</span>
                         </div>

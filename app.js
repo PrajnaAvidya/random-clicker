@@ -27,6 +27,7 @@ new Vue({
             { name: 'Kosher Bakery', baseCost: 1100, baseCps: 8, description: "These guys seem to know what they're doing.", showAt: 15, owned: 0 },
             { name: 'Non-Kosher Bakery', baseCost: 12000, baseCps: 47, description: "These guys don't follow the rules!", showAt: 100, owned: 0 },
             { name: 'Tea Club', baseCost: 130000, baseCps: 260, description: "These people LOVE crackers with their tea", showAt: 1100, owned: 0 },
+            { name: 'Cracker Factory', baseCost: 1400000, baseCps: 1400, description: "Seems only logical", showAt: 12000, owned: 0 },
         ],
 
         upgrades: [
@@ -34,11 +35,9 @@ new Vue({
             { type: 'Cracker', name: 'Store Brand Crackers', needed: 50000, cost: 999999, multiplier: 1.01, description: 'Meh', active: false },
             { type: 'Cracker', name: 'Fancy Store Crackers', needed: 250000, cost: 5000000, multiplier: 1.01, description: 'Ok I guess', active: false },
             { type: 'Cracker', name: 'Rye Crackers', needed: 500000, cost: 10000000, multiplier: 1.01, description: 'Better than cardboard', active: false },
-            // 2.5M
-            // 5M
-            // 25M
-            // 50M
-            // etc
+            { type: 'Cracker', name: 'Sugared Crackers', needed: 2500000, cost: 50000000, multiplier: 1.01, description: 'Gross?', active: false },
+            { type: 'Cracker', name: 'Salted Crackers', needed: 5000000, cost: 100000000, multiplier: 1.01, description: 'Ugh what?', active: false },
+            // 2% etc
 
             // finger (cursor)
             { type: 'Finger', name: 'Double Tap', needed: 1, cost: 100, multiplier: 2, description: 'Doubles your finger clicks', active: false },
@@ -90,6 +89,16 @@ new Vue({
             { type: 'Tea Club', name: 'Servant', needed: 25, cost: 65000000, multiplier: 2, description: "It's not technically slavery!", active: false },
             { type: 'Tea Club', name: 'Free trade tea', needed: 50, cost: 6500000000, multiplier: 2, description: "I feel so much better about this", active: false },
             { type: 'Tea Club', name: 'Slavery tea', needed: 100, cost: 650000000000, multiplier: 2, description: "Suffering tastes better", active: false },
+            // 150
+            // 200
+            // 250
+
+            // cracker factory (bank)
+            { type: 'Cracker Factory', name: 'Strumpets', needed: 1, cost: 1300000, multiplier: 2, description: "What are we, savages?", active: false },
+            { type: 'Cracker Factory', name: 'Valet', needed: 5, cost: 6500000, multiplier: 2, description: "I'm too rich to park my car", active: false },
+            { type: 'Cracker Factory', name: 'Servant', needed: 25, cost: 65000000, multiplier: 2, description: "It's not technically slavery!", active: false },
+            { type: 'Cracker Factory', name: 'Free trade tea', needed: 50, cost: 6500000000, multiplier: 2, description: "I feel so much better about this", active: false },
+            { type: 'Cracker Factory', name: 'Slavery tea', needed: 100, cost: 650000000000, multiplier: 2, description: "Suffering tastes better", active: false },
             // 150
             // 200
             // 250
