@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cracker Clicker</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+    <link href="styles.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="conatiner" id="game">
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row totals">
+                    <span class="total-crackers"><h1>{{ crackers | whole }} crackers</h1></span>
+                    <span class="crackers-per-second"><h2>Per second: {{ cps | round }}</h2></span>
+                </div>
+
+                <div class="row cracker">
+                    <img src="./img/cracker.png" v-on:click="crackerClick" />
+                </div>
+            </div>
+
+            <div class="col-md-7 col-md-offset-1">
+                <div class="row upgrades">
+                    <h3>Upgrades</h3>
+
+                    <div v-for="upgrade in upgrades" class="row upgrade" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
+                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.name }} ({{ upgrade.cost }})</span>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row buildings">
+                    <h3>Buildings</h3>
+
+                    <div v-for="building in buildings" class="row building">
+                        <div class="col-xs-3">
+
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{ building.name }} ({{
+                            building.owned }})
+                        </div>
+                        <div class="col-xs-2">
+                            <button class="btn btn-default" @click="buyBuilding(building)">Buy ({{ buildingCost(building) }})</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
