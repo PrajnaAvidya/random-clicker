@@ -94,11 +94,11 @@ new Vue({
             // 250
 
             // cracker factory (bank)
-            { type: 'Cracker Factory', name: 'Strumpets', needed: 1, cost: 1300000, multiplier: 2, description: "What are we, savages?", active: false },
-            { type: 'Cracker Factory', name: 'Valet', needed: 5, cost: 6500000, multiplier: 2, description: "I'm too rich to park my car", active: false },
-            { type: 'Cracker Factory', name: 'Servant', needed: 25, cost: 65000000, multiplier: 2, description: "It's not technically slavery!", active: false },
-            { type: 'Cracker Factory', name: 'Free trade tea', needed: 50, cost: 6500000000, multiplier: 2, description: "I feel so much better about this", active: false },
-            { type: 'Cracker Factory', name: 'Slavery tea', needed: 100, cost: 650000000000, multiplier: 2, description: "Suffering tastes better", active: false },
+            { type: 'Cracker Factory', name: 'Strumpets', needed: 1, cost: 14000000, multiplier: 2, description: "What are we, savages?", active: false },
+            { type: 'Cracker Factory', name: 'Valet', needed: 5, cost: 70000000, multiplier: 2, description: "I'm too rich to park my car", active: false },
+            { type: 'Cracker Factory', name: 'Servant', needed: 25, cost: 700000000, multiplier: 2, description: "It's not technically slavery!", active: false },
+            { type: 'Cracker Factory', name: 'Free trade tea', needed: 50, cost: 70000000000, multiplier: 2, description: "I feel so much better about this", active: false },
+            { type: 'Cracker Factory', name: 'Slavery tea', needed: 100, cost: 7000000000000, multiplier: 2, description: "Suffering tastes better", active: false },
             // 150
             // 200
             // 250
