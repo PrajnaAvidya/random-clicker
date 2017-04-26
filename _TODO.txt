@@ -6,5 +6,5 @@ achivements
 - click achievements
 - check for total crackers/cps every second?
 - tea (milk) + upgrades
-order upgrades by cost
-only show close (new) buildings
+multiple buy
+hide new building name until can afford
