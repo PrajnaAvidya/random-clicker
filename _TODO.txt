@@ -1,4 +1,3 @@
-npm/rollup/whatever compilation instead of cdn
 tooltips - https://github.com/Akryum/v-tooltip
 achivements
 - ui
@@ -10,3 +9,5 @@ other non-standard upgrades
 multiple buy
 hide new building name until can afford
 number conversion/big numbers library
+save data
+move html to vue templates/component?
