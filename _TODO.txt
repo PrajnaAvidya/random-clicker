@@ -1,2 +1,10 @@
-npm/rollup/whatever compilation
+npm/rollup/whatever compilation instead of cdn
 tooltips - https://github.com/Akryum/v-tooltip
+achivements
+- ui
+- building achievements
+- click achievements
+- check for total crackers/cps every second?
+- tea (milk) + upgrades
+order upgrades by cost
+only show close (new) buildings

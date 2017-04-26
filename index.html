@@ -18,6 +18,7 @@
                 <div class="row totals">
                     <span class="total-crackers"><h1>{{ crackers | whole }} crackers</h1></span>
                     <span class="crackers-per-second"><h2>Per second: {{ cps | round }}</h2></span>
+                    <span class="crackers-per-click"><h3>Per click: {{ clickPower | whole }}</h3></span>
                 </div>
 
                 <div class="row cracker">
@@ -29,8 +30,11 @@
                 <div class="row upgrades">
                     <h3>Upgrades</h3>
 
-                    <div v-for="upgrade in upgrades" class="row upgrade" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
-                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.name }} ({{ upgrade.cost }})</span>
+                    <div v-for="upgrade in orderBy(upgrades, 'cost')" class="row upgrade" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
+                        <div class="col-xs-6">
+                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                            <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.name }} ({{ upgrade.cost }})</span>
+                        </div>
                     </div>
                 </div>
 
@@ -56,6 +60,7 @@
     </div>
 
     <script src="https://unpkg.com/vue"></script>
+    <script src="https://cdn.jsdelivr.net/vue2-filters/0.1.8/vue2-filters.min.js"></script>
     <script src="app.js"></script>
 </body>
 
