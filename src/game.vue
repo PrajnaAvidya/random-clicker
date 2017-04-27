@@ -56,35 +56,41 @@
     export default {
         data: function () {
             return {
-                crackers: Big(0),
+                crackers: Big(1E21),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
                 clickPower: Big(1),
 
                 buildings: [
-                    { name: 'Finger', baseCost: 15, baseCps: 0.1, currentCps: 0.1, description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
-                    { name: 'Toddler', baseCost: 100, baseCps: 1, currentCps: 1, description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: 0, owned: 0 },
-                    { name: 'Kosher Bakery', baseCost: 1100, baseCps: 8, currentCps: 8, description: "These guys seem to know what they're doing.", showAt: 15, owned: 0 },
-                    { name: 'Non-Kosher Bakery', baseCost: 12000, baseCps: 47, currentCps: 47, description: "These guys don't follow the rules!", showAt: 100, owned: 0 },
-                    { name: 'Tea Club', baseCost: 130000, baseCps: 260, currentCps: 260, description: "These ladies LOVE crackers with their tea", showAt: 1100, owned: 0 },
-                    { name: 'Cracker Factory', baseCost: Big(1.4E6), baseCps: 1400, currentCps: 1400, description: "Seems only logical", showAt: 12000, owned: 0 },
+                    { name: 'Finger', baseCost: Big(15), baseCps: 0.1, currentCps: 0.1, description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
+                    { name: 'Toddler', baseCost: Big(100), baseCps: 1, currentCps: 1, description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: Big(0), owned: 0 },
+                    { name: 'Kosher Bakery', baseCost: Big(1100), baseCps: 8, currentCps: 8, description: "These guys seem to know what they're doing.", showAt: Big(15), owned: 0 },
+                    { name: 'Non-Kosher Bakery', baseCost: Big(12000), baseCps: 47, currentCps: 47, description: "These guys don't follow the rules!", showAt: Big(100), owned: 0 },
+                    { name: 'Tea Club', baseCost: Big(130000), baseCps: 260, currentCps: 260, description: "These ladies LOVE crackers with their tea", showAt: Big(1100), owned: 0 },
+                    { name: 'Cracker Factory', baseCost: Big(1.4E6), baseCps: 1400, currentCps: 1400, description: "Seems only logical", showAt: Big(12000), owned: 0 },
+                    { name: 'Cracker Warehouse', baseCost: Big(20E6), baseCps: 7800, currentCps: 7800, description: "We need more space to store all these crackers!", showAt: Big(130000), owned: 0 },
                 ],
 
                 upgrades: [
                     // production
-                    { type: 'Cracker', name: 'Store Brand Crackers', needed: 50000, cost: 999999, multiplier: 1.01, description: 'Meh', active: false },
-                    { type: 'Cracker', name: 'Fancy Store Crackers', needed: 250000, cost: Big(5E6), multiplier: 1.01, description: 'Ok I guess', active: false },
-                    { type: 'Cracker', name: 'Rye Crackers', needed: 500000, cost: Big(10E6), multiplier: 1.01, description: 'Better than cardboard', active: false },
+                    { type: 'Cracker', name: 'Store Brand Crackers', needed: Big(50000), cost: Big(999999), multiplier: 1.01, description: 'Meh', active: false },
+                    { type: 'Cracker', name: 'Fancy Store Crackers', needed: Big(250000), cost: Big(5E6), multiplier: 1.01, description: 'Ok I guess', active: false },
+                    { type: 'Cracker', name: 'Rye Crackers', needed: Big(500000), cost: Big(10E6), multiplier: 1.01, description: 'Better than cardboard', active: false },
                     { type: 'Cracker', name: 'Sugared Crackers', needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01, description: 'Gross?', active: false },
-                    { type: 'Cracker', name: 'Salted Crackers', needed: Big(5E6), cost: Big(100E6), multiplier: 1.01, description: 'Ugh what?', active: false },
-                    // 2% etc
+                    { type: 'Cracker', name: 'Saltine Crackers', needed: Big(5E6), cost: Big(100E6), multiplier: 1.01, description: 'That seems reasonable', active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(25E6), cost: Big(500E6), multiplier: 1.02, description: 'Need Description', active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(50E6), cost: Big(1E9), multiplier: 1.02, description: 'Need Description', active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(250E6), cost: Big(5E9), multiplier: 1.02, description: 'Need Description', active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(500E6), cost: Big(10E9), multiplier: 1.02, description: 'Need Description', active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02, description: 'Need Description', active: false },
+                    // 4% etc
 
                     // finger (cursor)
-                    { type: 'Finger', name: 'Double Tap', needed: 1, cost: 100, multiplier: 2, description: 'Tap faster', active: false },
-                    { type: 'Finger', name: 'Quattro Tap', needed: 1, cost: 500, multiplier: 2, description: 'Tap faster!', active: false },
-                    { type: 'Finger', name: 'Mega Tap', needed: 10, cost: 10000, multiplier: 2, description: 'Tap even faster!!', active: false },
-                    { type: 'Finger', name: 'Middle Finger', needed: 20, cost: 100000, addition: 0.1, description: 'Put that thing away.', active: false },
+                    { type: 'Finger', name: 'Double Tap', needed: 1, cost: Big(100), multiplier: 2, description: 'Tap faster', active: false },
+                    { type: 'Finger', name: 'Quattro Tap', needed: 1, cost: Big(500), multiplier: 2, description: 'Tap faster!', active: false },
+                    { type: 'Finger', name: 'Mega Tap', needed: 10, cost: Big(10000), multiplier: 2, description: 'Tap even faster!!', active: false },
+                    { type: 'Finger', name: 'Middle Finger', needed: 20, cost: Big(100000), addition: 0.1, description: 'Put that thing away.', active: false },
                     { type: 'Finger', name: 'Double Middle Finger', needed: 40, cost: Big(10E6), addition: 0.5, description: 'Put those away.', active: false },
                     { type: 'Finger', name: 'Extra Middle Fingers', needed: 80, cost: Big(100E6), addition: 5, description: "Now that's just rude.", active: false },
                     { type: 'Finger', name: 'Super Finger', needed: 120, cost: Big(1E9), addition: 50, description: "No decorum at all.", active: false },
@@ -95,34 +101,34 @@
                     { type: 'Finger', name: 'Ultimate Finger', needed: 320, cost: Big(10E15), addition: 5000000, description: "Need Description", active: false },
 
                     // toddler (grandma)
-                    { type: 'Toddler', name: 'Timeout', needed: 1, cost: 1000, multiplier: 2, description: 'These toddlers need to learn some discipline', active: false },
-                    { type: 'Toddler', name: 'Daycare', needed: 5, cost: 5000, multiplier: 2, description: 'Finally, some me time!', active: false },
-                    { type: 'Toddler', name: 'Play Date', needed: 25, cost: 50000, multiplier: 2, description: 'An active social life is good for productivity', active: false },
+                    { type: 'Toddler', name: 'Timeout', needed: 1, cost: Big(1000), multiplier: 2, description: 'These toddlers need to learn some discipline', active: false },
+                    { type: 'Toddler', name: 'Daycare', needed: 5, cost: Big(5000), multiplier: 2, description: 'Finally, some me time!', active: false },
+                    { type: 'Toddler', name: 'Play Date', needed: 25, cost: Big(50000), multiplier: 2, description: 'An active social life is good for productivity', active: false },
                     { type: 'Toddler', name: 'ADHD Meds', needed: 50, cost: Big(5E6), multiplier: 2, description: "That's better...", active: false },
                     { type: 'Toddler', name: 'Jack', needed: 100, cost: Big(500E6), multiplier: 2, description: "Like that movie?", active: false },
-                    // 150
-                    // 200
-                    // 250
+                    { type: 'Toddler', name: 'Jack & Jill', needed: 150, cost: Big(50E9), multiplier: 2, description: "The worst Adam Sandler movie", active: false },
+                    { type: 'Toddler', name: 'Need Name', needed: 200, cost: Big(50E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Toddler', name: 'Need Name', needed: 250, cost: Big(50E15), multiplier: 2, description: "Need Description", active: false },
 
                     // kosher bakery (farm)
-                    { type: 'Kosher Bakery', name: 'Torah', needed: 1, cost: 11000, multiplier: 2, description: 'Got to follow the rules', active: false },
-                    { type: 'Kosher Bakery', name: 'Another Torah', needed: 5, cost: 55000, multiplier: 2, description: 'More to go around', active: false },
-                    { type: 'Kosher Bakery', name: 'Rabbi', needed: 25, cost: 550000, multiplier: 2, description: "This rabbi doesn't come cheap", active: false },
+                    { type: 'Kosher Bakery', name: 'Torah', needed: 1, cost: Big(11000), multiplier: 2, description: 'Got to follow the rules', active: false },
+                    { type: 'Kosher Bakery', name: 'Another Torah', needed: 5, cost: Big(55000), multiplier: 2, description: 'More to go around', active: false },
+                    { type: 'Kosher Bakery', name: 'Rabbi', needed: 25, cost: Big(550000), multiplier: 2, description: "This rabbi doesn't come cheap", active: false },
                     { type: 'Kosher Bakery', name: 'Rabbi Council', needed: 50, cost: Big(55E6), multiplier: 2, description: "These rabbis don't come cheap", active: false },
                     { type: 'Kosher Bakery', name: 'Passover Bonus', needed: 100, cost: Big(5.5E9), multiplier: 2, description: "What does that even mean?", active: false },
-                    // 150
-                    // 200
-                    // 250
+                    { type: 'Kosher Bakery', name: 'Need Name', needed: 150, cost: Big(550E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Kosher Bakery', name: 'Need Name', needed: 200, cost: Big(550E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Kosher Bakery', name: 'Need Name', needed: 250, cost: Big(550E15), multiplier: 2, description: "Need Description", active: false },
 
                     // non-kosher bakery (mine)
-                    { type: 'Non-Kosher Bakery', name: 'Knockoff Torah', needed: 1, cost: 120000, multiplier: 2, description: "This doesn't seem legit...", active: false },
-                    { type: 'Non-Kosher Bakery', name: 'Another Knockoff Torah', needed: 5, cost: 600000, multiplier: 2, description: "??", active: false },
+                    { type: 'Non-Kosher Bakery', name: 'Knockoff Torah', needed: 1, cost: Big(120000), multiplier: 2, description: "This doesn't seem legit...", active: false },
+                    { type: 'Non-Kosher Bakery', name: 'Another Knockoff Torah', needed: 5, cost: Big(600000), multiplier: 2, description: "??", active: false },
                     { type: 'Non-Kosher Bakery', name: 'Fake Rabbi', needed: 25, cost: Big(6E6), multiplier: 2, description: "I don't think his beard is real", active: false },
                     { type: 'Non-Kosher Bakery', name: 'Fake Rabbi Council', needed: 50, cost: Big(600E6), multiplier: 2, description: "I have a bad feeling about this", active: false },
                     { type: 'Non-Kosher Bakery', name: 'Fake Passover Bonus', needed: 100, cost: Big(60E9), multiplier: 2, description: "What does that even mean?!", active: false },
-                    // 150
-                    // 200
-                    // 250
+                    { type: 'Non-Kosher Bakery', name: 'Need Name', needed: 150, cost: Big(6E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Non-Kosher Bakery', name: 'Need Name', needed: 200, cost: Big(6E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Non-Kosher Bakery', name: 'Need Name', needed: 250, cost: Big(6E18), multiplier: 2, description: "Need Description", active: false },
 
                     // tea club (factory)
                     { type: 'Tea Club', name: 'Strumpets', needed: 1, cost: Big(1.3E6), multiplier: 2, description: "What are we, savages?", active: false },
@@ -130,9 +136,9 @@
                     { type: 'Tea Club', name: 'Servant', needed: 25, cost: Big(65E6), multiplier: 2, description: "It's not technically slavery!", active: false },
                     { type: 'Tea Club', name: 'Free trade tea', needed: 50, cost: Big(6.5E9), multiplier: 2, description: "I feel so much better about this", active: false },
                     { type: 'Tea Club', name: 'Slavery tea', needed: 100, cost: Big(650E9), multiplier: 2, description: "Suffering tastes better", active: false },
-                    // 150
-                    // 200
-                    // 250
+                    { type: 'Tea Club', name: 'Need Name', needed: 150, cost: Big(65E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Tea Club', name: 'Need Name', needed: 200, cost: Big(65E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Tea Club', name: 'Need Name', needed: 250, cost: Big(65E18), multiplier: 2, description: "Need Description", active: false },
 
                     // cracker factory (bank)
                     { type: 'Cracker Factory', name: 'Strumpets', needed: 1, cost: Big(14E6), multiplier: 2, description: "What are we, savages?", active: false },
@@ -140,9 +146,19 @@
                     { type: 'Cracker Factory', name: 'Servant', needed: 25, cost: Big(700E6), multiplier: 2, description: "It's not technically slavery!", active: false },
                     { type: 'Cracker Factory', name: 'Free trade tea', needed: 50, cost: Big(70E9), multiplier: 2, description: "I feel so much better about this", active: false },
                     { type: 'Cracker Factory', name: 'Slavery tea', needed: 100, cost: Big(7E12), multiplier: 2, description: "Suffering tastes better", active: false },
-                    // 150
-                    // 200
-                    // 250
+                    { type: 'Cracker Factory', name: 'Need Name', needed: 150, cost: Big(700E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Cracker Factory', name: 'Need Name', needed: 200, cost: Big(700E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Cracker Factory', name: 'Need Name', needed: 250, cost: Big(700E18), multiplier: 2, description: "Need Description", active: false },
+
+                    // cracker warehouse (temple)
+                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 1, cost: Big(200E6), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 5, cost: Big(1E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 25, cost: Big(10E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 50, cost: Big(1E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 100, cost: Big(100E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 150, cost: Big(10E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 200, cost: Big(10E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 250, cost: Big(10E21), multiplier: 2, description: "Need Description", active: false },
                 ],
             }
         },
@@ -191,7 +207,8 @@
                 }
             },
             buildingCost: function (building, amount = 1) {
-                return Big(Math.ceil((building.baseCost * (Math.pow(1.15, building.owned + amount) - Math.pow(1.15, building.owned))) / 0.15));
+                Big.RM = 3;
+                return building.baseCost.times(Big(1.15).pow(building.owned + amount).minus(Big(1.15).pow(building.owned))).div(0.15).round();
             },
             buildingCount: function (buildingName) {
                 return this.buildings.find(function (building) {
@@ -288,12 +305,14 @@
             round: function (value) {
                 if (value < 10) {
                     return Number((value).toFixed(1));
-                } else {
+                } else if (value <= 9999999999) {
                     return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                } else {
+                    return value.toExponential(3);
                 }
             },
             crackers: function (value) {
-                if (value < 9999999) {
+                if (value <= 9999999999) {
                     return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
                     return value.toExponential(3);

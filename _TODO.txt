@@ -9,4 +9,13 @@ other non-standard upgrades
 sell buildings
 hide next building name until can afford
 save data
-better flavor texts
+better names/flavor texts
+prettier numbers (million/billion/trillion/etc)
+
+
+1E6 = 1 million
+1E9 = 1 billion
+1E12 = 1 trillion
+1E15 = 1 quadrillion
+1E18 = 1 quintillion
+1E21 = 1 sextillion
