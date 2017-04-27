@@ -2,9 +2,9 @@
     <div class="row">
         <div class="col-md-3">
             <div class="row totals">
-                <span class="total-crackers"><h1>{{ crackers | whole }} crackers</h1></span>
+                <span class="total-crackers"><h1>{{ crackers | crackers }} crackers</h1></span>
                 <span class="crackers-per-second"><h2>Per second: {{ cps | round }}</h2></span>
-                <span class="crackers-per-click"><h3>Per click: {{ clickPower | whole }}</h3></span>
+                <span class="crackers-per-click"><h3>Per click: {{ clickPower | crackers }}</h3></span>
             </div>
 
             <div class="row cracker">
@@ -23,13 +23,13 @@
                         {{ building.name }}<br />({{ building.owned }} owned)
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building)">Buy 1 ({{ buildingCost(building) }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building)">Buy 1 ({{ buildingCost(building) | crackers }})</button>
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building, 10)">Buy 10 ({{ buildingCost(building, 10) }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building, 10)">Buy 10 ({{ buildingCost(building, 10) | crackers }})</button>
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building, 100)">Buy 100 ({{ buildingCost(building, 100) }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building, 100)">Buy 100 ({{ buildingCost(building, 100) | crackers }})</button>
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                 <div class="row upgrade" v-for="upgrade in orderBy(upgrades, 'cost')" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
                     <div class="col-xs-12">
                         <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
-                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost }})</span>
+                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | crackers }})</span>
                     </div>
                 </div>
             </div>
@@ -51,14 +51,16 @@
 </template>
 
 <script>
+    import Big from 'big.js';
+
     export default {
         data: function () {
             return {
-                crackers: 0,
-                totalCrackers: 0,
-                clicks: 0,
-                cps: 0,
-                clickPower: 1,
+                crackers: Big(1000000000000000),
+                totalCrackers: Big(0),
+                clicks: Big(0),
+                cps: Big(0),
+                clickPower: Big(1),
 
                 buildings: [
                     { name: 'Finger', baseCost: 15, baseCps: 0.1, currentCps: 0.1, description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
@@ -144,15 +146,12 @@
                 ],
             }
         },
-        computed: {
-
-        },
         methods: {
             // clicking/cps
             crackerClick: function () {
-                this.clicks += this.clickPower;
-                this.crackers += this.clickPower;
-                this.totalCrackers += this.clickPower;
+                this.clicks = this.clicks.plus(this.clickPower);
+                this.crackers = this.crackers.plus(this.clickPower);
+                this.totalCrackers = this.totalCrackers.plus(this.clickPower);
             },
             recalculateClickPower: function () {
                 this.clickPower = this.upgradeMultiplier('Finger') + this.upgradeAddition();
@@ -181,7 +180,7 @@
             },
             buyBuilding: function (building, amount = 1) {
                 if (this.crackers >= this.buildingCost(building, amount)) {
-                    this.crackers -= this.buildingCost(building, amount);
+                    this.crackers = this.crackers.minus(this.buildingCost(building, amount));
                     building.owned += amount;
 
                     this.recalculateCps();
@@ -228,7 +227,7 @@
             buyUpgrade: function (upgrade) {
                 if (this.canBuyUpgrade(upgrade) && this.crackers >= upgrade.cost) {
                     upgrade.active = true;
-                    this.crackers -= upgrade.cost;
+                    this.crackers = this.crackers.minus(upgrade.cost);
 
                     this.recalculateCps();
                     this.recalculateClickPower();
@@ -278,8 +277,24 @@
 
             // tick
             tick: function () {
-                this.crackers += this.cps / 10;
-                this.totalCrackers += this.cps / 10;
+                this.crackers = this.crackers.plus(this.cps / 10);
+                this.totalCrackers = this.totalCrackers.plus(this.cps / 10);
+            }
+        },
+        filters: {
+            round: function (value) {
+                if (value < 10) {
+                    return Number((value).toFixed(1));
+                } else {
+                    return parseInt(value);
+                }
+            },
+            crackers: function (value) {
+                if (value < 9999999) {
+                    return parseInt(value);
+                } else {
+                    return value.toExponential(3);
+                }
             }
         },
         mounted: function () {
