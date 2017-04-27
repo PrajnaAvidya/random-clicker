@@ -9485,6 +9485,7 @@ exports.default = {
             clicks: (0, _big2.default)(0),
             cps: (0, _big2.default)(0),
             clickPower: (0, _big2.default)(1),
+            buyAmount: 1,
 
             buildings: [{ name: 'Finger', baseCost: (0, _big2.default)(15), baseCps: (0, _big2.default)(0.1), currentCps: (0, _big2.default)(0.1), description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 }, { name: 'Toddler', baseCost: (0, _big2.default)(100), baseCps: (0, _big2.default)(1), currentCps: (0, _big2.default)(1), description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: (0, _big2.default)(0), owned: 0 }, { name: 'Kosher Bakery', baseCost: (0, _big2.default)(1100), baseCps: (0, _big2.default)(8), currentCps: (0, _big2.default)(8), description: "These guys seem to know what they're doing.", showAt: (0, _big2.default)(15), owned: 0 }, { name: 'Non-Kosher Bakery', baseCost: (0, _big2.default)(12000), baseCps: (0, _big2.default)(47), currentCps: (0, _big2.default)(47), description: "These guys don't follow the rules!", showAt: (0, _big2.default)(100), owned: 0 }, { name: 'Tea Club', baseCost: (0, _big2.default)(130000), baseCps: (0, _big2.default)(260), currentCps: (0, _big2.default)(260), description: "These ladies LOVE crackers with their tea", showAt: (0, _big2.default)(1100), owned: 0 }, { name: 'Cracker Factory', baseCost: (0, _big2.default)(1.4E6), baseCps: (0, _big2.default)(1400), currentCps: (0, _big2.default)(1400), description: "Seems only logical", showAt: (0, _big2.default)(12000), owned: 0 }, { name: 'Cracker Warehouse', baseCost: (0, _big2.default)(20E6), baseCps: (0, _big2.default)(7800), currentCps: (0, _big2.default)(7800), description: "We need more space to store all these crackers!", showAt: (0, _big2.default)(130000), owned: 0 }, { name: 'Food Lab', baseCost: (0, _big2.default)(330E6), baseCps: (0, _big2.default)(44000), currentCps: (0, _big2.default)(44000), description: "Genetically engineered crackers?", showAt: (0, _big2.default)(1.4E6), owned: 0 }],
 
@@ -9519,6 +9520,7 @@ exports.default = {
             _sortedUpgrades: null
         };
     },
+
     computed: {
         sortedUpgrades: function sortedUpgrades() {
             if (this._sortedUpgrades == null) {
@@ -9533,6 +9535,7 @@ exports.default = {
             return this._sortedUpgrades;
         }
     },
+
     methods: {
         // clicking/cps
         crackerClick: function crackerClick() {
@@ -9566,26 +9569,21 @@ exports.default = {
             return this.totalCrackers.gte(building.showAt);
         },
         canBuyBuilding: function canBuyBuilding(building) {
-            var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
-            return this.crackers.gte(this.buildingCost(building, amount));
+            return this.crackers.gte(this.buildingCost(building, this.buyAmount));
         },
         buyBuilding: function buyBuilding(building) {
-            var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
-            if (this.canBuyBuilding(building, amount)) {
-                this.crackers = this.crackers.minus(this.buildingCost(building, amount));
-                building.owned += amount;
+            if (this.canBuyBuilding(building, this.buyAmount)) {
+                this.crackers = this.crackers.minus(this.buildingCost(building));
+                building.owned += this.buyAmount;
 
                 this.recalculateCps();
                 this.recalculateClickPower();
             }
         },
         buildingCost: function buildingCost(building) {
-            var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
+            // TODO cache
             _big2.default.RM = 3;
-            return building.baseCost.times((0, _big2.default)(1.15).pow(building.owned + amount).minus((0, _big2.default)(1.15).pow(building.owned))).div(0.15).round();
+            return building.baseCost.times((0, _big2.default)(1.15).pow(building.owned + this.buyAmount).minus((0, _big2.default)(1.15).pow(building.owned))).div(0.15).round();
         },
         buildingCount: function buildingCount(buildingName) {
             return this.buildings.find(function (building) {
@@ -9611,6 +9609,9 @@ exports.default = {
             buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
             buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + building.currentCps * building.owned + " crackers per second";
             return buildingText;
+        },
+        setBuyAmount: function setBuyAmount(amount) {
+            this.buyAmount = amount;
         },
 
         // upgrades
@@ -9710,6 +9711,8 @@ exports.default = {
         }.bind(this), 100);
     }
 }; //
+//
+//
 //
 //
 //
@@ -12860,7 +12863,7 @@ exports = module.exports = __webpack_require__(9)(undefined);
 
 
 // module
-exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.buildings,\n.upgrades {\n    margin-top: 50px;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n.tooltips {\n    position: relative;\n    display: inline;\n}\n.tooltips span {\n    position: absolute;\n    width: 300px;\n    color: #FFFFFF;\n    background: #000000;\n    line-height: 24px;\n    text-align: center;\n    visibility: hidden;\n    border-radius: 6px;\n    font-family: \"Helvetica Neue, Helvetica, Arial, sans-serif\";\n    font-weight: bold;\n    padding-right: 5px;\n    padding-left: 5px;\n}\n.tooltips span:after {\n    content: '';\n    position: absolute;\n    top: 100%;\n    left: 50%;\n    margin-left: -8px;\n    width: 0;\n    height: 0;\n    border-top: 8px solid #000000;\n    border-right: 8px solid transparent;\n    border-left: 8px solid transparent;\n}\n:hover.tooltips span {\n    visibility: visible;\n    opacity: 0.8;\n    bottom: 30px;\n    left: 50%;\n    margin-left: -76px;\n    z-index: 999;\n}\n", ""]);
+exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.buy-sell-buttons {\n    margin-bottom: 20px;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.buildings,\n.upgrades {\n    margin-top: 50px;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n.tooltips {\n    position: relative;\n    display: inline;\n}\n.tooltips span {\n    position: absolute;\n    width: 300px;\n    color: #FFFFFF;\n    background: #000000;\n    line-height: 24px;\n    text-align: center;\n    visibility: hidden;\n    border-radius: 6px;\n    font-family: \"Helvetica Neue, Helvetica, Arial, sans-serif\";\n    font-weight: bold;\n    padding-right: 5px;\n    padding-left: 5px;\n}\n.tooltips span:after {\n    content: '';\n    position: absolute;\n    top: 100%;\n    left: 50%;\n    margin-left: -8px;\n    width: 0;\n    height: 0;\n    border-top: 8px solid #000000;\n    border-right: 8px solid transparent;\n    border-left: 8px solid transparent;\n}\n:hover.tooltips span {\n    visibility: visible;\n    opacity: 0.8;\n    bottom: 30px;\n    left: 50%;\n    margin-left: -76px;\n    z-index: 999;\n}\n", ""]);
 
 // exports
 
@@ -13161,7 +13164,41 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "col-md-6"
   }, [_c('div', {
     staticClass: "row buildings"
-  }, [_c('h3', [_vm._v("Buildings")]), _vm._v(" "), _vm._l((_vm.buildings), function(building) {
+  }, [_c('h3', [_vm._v("Buildings")]), _vm._v(" "), _c('div', {
+    staticClass: "row buy-sell-buttons"
+  }, [_c('div', {
+    staticClass: "col-xs-12"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    class: {
+      active: this.buyAmount == 1
+    },
+    on: {
+      "click": function($event) {
+        _vm.setBuyAmount(1)
+      }
+    }
+  }, [_vm._v("Buy 1")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    class: {
+      active: this.buyAmount == 10
+    },
+    on: {
+      "click": function($event) {
+        _vm.setBuyAmount(10)
+      }
+    }
+  }, [_vm._v("Buy 10")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-default",
+    class: {
+      active: this.buyAmount == 100
+    },
+    on: {
+      "click": function($event) {
+        _vm.setBuyAmount(100)
+      }
+    }
+  }, [_vm._v("Buy 100")])])]), _vm._v(" "), _vm._l((_vm.buildings), function(building) {
     return (building.owned > 0 || _vm.showBuilding(building)) ? _c('div', {
       staticClass: "row building"
     }, [_c('div', {
@@ -13187,31 +13224,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.buyBuilding(building)
         }
       }
-    }, [_vm._v("Buy 1 (" + _vm._s(_vm._f("crackers")(_vm.buildingCost(building))) + ")")])]), _vm._v(" "), _c('div', {
-      staticClass: "col-xs-2"
-    }, [_c('button', {
-      staticClass: "btn btn-default",
-      attrs: {
-        "disabled": !_vm.canBuyBuilding(building, 10)
-      },
-      on: {
-        "click": function($event) {
-          _vm.buyBuilding(building, 10)
-        }
-      }
-    }, [_vm._v("Buy 10 (" + _vm._s(_vm._f("crackers")(_vm.buildingCost(building, 10))) + ")")])]), _vm._v(" "), _c('div', {
-      staticClass: "col-xs-2"
-    }, [_c('button', {
-      staticClass: "btn btn-default",
-      attrs: {
-        "disabled": !_vm.canBuyBuilding(building, 100)
-      },
-      on: {
-        "click": function($event) {
-          _vm.buyBuilding(building, 100)
-        }
-      }
-    }, [_vm._v("Buy 100 (" + _vm._s(_vm._f("crackers")(_vm.buildingCost(building, 100))) + ")")])])]) : _vm._e()
+    }, [_vm._v("Buy (" + _vm._s(_vm._f("crackers")(_vm.buildingCost(building))) + ")")])])]) : _vm._e()
   })], 2)]), _vm._v(" "), _c('div', {
     staticClass: "col-md-3"
   }, [_c('div', {

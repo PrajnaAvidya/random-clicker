@@ -16,6 +16,14 @@
             <div class="row buildings">
                 <h3>Buildings</h3>
 
+                <div class="row buy-sell-buttons">
+                    <div class="col-xs-12">
+                        <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 1 }" @click="setBuyAmount(1)">Buy 1</button>
+                        <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 10 }" @click="setBuyAmount(10)">Buy 10</button>
+                        <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 100 }" @click="setBuyAmount(100)">Buy 100</button>
+                    </div>
+                </div>
+
                 <div class="row building" v-for="building in buildings" v-if="building.owned > 0 || showBuilding(building)">
                     <div class="col-xs-3">
 
@@ -23,13 +31,7 @@
                         {{ building.name }}<br />({{ building.owned }} owned)
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy 1 ({{ buildingCost(building) | crackers }})</button>
-                    </div>
-                    <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building, 10)" :disabled="!canBuyBuilding(building, 10)">Buy 10 ({{ buildingCost(building, 10) | crackers }})</button>
-                    </div>
-                    <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building, 100)" :disabled="!canBuyBuilding(building, 100)">Buy 100 ({{ buildingCost(building, 100) | crackers }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ buildingCost(building) | crackers }})</button>
                     </div>
                 </div>
             </div>
@@ -61,6 +63,7 @@
                 clicks: Big(0),
                 cps: Big(0),
                 clickPower: Big(1),
+                buyAmount: 1,
 
                 buildings: [
                     { name: 'Finger', baseCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
@@ -174,6 +177,7 @@
                 _sortedUpgrades: null
             }
         },
+
         computed: {
             sortedUpgrades: function () {
                 if (this._sortedUpgrades == null) {
@@ -188,6 +192,7 @@
                 return this._sortedUpgrades;
             }
         },
+
         methods: {
             // clicking/cps
             crackerClick: function () {
@@ -220,21 +225,22 @@
             showBuilding: function (building) {
                 return this.totalCrackers.gte(building.showAt);
             },
-            canBuyBuilding: function (building, amount = 1) {
-                return this.crackers.gte(this.buildingCost(building, amount));
+            canBuyBuilding: function (building) {
+                return this.crackers.gte(this.buildingCost(building, this.buyAmount));
             },
-            buyBuilding: function (building, amount = 1) {
-                if (this.canBuyBuilding(building, amount)) {
-                    this.crackers = this.crackers.minus(this.buildingCost(building, amount));
-                    building.owned += amount;
+            buyBuilding: function (building) {
+                if (this.canBuyBuilding(building, this.buyAmount)) {
+                    this.crackers = this.crackers.minus(this.buildingCost(building));
+                    building.owned += this.buyAmount;
 
                     this.recalculateCps();
                     this.recalculateClickPower();
                 }
             },
-            buildingCost: function (building, amount = 1) {
+            buildingCost: function (building) {
+                // TODO cache
                 Big.RM = 3;
-                return building.baseCost.times(Big(1.15).pow(building.owned + amount).minus(Big(1.15).pow(building.owned))).div(0.15).round();
+                return building.baseCost.times(Big(1.15).pow(building.owned + this.buyAmount).minus(Big(1.15).pow(building.owned))).div(0.15).round();
             },
             buildingCount: function (buildingName) {
                 return this.buildings.find(function (building) {
@@ -260,6 +266,9 @@
                 buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
                 buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + (building.currentCps * building.owned) + " crackers per second";
                 return buildingText;
+            },
+            setBuyAmount: function (amount) {
+                this.buyAmount = amount;
             },
 
             // upgrades
@@ -370,6 +379,10 @@
     .totals,
     .cracker {
         text-align: center;
+    }
+    
+    .buy-sell-buttons {
+        margin-bottom: 20px;
     }
     
     .upgrade-link {
