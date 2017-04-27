@@ -10096,7 +10096,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = {
     data: function data() {
         return {
-            crackers: (0, _big2.default)(1E21),
+            crackers: (0, _big2.default)(0),
             totalCrackers: (0, _big2.default)(0),
             clicks: (0, _big2.default)(0),
             cps: (0, _big2.default)(0),

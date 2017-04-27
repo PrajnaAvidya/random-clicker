@@ -56,7 +56,7 @@
     export default {
         data: function () {
             return {
-                crackers: Big(1E21),
+                crackers: Big(0),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
