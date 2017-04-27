@@ -286,12 +286,12 @@
                 if (value < 10) {
                     return Number((value).toFixed(1));
                 } else {
-                    return Math.ceil(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
             },
             crackers: function (value) {
                 if (value < 9999999) {
-                    return Math.ceil(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
                     return value.toExponential(3);
                 }

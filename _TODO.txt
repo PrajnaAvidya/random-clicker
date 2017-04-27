@@ -5,6 +5,7 @@ achivements
 - check for total crackers/cps every second?
 - tea (milk) + upgrades
 other non-standard upgrades
+- toddler forms
 grey-out unaffordable buildings
 sell buildings
 hide next building name until can afford
