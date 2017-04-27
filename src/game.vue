@@ -31,7 +31,7 @@
                         {{ building.name }}<br />({{ building.owned }} owned)
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ buildingCost(building) | crackers }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | crackers }})</button>
                     </div>
                 </div>
             </div>
@@ -66,14 +66,14 @@
                 buyAmount: 1,
 
                 buildings: [
-                    { name: 'Finger', baseCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
-                    { name: 'Toddler', baseCost: Big(100), baseCps: Big(1), currentCps: Big(1), description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: Big(0), owned: 0 },
-                    { name: 'Kosher Bakery', baseCost: Big(1100), baseCps: Big(8), currentCps: Big(8), description: "These guys seem to know what they're doing.", showAt: Big(15), owned: 0 },
-                    { name: 'Non-Kosher Bakery', baseCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "These guys don't follow the rules!", showAt: Big(100), owned: 0 },
-                    { name: 'Tea Club', baseCost: Big(130000), baseCps: Big(260), currentCps: Big(260), description: "These ladies LOVE crackers with their tea", showAt: Big(1100), owned: 0 },
-                    { name: 'Cracker Factory', baseCost: Big(1.4E6), baseCps: Big(1400), currentCps: Big(1400), description: "Seems only logical", showAt: Big(12000), owned: 0 },
-                    { name: 'Cracker Warehouse', baseCost: Big(20E6), baseCps: Big(7800), currentCps: Big(7800), description: "We need more space to store all these crackers!", showAt: Big(130000), owned: 0 },
-                    { name: 'Food Lab', baseCost: Big(330E6), baseCps: Big(44000), currentCps: Big(44000), description: "Genetically engineered crackers?", showAt: Big(1.4E6), owned: 0 },
+                    { name: 'Finger', baseCost: Big(15), buyCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
+                    { name: 'Toddler', baseCost: Big(100), buyCost: Big(100), baseCps: Big(1), currentCps: Big(1), description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: Big(0), owned: 0 },
+                    { name: 'Kosher Bakery', baseCost: Big(1100), buyCost: Big(1100), baseCps: Big(8), currentCps: Big(8), description: "These guys seem to know what they're doing.", showAt: Big(15), owned: 0 },
+                    { name: 'Non-Kosher Bakery', baseCost: Big(12000), buyCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "These guys don't follow the rules!", showAt: Big(100), owned: 0 },
+                    { name: 'Tea Club', baseCost: Big(130000), buyCost: Big(130000), baseCps: Big(260), currentCps: Big(260), description: "These ladies LOVE crackers with their tea", showAt: Big(1100), owned: 0 },
+                    { name: 'Cracker Factory', baseCost: Big(1.4E6), buyCost: Big(1.4E6), baseCps: Big(1400), currentCps: Big(1400), description: "Seems only logical", showAt: Big(12000), owned: 0 },
+                    { name: 'Cracker Warehouse', baseCost: Big(20E6), buyCost: Big(20E6), baseCps: Big(7800), currentCps: Big(7800), description: "We need more space to store all these crackers!", showAt: Big(130000), owned: 0 },
+                    { name: 'Food Lab', baseCost: Big(330E6), buyCost: Big(330E6), baseCps: Big(44000), currentCps: Big(44000), description: "Genetically engineered crackers?", showAt: Big(1.4E6), owned: 0 },
                 ],
 
                 upgrades: [
@@ -201,7 +201,7 @@
                 this.totalCrackers = this.totalCrackers.plus(this.clickPower);
             },
             recalculateClickPower: function () {
-                this.clickPower = this.upgradeMultiplier('Finger') + this.upgradeAddition();
+                this.clickPower = this.upgradeMultiplier('Finger').plus(this.upgradeAddition());
             },
             recalculateCps: function () {
                 let cps = Big(0);
@@ -235,10 +235,10 @@
 
                     this.recalculateCps();
                     this.recalculateClickPower();
+                    this.recalculateBuyCosts();
                 }
             },
             buildingCost: function (building) {
-                // TODO cache
                 Big.RM = 3;
                 return building.baseCost.times(Big(1.15).pow(building.owned + this.buyAmount).minus(Big(1.15).pow(building.owned))).div(0.15).round();
             },
@@ -269,6 +269,14 @@
             },
             setBuyAmount: function (amount) {
                 this.buyAmount = amount;
+
+                this.recalculateBuyCosts();
+            },
+            recalculateBuyCosts: function () {
+                let vm = this;
+                this.buildings.forEach(function (building) {
+                    building.buyCost = vm.buildingCost(building);
+                });
             },
 
             // upgrades
@@ -294,19 +302,19 @@
                 });
             },
             upgradeMultiplier: function (buildingType) {
-                let multiplier = 1;
+                let multiplier = Big(1);
                 this.activeUpgrades(buildingType).forEach(function (upgrade) {
                     if (upgrade.multiplier != null) {
-                        multiplier *= upgrade.multiplier;
+                        multiplier.times(upgrade.multiplier);
                     }
                 });
                 return multiplier;
             },
             upgradeAddition: function () {
-                let addition = 0;
+                let addition = Big(0);
                 this.activeUpgrades('Finger').forEach(function (upgrade) {
                     if (upgrade.addition != null) {
-                        addition += upgrade.addition;
+                        addition.plus(upgrade.addition);
                     }
                 });
                 return addition * this.otherBuildingCount('Finger');
@@ -328,14 +336,6 @@
                     upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
                 }
                 return upgradeText;
-            },
-            sortedUpgrades: function () {
-                /*upgrades.sort(function (a, b) {
-                    //console.log(a);
-                    return 1;
-                });*/
-                console.log(upgrades);
-                return upgrades;
             },
 
             // tick

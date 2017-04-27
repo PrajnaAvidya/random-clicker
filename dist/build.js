@@ -9487,7 +9487,7 @@ exports.default = {
             clickPower: (0, _big2.default)(1),
             buyAmount: 1,
 
-            buildings: [{ name: 'Finger', baseCost: (0, _big2.default)(15), baseCps: (0, _big2.default)(0.1), currentCps: (0, _big2.default)(0.1), description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 }, { name: 'Toddler', baseCost: (0, _big2.default)(100), baseCps: (0, _big2.default)(1), currentCps: (0, _big2.default)(1), description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: (0, _big2.default)(0), owned: 0 }, { name: 'Kosher Bakery', baseCost: (0, _big2.default)(1100), baseCps: (0, _big2.default)(8), currentCps: (0, _big2.default)(8), description: "These guys seem to know what they're doing.", showAt: (0, _big2.default)(15), owned: 0 }, { name: 'Non-Kosher Bakery', baseCost: (0, _big2.default)(12000), baseCps: (0, _big2.default)(47), currentCps: (0, _big2.default)(47), description: "These guys don't follow the rules!", showAt: (0, _big2.default)(100), owned: 0 }, { name: 'Tea Club', baseCost: (0, _big2.default)(130000), baseCps: (0, _big2.default)(260), currentCps: (0, _big2.default)(260), description: "These ladies LOVE crackers with their tea", showAt: (0, _big2.default)(1100), owned: 0 }, { name: 'Cracker Factory', baseCost: (0, _big2.default)(1.4E6), baseCps: (0, _big2.default)(1400), currentCps: (0, _big2.default)(1400), description: "Seems only logical", showAt: (0, _big2.default)(12000), owned: 0 }, { name: 'Cracker Warehouse', baseCost: (0, _big2.default)(20E6), baseCps: (0, _big2.default)(7800), currentCps: (0, _big2.default)(7800), description: "We need more space to store all these crackers!", showAt: (0, _big2.default)(130000), owned: 0 }, { name: 'Food Lab', baseCost: (0, _big2.default)(330E6), baseCps: (0, _big2.default)(44000), currentCps: (0, _big2.default)(44000), description: "Genetically engineered crackers?", showAt: (0, _big2.default)(1.4E6), owned: 0 }],
+            buildings: [{ name: 'Finger', baseCost: (0, _big2.default)(15), buyCost: (0, _big2.default)(15), baseCps: (0, _big2.default)(0.1), currentCps: (0, _big2.default)(0.1), description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 }, { name: 'Toddler', baseCost: (0, _big2.default)(100), buyCost: (0, _big2.default)(100), baseCps: (0, _big2.default)(1), currentCps: (0, _big2.default)(1), description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: (0, _big2.default)(0), owned: 0 }, { name: 'Kosher Bakery', baseCost: (0, _big2.default)(1100), buyCost: (0, _big2.default)(1100), baseCps: (0, _big2.default)(8), currentCps: (0, _big2.default)(8), description: "These guys seem to know what they're doing.", showAt: (0, _big2.default)(15), owned: 0 }, { name: 'Non-Kosher Bakery', baseCost: (0, _big2.default)(12000), buyCost: (0, _big2.default)(12000), baseCps: (0, _big2.default)(47), currentCps: (0, _big2.default)(47), description: "These guys don't follow the rules!", showAt: (0, _big2.default)(100), owned: 0 }, { name: 'Tea Club', baseCost: (0, _big2.default)(130000), buyCost: (0, _big2.default)(130000), baseCps: (0, _big2.default)(260), currentCps: (0, _big2.default)(260), description: "These ladies LOVE crackers with their tea", showAt: (0, _big2.default)(1100), owned: 0 }, { name: 'Cracker Factory', baseCost: (0, _big2.default)(1.4E6), buyCost: (0, _big2.default)(1.4E6), baseCps: (0, _big2.default)(1400), currentCps: (0, _big2.default)(1400), description: "Seems only logical", showAt: (0, _big2.default)(12000), owned: 0 }, { name: 'Cracker Warehouse', baseCost: (0, _big2.default)(20E6), buyCost: (0, _big2.default)(20E6), baseCps: (0, _big2.default)(7800), currentCps: (0, _big2.default)(7800), description: "We need more space to store all these crackers!", showAt: (0, _big2.default)(130000), owned: 0 }, { name: 'Food Lab', baseCost: (0, _big2.default)(330E6), buyCost: (0, _big2.default)(330E6), baseCps: (0, _big2.default)(44000), currentCps: (0, _big2.default)(44000), description: "Genetically engineered crackers?", showAt: (0, _big2.default)(1.4E6), owned: 0 }],
 
             upgrades: [
             // production
@@ -9544,7 +9544,7 @@ exports.default = {
             this.totalCrackers = this.totalCrackers.plus(this.clickPower);
         },
         recalculateClickPower: function recalculateClickPower() {
-            this.clickPower = this.upgradeMultiplier('Finger') + this.upgradeAddition();
+            this.clickPower = this.upgradeMultiplier('Finger').plus(this.upgradeAddition());
         },
         recalculateCps: function recalculateCps() {
             var cps = (0, _big2.default)(0);
@@ -9578,10 +9578,10 @@ exports.default = {
 
                 this.recalculateCps();
                 this.recalculateClickPower();
+                this.recalculateBuyCosts();
             }
         },
         buildingCost: function buildingCost(building) {
-            // TODO cache
             _big2.default.RM = 3;
             return building.baseCost.times((0, _big2.default)(1.15).pow(building.owned + this.buyAmount).minus((0, _big2.default)(1.15).pow(building.owned))).div(0.15).round();
         },
@@ -9612,6 +9612,14 @@ exports.default = {
         },
         setBuyAmount: function setBuyAmount(amount) {
             this.buyAmount = amount;
+
+            this.recalculateBuyCosts();
+        },
+        recalculateBuyCosts: function recalculateBuyCosts() {
+            var vm = this;
+            this.buildings.forEach(function (building) {
+                building.buyCost = vm.buildingCost(building);
+            });
         },
 
         // upgrades
@@ -9637,19 +9645,19 @@ exports.default = {
             });
         },
         upgradeMultiplier: function upgradeMultiplier(buildingType) {
-            var multiplier = 1;
+            var multiplier = (0, _big2.default)(1);
             this.activeUpgrades(buildingType).forEach(function (upgrade) {
                 if (upgrade.multiplier != null) {
-                    multiplier *= upgrade.multiplier;
+                    multiplier.times(upgrade.multiplier);
                 }
             });
             return multiplier;
         },
         upgradeAddition: function upgradeAddition() {
-            var addition = 0;
+            var addition = (0, _big2.default)(0);
             this.activeUpgrades('Finger').forEach(function (upgrade) {
                 if (upgrade.addition != null) {
-                    addition += upgrade.addition;
+                    addition.plus(upgrade.addition);
                 }
             });
             return addition * this.otherBuildingCount('Finger');
@@ -9671,14 +9679,6 @@ exports.default = {
                 upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
             }
             return upgradeText;
-        },
-        sortedUpgrades: function sortedUpgrades() {
-            /*upgrades.sort(function (a, b) {
-                //console.log(a);
-                return 1;
-            });*/
-            console.log(upgrades);
-            return upgrades;
         },
 
         // tick
@@ -13224,7 +13224,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.buyBuilding(building)
         }
       }
-    }, [_vm._v("Buy (" + _vm._s(_vm._f("crackers")(_vm.buildingCost(building))) + ")")])])]) : _vm._e()
+    }, [_vm._v("Buy (" + _vm._s(_vm._f("crackers")(building.buyCost)) + ")")])])]) : _vm._e()
   })], 2)]), _vm._v(" "), _c('div', {
     staticClass: "col-md-3"
   }, [_c('div', {
