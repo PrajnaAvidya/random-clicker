@@ -1,6 +1,7 @@
 achivements
 - ui
 - building achievements
+- sell achivements
 - click achievements
 - check for total crackers/cps every second?
 - tea (milk) + upgrades

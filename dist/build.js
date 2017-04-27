@@ -9517,7 +9517,21 @@ exports.default = {
 
             // food lab (wizard tower)
             { type: 'Food Lab', name: 'Need Name', needed: 1, cost: (0, _big2.default)(3.3E9), multiplier: 2, description: "Need Description", active: false }, { type: 'Food Lab', name: 'Need Name', needed: 5, cost: (0, _big2.default)(16.5E9), multiplier: 2, description: "Need Description", active: false }, { type: 'Food Lab', name: 'Need Name', needed: 25, cost: (0, _big2.default)(165E9), multiplier: 2, description: "Need Description", active: false }, { type: 'Food Lab', name: 'Need Name', needed: 50, cost: (0, _big2.default)(16.5E12), multiplier: 2, description: "Need Description", active: false }, { type: 'Food Lab', name: 'Need Name', needed: 100, cost: (0, _big2.default)(1.65E15), multiplier: 2, description: "Need Description", active: false }, { type: 'Food Lab', name: 'Need Name', needed: 150, cost: (0, _big2.default)(165E15), multiplier: 2, description: "Need Description", active: false }, { type: 'Food Lab', name: 'Need Name', needed: 200, cost: (0, _big2.default)(165E18), multiplier: 2, description: "Need Description", active: false }, { type: 'Food Lab', name: 'Need Name', needed: 250, cost: (0, _big2.default)(165E21), multiplier: 2, description: "Need Description", active: false }],
-            _sortedUpgrades: null
+
+            _sortedUpgrades: null,
+
+            achivements: [
+            // total crackers
+            { type: 'Cracker', name: 'Cracker', total: (0, _big2.default)(1) }, { type: 'Cracker', name: 'Crackers', total: (0, _big2.default)(1000) },
+
+            // cps
+            { type: 'Cracker', name: 'Casual baking', cps: (0, _big2.default)(1) }, { type: 'Cracker', name: 'Hardcore baking', cps: (0, _big2.default)(10) },
+
+            // clicking
+            { type: 'Cracker', name: 'Clicktastic', clicks: (0, _big2.default)(10000) }, { type: 'Cracker', name: 'Clickathon', clicks: (0, _big2.default)(100000) },
+
+            // buildings
+            { type: 'Finger', name: 'Click', total: (0, _big2.default)(1) }, { type: 'Finger', name: 'Double Click', total: (0, _big2.default)(2) }, { type: 'Toddler', name: 'Toddler basics', total: (0, _big2.default)(1) }, { type: 'Toddler', name: 'Toddler proficiency', total: (0, _big2.default)(50) }]
         };
     },
 

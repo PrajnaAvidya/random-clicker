@@ -174,7 +174,29 @@
                     { type: 'Food Lab', name: 'Need Name', needed: 200, cost: Big(165E18), multiplier: 2, description: "Need Description", active: false },
                     { type: 'Food Lab', name: 'Need Name', needed: 250, cost: Big(165E21), multiplier: 2, description: "Need Description", active: false },
                 ],
-                _sortedUpgrades: null
+
+                _sortedUpgrades: null,
+
+                achivements: [
+                    // total crackers
+                    { type: 'Cracker', name: 'Cracker', total: Big(1) },
+                    { type: 'Cracker', name: 'Crackers', total: Big(1000) },
+
+                    // cps
+                    { type: 'Cracker', name: 'Casual baking', cps: Big(1) },
+                    { type: 'Cracker', name: 'Hardcore baking', cps: Big(10) },
+
+                    // clicking
+                    { type: 'Cracker', name: 'Clicktastic', clicks: Big(10000) },
+                    { type: 'Cracker', name: 'Clickathon', clicks: Big(100000) },
+
+                    // buildings
+                    { type: 'Finger', name: 'Click', total: Big(1) },
+                    { type: 'Finger', name: 'Double Click', total: Big(2) },
+
+                    { type: 'Toddler', name: 'Toddler basics', total: Big(1) },
+                    { type: 'Toddler', name: 'Toddler proficiency', total: Big(50) },
+                ],
             }
         },
 
