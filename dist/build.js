@@ -10175,10 +10175,15 @@ exports.default = {
         showBuilding: function showBuilding(building) {
             return this.totalCrackers >= building.showAt;
         },
+        canBuyBuilding: function canBuyBuilding(building) {
+            var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+            return this.crackers >= this.buildingCost(building, amount);
+        },
         buyBuilding: function buyBuilding(building) {
             var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
-            if (this.crackers >= this.buildingCost(building, amount)) {
+            if (this.canBuyBuilding(building, amount)) {
                 this.crackers = this.crackers.minus(this.buildingCost(building, amount));
                 building.owned += amount;
 
@@ -13779,6 +13784,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "col-xs-2"
     }, [_c('button', {
       staticClass: "btn btn-default",
+      attrs: {
+        "disabled": !_vm.canBuyBuilding(building)
+      },
       on: {
         "click": function($event) {
           _vm.buyBuilding(building)
@@ -13788,6 +13796,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "col-xs-2"
     }, [_c('button', {
       staticClass: "btn btn-default",
+      attrs: {
+        "disabled": !_vm.canBuyBuilding(building, 10)
+      },
       on: {
         "click": function($event) {
           _vm.buyBuilding(building, 10)
@@ -13797,6 +13808,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "col-xs-2"
     }, [_c('button', {
       staticClass: "btn btn-default",
+      attrs: {
+        "disabled": !_vm.canBuyBuilding(building, 100)
+      },
       on: {
         "click": function($event) {
           _vm.buyBuilding(building, 100)

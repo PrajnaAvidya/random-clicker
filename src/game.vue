@@ -23,13 +23,13 @@
                         {{ building.name }}<br />({{ building.owned }} owned)
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building)">Buy 1 ({{ buildingCost(building) | crackers }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy 1 ({{ buildingCost(building) | crackers }})</button>
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building, 10)">Buy 10 ({{ buildingCost(building, 10) | crackers }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building, 10)" :disabled="!canBuyBuilding(building, 10)">Buy 10 ({{ buildingCost(building, 10) | crackers }})</button>
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building, 100)">Buy 100 ({{ buildingCost(building, 100) | crackers }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building, 100)" :disabled="!canBuyBuilding(building, 100)">Buy 100 ({{ buildingCost(building, 100) | crackers }})</button>
                     </div>
                 </div>
             </div>
@@ -178,8 +178,11 @@
             showBuilding: function (building) {
                 return this.totalCrackers >= building.showAt;
             },
+            canBuyBuilding: function (building, amount = 1) {
+                return this.crackers >= this.buildingCost(building, amount);
+            },
             buyBuilding: function (building, amount = 1) {
-                if (this.crackers >= this.buildingCost(building, amount)) {
+                if (this.canBuyBuilding(building, amount)) {
                     this.crackers = this.crackers.minus(this.buildingCost(building, amount));
                     building.owned += amount;
 

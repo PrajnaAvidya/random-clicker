@@ -6,7 +6,7 @@ achivements
 - tea (milk) + upgrades
 other non-standard upgrades
 - toddler forms
-grey-out unaffordable buildings
 sell buildings
 hide next building name until can afford
 save data
+migrate ALL numbers to big.js
