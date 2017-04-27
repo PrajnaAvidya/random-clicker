@@ -58,7 +58,7 @@
     export default {
         data: function () {
             return {
-                crackers: Big(1E24),
+                crackers: Big(100000),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -69,7 +69,7 @@
                     { name: 'Cursor', baseCost: Big(15), buyCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
                     { name: 'Grandma', baseCost: Big(100), buyCost: Big(100), baseCps: Big(1), currentCps: Big(1), description: "", showAt: Big(0), owned: 0 },
                     { name: 'Farm', baseCost: Big(1100), buyCost: Big(1100), baseCps: Big(8), currentCps: Big(8), description: "", showAt: Big(15), owned: 0 },
-                    { name: 'Mine', baseCost: Big(12000), buyCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "!", showAt: Big(100), owned: 0 },
+                    { name: 'Mine', baseCost: Big(12000), buyCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "", showAt: Big(100), owned: 0 },
                     { name: 'Factory', baseCost: Big(130000), buyCost: Big(130000), baseCps: Big(260), currentCps: Big(260), description: "", showAt: Big(1100), owned: 0 },
                     { name: 'Bank', baseCost: Big(1.4E6), buyCost: Big(1.4E6), baseCps: Big(1400), currentCps: Big(1400), description: "", showAt: Big(12000), owned: 0 },
                     { name: 'Temple', baseCost: Big(20E6), buyCost: Big(20E6), baseCps: Big(7800), currentCps: Big(7800), description: "", showAt: Big(130000), owned: 0 },
@@ -85,93 +85,93 @@
 
                 upgrades: [
                     // production
-                    { type: 'Cracker', name: 'Store Brand Crackers', needed: Big(50000), cost: Big(999999), multiplier: 1.01, description: 'Meh', active: false },
-                    { type: 'Cracker', name: 'Fancy Store Crackers', needed: Big(250000), cost: Big(5E6), multiplier: 1.01, description: 'Ok I guess', active: false },
-                    { type: 'Cracker', name: 'Rye Crackers', needed: Big(500000), cost: Big(10E6), multiplier: 1.01, description: 'Better than cardboard', active: false },
-                    { type: 'Cracker', name: 'Sugared Crackers', needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01, description: 'Gross?', active: false },
-                    { type: 'Cracker', name: 'Saltine Crackers', needed: Big(5E6), cost: Big(100E6), multiplier: 1.01, description: 'That seems reasonable', active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(25E6), cost: Big(500E6), multiplier: 1.02, description: 'Need Description', active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(50E6), cost: Big(1E9), multiplier: 1.02, description: 'Need Description', active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(250E6), cost: Big(5E9), multiplier: 1.02, description: 'Need Description', active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(500E6), cost: Big(10E9), multiplier: 1.02, description: 'Need Description', active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02, description: 'Need Description', active: false },
+                    { type: 'Cracker', name: 'Store Brand Crackers', needed: Big(50000), cost: Big(999999), multiplier: 1.01, description: 'Meh', unlocked: false, active: false },
+                    { type: 'Cracker', name: 'Fancy Store Crackers', needed: Big(250000), cost: Big(5E6), multiplier: 1.01, description: 'Ok I guess', unlocked: false, active: false },
+                    { type: 'Cracker', name: 'Rye Crackers', needed: Big(500000), cost: Big(10E6), multiplier: 1.01, description: 'Better than cardboard', unlocked: false, active: false },
+                    { type: 'Cracker', name: 'Sugared Crackers', needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01, description: 'Gross?', unlocked: false, active: false },
+                    { type: 'Cracker', name: 'Saltine Crackers', needed: Big(5E6), cost: Big(100E6), multiplier: 1.01, description: 'That seems reasonable', unlocked: false, active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(25E6), cost: Big(500E6), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(50E6), cost: Big(1E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(250E6), cost: Big(5E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(500E6), cost: Big(10E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
+                    { type: 'Cracker', name: 'Need Name', needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
                     // 4% etc
 
-                    { type: 'Cursor', name: 'Double Tap', needed: 1, cost: Big(100), multiplier: 2, description: 'Tap faster', active: false },
-                    { type: 'Cursor', name: 'Quattro Tap', needed: 1, cost: Big(500), multiplier: 2, description: 'Tap faster!', active: false },
-                    { type: 'Cursor', name: 'Mega Tap', needed: 10, cost: Big(10000), multiplier: 2, description: 'Tap even faster!!', active: false },
-                    { type: 'Cursor', name: 'Middle Cursor', needed: 20, cost: Big(100000), addition: 0.1, description: 'Put that thing away.', active: false },
-                    { type: 'Cursor', name: 'Double Middle Cursor', needed: 40, cost: Big(10E6), addition: 0.5, description: 'Put those away.', active: false },
-                    { type: 'Cursor', name: 'Extra Middle Cursors', needed: 80, cost: Big(100E6), addition: 5, description: "Now that's just rude.", active: false },
-                    { type: 'Cursor', name: 'Super Cursor', needed: 120, cost: Big(1E9), addition: 50, description: "No decorum at all.", active: false },
-                    { type: 'Cursor', name: 'Super Duper Cursor', needed: 160, cost: Big(10E9), addition: 500, description: "Need Description", active: false },
-                    { type: 'Cursor', name: 'Mega Cursor', needed: 200, cost: Big(10E12), addition: 5000, description: "Need Description", active: false },
-                    { type: 'Cursor', name: 'Turbo Cursor', needed: 240, cost: Big(100E12), addition: 50000, description: "Need Description", active: false },
-                    { type: 'Cursor', name: 'Ultra Cursor', needed: 280, cost: Big(1E12), addition: 500000, description: "Need Description", active: false },
-                    { type: 'Cursor', name: 'Ultimate Cursor', needed: 320, cost: Big(10E15), addition: 5000000, description: "Need Description", active: false },
+                    { type: 'Cursor', name: 'Double Tap', needed: 1, cost: Big(100), multiplier: 2, description: 'Tap faster', unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Quattro Tap', needed: 1, cost: Big(500), multiplier: 2, description: 'Tap faster!', unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Mega Tap', needed: 10, cost: Big(10000), multiplier: 2, description: 'Tap even faster!!', unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Middle Finger', needed: 20, cost: Big(100000), addition: 0.1, description: 'Put that thing away.', unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Double Middle Finger', needed: 40, cost: Big(10E6), addition: 0.5, description: 'Put those away.', unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Extra Middle Fingers', needed: 80, cost: Big(100E6), addition: 5, description: "Now that's just rude.", unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Super Finger', needed: 120, cost: Big(1E9), addition: 50, description: "No decorum at all.", unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Super Duper Finger', needed: 160, cost: Big(10E9), addition: 500, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Mega Finger', needed: 200, cost: Big(10E12), addition: 5000, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Turbo Finger', needed: 240, cost: Big(100E12), addition: 50000, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Ultra Finger', needed: 280, cost: Big(1E12), addition: 500000, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Cursor', name: 'Ultimate Finger', needed: 320, cost: Big(10E15), addition: 5000000, description: "Need Description", unlocked: false, active: false },
 
-                    { type: 'Grandma', name: 'Timeout', needed: 1, cost: Big(1000), multiplier: 2, description: 'These toddlers need to learn some discipline', active: false },
-                    { type: 'Grandma', name: 'Daycare', needed: 5, cost: Big(5000), multiplier: 2, description: 'Finally, some me time!', active: false },
-                    { type: 'Grandma', name: 'Play Date', needed: 25, cost: Big(50000), multiplier: 2, description: 'An active social life is good for productivity', active: false },
-                    { type: 'Grandma', name: 'ADHD Meds', needed: 50, cost: Big(5E6), multiplier: 2, description: "That's better...", active: false },
-                    { type: 'Grandma', name: 'Jack', needed: 100, cost: Big(500E6), multiplier: 2, description: "Like that movie?", active: false },
-                    { type: 'Grandma', name: 'Jack & Jill', needed: 150, cost: Big(50E9), multiplier: 2, description: "The worst Adam Sandler movie", active: false },
-                    { type: 'Grandma', name: 'Need Name', needed: 200, cost: Big(50E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Grandma', name: 'Need Name', needed: 250, cost: Big(50E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Grandma', name: 'Timeout', needed: 1, cost: Big(1000), multiplier: 2, description: 'These toddlers need to learn some discipline', unlocked: false, active: false },
+                    { type: 'Grandma', name: 'Daycare', needed: 5, cost: Big(5000), multiplier: 2, description: 'Finally, some me time!', unlocked: false, active: false },
+                    { type: 'Grandma', name: 'Play Date', needed: 25, cost: Big(50000), multiplier: 2, description: 'An active social life is good for productivity', unlocked: false, active: false },
+                    { type: 'Grandma', name: 'ADHD Meds', needed: 50, cost: Big(5E6), multiplier: 2, description: "That's better...", unlocked: false, active: false },
+                    { type: 'Grandma', name: 'Jack', needed: 100, cost: Big(500E6), multiplier: 2, description: "Like that movie?", unlocked: false, active: false },
+                    { type: 'Grandma', name: 'Jack & Jill', needed: 150, cost: Big(50E9), multiplier: 2, description: "The worst Adam Sandler movie", unlocked: false, active: false },
+                    { type: 'Grandma', name: 'Need Name', needed: 200, cost: Big(50E12), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Grandma', name: 'Need Name', needed: 250, cost: Big(50E15), multiplier: 2, description: "Need Description", unlocked: false, active: false },
 
-                    { type: 'Farm', name: 'Torah', needed: 1, cost: Big(11000), multiplier: 2, description: 'Got to follow the rules', active: false },
-                    { type: 'Farm', name: 'Another Torah', needed: 5, cost: Big(55000), multiplier: 2, description: 'More to go around', active: false },
-                    { type: 'Farm', name: 'Rabbi', needed: 25, cost: Big(550000), multiplier: 2, description: "This rabbi doesn't come cheap", active: false },
-                    { type: 'Farm', name: 'Rabbi Council', needed: 50, cost: Big(55E6), multiplier: 2, description: "These rabbis don't come cheap", active: false },
-                    { type: 'Farm', name: 'Passover Bonus', needed: 100, cost: Big(5.5E9), multiplier: 2, description: "What does that even mean?", active: false },
-                    { type: 'Farm', name: 'Need Name', needed: 150, cost: Big(550E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Farm', name: 'Need Name', needed: 200, cost: Big(550E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Farm', name: 'Need Name', needed: 250, cost: Big(550E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Farm', name: 'Torah', needed: 1, cost: Big(11000), multiplier: 2, description: 'Got to follow the rules', unlocked: false, active: false },
+                    { type: 'Farm', name: 'Another Torah', needed: 5, cost: Big(55000), multiplier: 2, description: 'More to go around', unlocked: false, active: false },
+                    { type: 'Farm', name: 'Rabbi', needed: 25, cost: Big(550000), multiplier: 2, description: "This rabbi doesn't come cheap", unlocked: false, active: false },
+                    { type: 'Farm', name: 'Rabbi Council', needed: 50, cost: Big(55E6), multiplier: 2, description: "These rabbis don't come cheap", unlocked: false, active: false },
+                    { type: 'Farm', name: 'Passover Bonus', needed: 100, cost: Big(5.5E9), multiplier: 2, description: "What does that even mean?", unlocked: false, active: false },
+                    { type: 'Farm', name: 'Need Name', needed: 150, cost: Big(550E9), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Farm', name: 'Need Name', needed: 200, cost: Big(550E12), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Farm', name: 'Need Name', needed: 250, cost: Big(550E15), multiplier: 2, description: "Need Description", unlocked: false, active: false },
 
-                    { type: 'Mine', name: 'Knockoff Torah', needed: 1, cost: Big(120000), multiplier: 2, description: "This doesn't seem legit...", active: false },
-                    { type: 'Mine', name: 'Another Knockoff Torah', needed: 5, cost: Big(600000), multiplier: 2, description: "??", active: false },
-                    { type: 'Mine', name: 'Fake Rabbi', needed: 25, cost: Big(6E6), multiplier: 2, description: "I don't think his beard is real", active: false },
-                    { type: 'Mine', name: 'Fake Rabbi Council', needed: 50, cost: Big(600E6), multiplier: 2, description: "I have a bad feeling about this", active: false },
-                    { type: 'Mine', name: 'Fake Passover Bonus', needed: 100, cost: Big(60E9), multiplier: 2, description: "What does that even mean?!", active: false },
-                    { type: 'Mine', name: 'Need Name', needed: 150, cost: Big(6E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Mine', name: 'Need Name', needed: 200, cost: Big(6E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Mine', name: 'Need Name', needed: 250, cost: Big(6E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Mine', name: 'Knockoff Torah', needed: 1, cost: Big(120000), multiplier: 2, description: "This doesn't seem legit...", unlocked: false, active: false },
+                    { type: 'Mine', name: 'Another Knockoff Torah', needed: 5, cost: Big(600000), multiplier: 2, description: "??", unlocked: false, active: false },
+                    { type: 'Mine', name: 'Fake Rabbi', needed: 25, cost: Big(6E6), multiplier: 2, description: "I don't think his beard is real", unlocked: false, active: false },
+                    { type: 'Mine', name: 'Fake Rabbi Council', needed: 50, cost: Big(600E6), multiplier: 2, description: "I have a bad feeling about this", unlocked: false, active: false },
+                    { type: 'Mine', name: 'Fake Passover Bonus', needed: 100, cost: Big(60E9), multiplier: 2, description: "What does that even mean?!", unlocked: false, active: false },
+                    { type: 'Mine', name: 'Need Name', needed: 150, cost: Big(6E12), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Mine', name: 'Need Name', needed: 200, cost: Big(6E15), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Mine', name: 'Need Name', needed: 250, cost: Big(6E18), multiplier: 2, description: "Need Description", unlocked: false, active: false },
 
-                    { type: 'Factory', name: 'Strumpets', needed: 1, cost: Big(1.3E6), multiplier: 2, description: "What are we, savages?", active: false },
-                    { type: 'Factory', name: 'Valet', needed: 5, cost: Big(6.5E6), multiplier: 2, description: "I'm too rich to park my car", active: false },
-                    { type: 'Factory', name: 'Servant', needed: 25, cost: Big(65E6), multiplier: 2, description: "It's not technically slavery!", active: false },
-                    { type: 'Factory', name: 'Free trade tea', needed: 50, cost: Big(6.5E9), multiplier: 2, description: "I feel so much better about this", active: false },
-                    { type: 'Factory', name: 'Slavery tea', needed: 100, cost: Big(650E9), multiplier: 2, description: "Suffering tastes better", active: false },
-                    { type: 'Factory', name: 'Need Name', needed: 150, cost: Big(65E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Factory', name: 'Need Name', needed: 200, cost: Big(65E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Factory', name: 'Need Name', needed: 250, cost: Big(65E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Factory', name: 'Strumpets', needed: 1, cost: Big(1.3E6), multiplier: 2, description: "What are we, savages?", unlocked: false, active: false },
+                    { type: 'Factory', name: 'Valet', needed: 5, cost: Big(6.5E6), multiplier: 2, description: "I'm too rich to park my car", unlocked: false, active: false },
+                    { type: 'Factory', name: 'Servant', needed: 25, cost: Big(65E6), multiplier: 2, description: "It's not technically slavery!", unlocked: false, active: false },
+                    { type: 'Factory', name: 'Free trade tea', needed: 50, cost: Big(6.5E9), multiplier: 2, description: "I feel so much better about this", unlocked: false, active: false },
+                    { type: 'Factory', name: 'Slavery tea', needed: 100, cost: Big(650E9), multiplier: 2, description: "Suffering tastes better", unlocked: false, active: false },
+                    { type: 'Factory', name: 'Need Name', needed: 150, cost: Big(65E12), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Factory', name: 'Need Name', needed: 200, cost: Big(65E15), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Factory', name: 'Need Name', needed: 250, cost: Big(65E18), multiplier: 2, description: "Need Description", unlocked: false, active: false },
 
-                    { type: 'Bank', name: 'Strumpets', needed: 1, cost: Big(14E6), multiplier: 2, description: "What are we, savages?", active: false },
-                    { type: 'Bank', name: 'Valet', needed: 5, cost: Big(70E6), multiplier: 2, description: "I'm too rich to park my car", active: false },
-                    { type: 'Bank', name: 'Servant', needed: 25, cost: Big(700E6), multiplier: 2, description: "It's not technically slavery!", active: false },
-                    { type: 'Bank', name: 'Free trade tea', needed: 50, cost: Big(70E9), multiplier: 2, description: "I feel so much better about this", active: false },
-                    { type: 'Bank', name: 'Slavery tea', needed: 100, cost: Big(7E12), multiplier: 2, description: "Suffering tastes better", active: false },
-                    { type: 'Bank', name: 'Need Name', needed: 150, cost: Big(700E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Bank', name: 'Need Name', needed: 200, cost: Big(700E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Bank', name: 'Need Name', needed: 250, cost: Big(700E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Bank', name: 'Strumpets', needed: 1, cost: Big(14E6), multiplier: 2, description: "What are we, savages?", unlocked: false, active: false },
+                    { type: 'Bank', name: 'Valet', needed: 5, cost: Big(70E6), multiplier: 2, description: "I'm too rich to park my car", unlocked: false, active: false },
+                    { type: 'Bank', name: 'Servant', needed: 25, cost: Big(700E6), multiplier: 2, description: "It's not technically slavery!", unlocked: false, active: false },
+                    { type: 'Bank', name: 'Free trade tea', needed: 50, cost: Big(70E9), multiplier: 2, description: "I feel so much better about this", unlocked: false, active: false },
+                    { type: 'Bank', name: 'Slavery tea', needed: 100, cost: Big(7E12), multiplier: 2, description: "Suffering tastes better", unlocked: false, active: false },
+                    { type: 'Bank', name: 'Need Name', needed: 150, cost: Big(700E12), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Bank', name: 'Need Name', needed: 200, cost: Big(700E15), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Bank', name: 'Need Name', needed: 250, cost: Big(700E18), multiplier: 2, description: "Need Description", unlocked: false, active: false },
 
-                    { type: 'Temple', name: 'Need Name', needed: 1, cost: Big(200E6), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Temple', name: 'Need Name', needed: 5, cost: Big(1E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Temple', name: 'Need Name', needed: 25, cost: Big(10E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Temple', name: 'Need Name', needed: 50, cost: Big(1E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Temple', name: 'Need Name', needed: 100, cost: Big(100E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Temple', name: 'Need Name', needed: 150, cost: Big(10E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Temple', name: 'Need Name', needed: 200, cost: Big(10E18), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Temple', name: 'Need Name', needed: 250, cost: Big(10E21), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 1, cost: Big(200E6), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 5, cost: Big(1E9), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 25, cost: Big(10E9), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 50, cost: Big(1E12), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 100, cost: Big(100E12), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 150, cost: Big(10E15), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 200, cost: Big(10E18), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 250, cost: Big(10E21), multiplier: 2, description: "Need Description", unlocked: false, active: false },
 
-                    { type: 'Wizard Tower', name: 'Need Name', needed: 1, cost: Big(3.3E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Wizard Tower', name: 'Need Name', needed: 5, cost: Big(16.5E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Wizard Tower', name: 'Need Name', needed: 25, cost: Big(165E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Wizard Tower', name: 'Need Name', needed: 50, cost: Big(16.5E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Wizard Tower', name: 'Need Name', needed: 100, cost: Big(1.65E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Wizard Tower', name: 'Need Name', needed: 150, cost: Big(165E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Wizard Tower', name: 'Need Name', needed: 200, cost: Big(165E18), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Wizard Tower', name: 'Need Name', needed: 250, cost: Big(165E21), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 1, cost: Big(3.3E9), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 5, cost: Big(16.5E9), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 25, cost: Big(165E9), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 50, cost: Big(16.5E12), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 100, cost: Big(1.65E15), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 150, cost: Big(165E15), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 200, cost: Big(165E18), multiplier: 2, description: "Need Description", unlocked: false, active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 250, cost: Big(165E21), multiplier: 2, description: "Need Description", unlocked: false, active: false },
                 ],
 
                 _sortedUpgrades: null,
@@ -285,7 +285,7 @@
             buildingText: function (building) {
                 let buildingText = building.description;
                 buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
-                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + (building.currentCps * building.owned) + " crackers per second";
+                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.round(building.currentCps * building.owned) + " crackers per second";
                 return buildingText;
             },
             setBuyAmount: function (amount) {
@@ -302,10 +302,23 @@
 
             // upgrades
             canBuyUpgrade: function (upgrade) {
+                if (upgrade.unlocked == true) {
+                    return true;
+                }
                 if (upgrade.type == 'Cracker') {
-                    return this.crackers.gte(upgrade.needed);
+                    if (this.crackers.gte(upgrade.needed)) {
+                        upgrade.unlocked = true;
+                        return true;
+                    } else {
+                        return false;
+                    }
                 } else {
-                    return this.buildingCount(upgrade.type) >= upgrade.needed;
+                    if (this.buildingCount(upgrade.type) >= upgrade.needed) {
+                        upgrade.unlocked = true;
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
             },
             buyUpgrade: function (upgrade) {
@@ -363,6 +376,16 @@
             tick: function () {
                 this.crackers = this.crackers.plus(this.cps.div(10));
                 this.totalCrackers = this.totalCrackers.plus(this.cps.div(10));
+            },
+
+            round: function (value) {
+                if (value < 10) {
+                    return Number((value).toFixed(1));
+                } else if (value <= 9999999999) {
+                    return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                } else {
+                    return value.toExponential(3);
+                }
             }
         },
         filters: {
