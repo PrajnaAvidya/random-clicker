@@ -12,6 +12,7 @@ hide next building name until can afford
 save data
 better names/flavor texts
 - maybe procedurally generate names/descriptions every game?
+- make everything else loadable/savable
 prettier numbers (million/billion/trillion/etc)
 show upcoming upgrades
 showAt computed property
