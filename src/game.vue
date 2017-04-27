@@ -63,13 +63,14 @@
                 clickPower: Big(1),
 
                 buildings: [
-                    { name: 'Finger', baseCost: Big(15), baseCps: 0.1, currentCps: 0.1, description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
-                    { name: 'Toddler', baseCost: Big(100), baseCps: 1, currentCps: 1, description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: Big(0), owned: 0 },
-                    { name: 'Kosher Bakery', baseCost: Big(1100), baseCps: 8, currentCps: 8, description: "These guys seem to know what they're doing.", showAt: Big(15), owned: 0 },
-                    { name: 'Non-Kosher Bakery', baseCost: Big(12000), baseCps: 47, currentCps: 47, description: "These guys don't follow the rules!", showAt: Big(100), owned: 0 },
-                    { name: 'Tea Club', baseCost: Big(130000), baseCps: 260, currentCps: 260, description: "These ladies LOVE crackers with their tea", showAt: Big(1100), owned: 0 },
-                    { name: 'Cracker Factory', baseCost: Big(1.4E6), baseCps: 1400, currentCps: 1400, description: "Seems only logical", showAt: Big(12000), owned: 0 },
-                    { name: 'Cracker Warehouse', baseCost: Big(20E6), baseCps: 7800, currentCps: 7800, description: "We need more space to store all these crackers!", showAt: Big(130000), owned: 0 },
+                    { name: 'Finger', baseCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
+                    { name: 'Toddler', baseCost: Big(100), baseCps: Big(1), currentCps: Big(1), description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: Big(0), owned: 0 },
+                    { name: 'Kosher Bakery', baseCost: Big(1100), baseCps: Big(8), currentCps: Big(8), description: "These guys seem to know what they're doing.", showAt: Big(15), owned: 0 },
+                    { name: 'Non-Kosher Bakery', baseCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "These guys don't follow the rules!", showAt: Big(100), owned: 0 },
+                    { name: 'Tea Club', baseCost: Big(130000), baseCps: Big(260), currentCps: Big(260), description: "These ladies LOVE crackers with their tea", showAt: Big(1100), owned: 0 },
+                    { name: 'Cracker Factory', baseCost: Big(1.4E6), baseCps: Big(1400), currentCps: Big(1400), description: "Seems only logical", showAt: Big(12000), owned: 0 },
+                    { name: 'Cracker Warehouse', baseCost: Big(20E6), baseCps: Big(7800), currentCps: Big(7800), description: "We need more space to store all these crackers!", showAt: Big(130000), owned: 0 },
+                    { name: 'Food Lab', baseCost: Big(330E6), baseCps: Big(44000), currentCps: Big(44000), description: "Genetically engineered crackers?", showAt: Big(1.4E6), owned: 0 },
                 ],
 
                 upgrades: [
@@ -159,6 +160,16 @@
                     { type: 'Cracker Warehouse', name: 'Need Name', needed: 150, cost: Big(10E15), multiplier: 2, description: "Need Description", active: false },
                     { type: 'Cracker Warehouse', name: 'Need Name', needed: 200, cost: Big(10E18), multiplier: 2, description: "Need Description", active: false },
                     { type: 'Cracker Warehouse', name: 'Need Name', needed: 250, cost: Big(10E21), multiplier: 2, description: "Need Description", active: false },
+
+                    // food lab (wizard tower)
+                    { type: 'Food Lab', name: 'Need Name', needed: 1, cost: Big(3.3E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Food Lab', name: 'Need Name', needed: 5, cost: Big(16.5E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Food Lab', name: 'Need Name', needed: 25, cost: Big(165E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Food Lab', name: 'Need Name', needed: 50, cost: Big(16.5E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Food Lab', name: 'Need Name', needed: 100, cost: Big(1.65E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Food Lab', name: 'Need Name', needed: 150, cost: Big(165E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Food Lab', name: 'Need Name', needed: 200, cost: Big(165E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Food Lab', name: 'Need Name', needed: 250, cost: Big(165E21), multiplier: 2, description: "Need Description", active: false },
                 ],
             }
         },
@@ -176,9 +187,9 @@
                 let cps = Big(0);
                 let vm = this;
                 this.ownedBuildings().forEach(function (building) {
-                    let buildingCps = building.baseCps * vm.upgradeMultiplier(building.name);
+                    let buildingCps = building.baseCps.times(vm.upgradeMultiplier(building.name));
                     building.currentCps = buildingCps;
-                    cps = cps.plus(buildingCps * building.owned);
+                    cps = cps.plus(buildingCps.times(building.owned));
                 });
 
                 // add finger additive upgrades
