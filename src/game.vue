@@ -12,18 +12,24 @@
             </div>
         </div>
 
-        <div class="col-md-5 col-md-offset-1">
+        <div class="col-md-6">
             <div class="row buildings">
                 <h3>Buildings</h3>
 
                 <div class="row building" v-for="building in buildings" v-if="building.owned > 0 || showBuilding(building)">
-                    <div class="col-xs-4">
+                    <div class="col-xs-3">
 
                         <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="buildingText(building)"></span></span>
-                        {{ building.name }} ({{ building.owned }})
+                        {{ building.name }}<br />({{ building.owned }} owned)
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building)">Buy ({{ buildingCost(building) }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building)">Buy 1 ({{ buildingCost(building) }})</button>
+                    </div>
+                    <div class="col-xs-2">
+                        <button class="btn btn-default" @click="buyBuilding(building, 10)">Buy 10 ({{ buildingCost(building, 10) }})</button>
+                    </div>
+                    <div class="col-xs-2">
+                        <button class="btn btn-default" @click="buyBuilding(building, 100)">Buy 100 ({{ buildingCost(building, 100) }})</button>
                     </div>
                 </div>
             </div>
@@ -173,17 +179,17 @@
             showBuilding: function (building) {
                 return this.totalCrackers >= building.showAt;
             },
-            buyBuilding: function (building) {
-                if (this.crackers >= this.buildingCost(building)) {
-                    this.crackers -= this.buildingCost(building);
-                    building.owned += 1;
+            buyBuilding: function (building, amount = 1) {
+                if (this.crackers >= this.buildingCost(building, amount)) {
+                    this.crackers -= this.buildingCost(building, amount);
+                    building.owned += amount;
 
                     this.recalculateCps();
                     this.recalculateClickPower();
                 }
             },
-            buildingCost: function (building) {
-                return Math.ceil(building.baseCost * Math.pow(1.15, building.owned));
+            buildingCost: function (building, amount = 1) {
+                return Math.ceil((building.baseCost * (Math.pow(1.15, building.owned + amount) - Math.pow(1.15, building.owned))) / 0.15);
             },
             buildingCount: function (buildingName) {
                 return this.buildings.find(function (building) {

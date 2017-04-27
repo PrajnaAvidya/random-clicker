@@ -10132,6 +10132,12 @@ Object.defineProperty(exports, "__esModule", {
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 exports.default = {
     data: function data() {
@@ -10217,16 +10223,20 @@ exports.default = {
             return this.totalCrackers >= building.showAt;
         },
         buyBuilding: function buyBuilding(building) {
-            if (this.crackers >= this.buildingCost(building)) {
-                this.crackers -= this.buildingCost(building);
-                building.owned += 1;
+            var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+            if (this.crackers >= this.buildingCost(building, amount)) {
+                this.crackers -= this.buildingCost(building, amount);
+                building.owned += amount;
 
                 this.recalculateCps();
                 this.recalculateClickPower();
             }
         },
         buildingCost: function buildingCost(building) {
-            return Math.ceil(building.baseCost * Math.pow(1.15, building.owned));
+            var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+            return Math.ceil(building.baseCost * (Math.pow(1.15, building.owned + amount) - Math.pow(1.15, building.owned)) / 0.15);
         },
         buildingCount: function buildingCount(buildingName) {
             return this.buildings.find(function (building) {
@@ -12591,14 +12601,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "click": _vm.crackerClick
     }
   })])]), _vm._v(" "), _c('div', {
-    staticClass: "col-md-5 col-md-offset-1"
+    staticClass: "col-md-6"
   }, [_c('div', {
     staticClass: "row buildings"
   }, [_c('h3', [_vm._v("Buildings")]), _vm._v(" "), _vm._l((_vm.buildings), function(building) {
     return (building.owned > 0 || _vm.showBuilding(building)) ? _c('div', {
       staticClass: "row building"
     }, [_c('div', {
-      staticClass: "col-xs-4"
+      staticClass: "col-xs-3"
     }, [_c('span', {
       staticClass: "glyphicon glyphicon-info-sign tooltips",
       attrs: {
@@ -12608,7 +12618,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       domProps: {
         "innerHTML": _vm._s(_vm.buildingText(building))
       }
-    })]), _vm._v("\n                    " + _vm._s(building.name) + " (" + _vm._s(building.owned) + ")\n                ")]), _vm._v(" "), _c('div', {
+    })]), _vm._v("\n                    " + _vm._s(building.name)), _c('br'), _vm._v("(" + _vm._s(building.owned) + " owned)\n                ")]), _vm._v(" "), _c('div', {
       staticClass: "col-xs-2"
     }, [_c('button', {
       staticClass: "btn btn-default",
@@ -12617,7 +12627,25 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           _vm.buyBuilding(building)
         }
       }
-    }, [_vm._v("Buy (" + _vm._s(_vm.buildingCost(building)) + ")")])])]) : _vm._e()
+    }, [_vm._v("Buy 1 (" + _vm._s(_vm.buildingCost(building)) + ")")])]), _vm._v(" "), _c('div', {
+      staticClass: "col-xs-2"
+    }, [_c('button', {
+      staticClass: "btn btn-default",
+      on: {
+        "click": function($event) {
+          _vm.buyBuilding(building, 10)
+        }
+      }
+    }, [_vm._v("Buy 10 (" + _vm._s(_vm.buildingCost(building, 10)) + ")")])]), _vm._v(" "), _c('div', {
+      staticClass: "col-xs-2"
+    }, [_c('button', {
+      staticClass: "btn btn-default",
+      on: {
+        "click": function($event) {
+          _vm.buyBuilding(building, 100)
+        }
+      }
+    }, [_vm._v("Buy 100 (" + _vm._s(_vm.buildingCost(building, 100)) + ")")])])]) : _vm._e()
   })], 2)]), _vm._v(" "), _c('div', {
     staticClass: "col-md-3"
   }, [_c('div', {
