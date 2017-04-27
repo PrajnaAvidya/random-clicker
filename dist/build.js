@@ -10132,6 +10132,8 @@ Object.defineProperty(exports, "__esModule", {
 //
 //
 //
+//
+//
 
 exports.default = {
     data: function data() {
@@ -10150,7 +10152,7 @@ exports.default = {
             // 2% etc
 
             // finger (cursor)
-            { type: 'Finger', name: 'Double Tap', needed: 1, cost: 100, multiplier: 2, description: 'Doubles your finger clicks', active: false }, { type: 'Finger', name: 'Quattro Tap', needed: 1, cost: 500, multiplier: 2, description: 'Doubles your finger clicks (again)', active: false }, { type: 'Finger', name: 'Mega Tap', needed: 10, cost: 10000, multiplier: 2, description: 'Doubles your finger clicks (again!)', active: false }, { type: 'Finger', name: 'Middle Finger', needed: 20, cost: 100000, addition: 0.1, description: 'Put that thing away.', active: false }, { type: 'Finger', name: 'Double Middle Finger', needed: 40, cost: 10000000, addition: 0.5, description: 'Put those away.', active: false }, { type: 'Finger', name: 'Extra Middle Fingers', needed: 80, cost: 100000000, addition: 5, description: "Now that's just rude.", active: false }, { type: 'Finger', name: 'Super Finger', needed: 120, cost: 1000000000, addition: 50, description: "No decorum at all.", active: false }, { type: 'Finger', name: 'Super Duper Finger', needed: 160, cost: 10000000000, addition: 500, description: "...", active: false }, { type: 'Finger', name: 'Mega Finger', needed: 200, cost: 10000000000000, addition: 5000, description: "...!?...", active: false },
+            { type: 'Finger', name: 'Double Tap', needed: 1, cost: 100, multiplier: 2, description: 'Tap faster', active: false }, { type: 'Finger', name: 'Quattro Tap', needed: 1, cost: 500, multiplier: 2, description: 'Tap faster!', active: false }, { type: 'Finger', name: 'Mega Tap', needed: 10, cost: 10000, multiplier: 2, description: 'Tap even faster!!', active: false }, { type: 'Finger', name: 'Middle Finger', needed: 20, cost: 100000, addition: 0.1, description: 'Put that thing away.', active: false }, { type: 'Finger', name: 'Double Middle Finger', needed: 40, cost: 10000000, addition: 0.5, description: 'Put those away.', active: false }, { type: 'Finger', name: 'Extra Middle Fingers', needed: 80, cost: 100000000, addition: 5, description: "Now that's just rude.", active: false }, { type: 'Finger', name: 'Super Finger', needed: 120, cost: 1000000000, addition: 50, description: "No decorum at all.", active: false }, { type: 'Finger', name: 'Super Duper Finger', needed: 160, cost: 10000000000, addition: 500, description: "...", active: false }, { type: 'Finger', name: 'Mega Finger', needed: 200, cost: 10000000000000, addition: 5000, description: "...!?...", active: false },
             // 240
             // 280
             // 320
@@ -10183,9 +10185,7 @@ exports.default = {
             { type: 'Cracker Factory', name: 'Strumpets', needed: 1, cost: 14000000, multiplier: 2, description: "What are we, savages?", active: false }, { type: 'Cracker Factory', name: 'Valet', needed: 5, cost: 70000000, multiplier: 2, description: "I'm too rich to park my car", active: false }, { type: 'Cracker Factory', name: 'Servant', needed: 25, cost: 700000000, multiplier: 2, description: "It's not technically slavery!", active: false }, { type: 'Cracker Factory', name: 'Free trade tea', needed: 50, cost: 70000000000, multiplier: 2, description: "I feel so much better about this", active: false }, { type: 'Cracker Factory', name: 'Slavery tea', needed: 100, cost: 7000000000000, multiplier: 2, description: "Suffering tastes better", active: false }]
         };
     },
-    computed: {
-        //
-    },
+    computed: {},
     methods: {
         // clicking/cps
         crackerClick: function crackerClick() {
@@ -10296,6 +10296,15 @@ exports.default = {
                 }
             });
             return production;
+        },
+        upgradeText: function upgradeText(upgrade) {
+            var upgradeText = upgrade.description;
+            if (upgrade.multiplier != null) {
+                upgradeText += ' (Multiplies ' + upgrade.type + ' production by ' + upgrade.multiplier + ')';
+            } else if (upgrade.addition != null) {
+                upgradeText += ' (Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned)';
+            }
+            return upgradeText;
         },
 
         // tick
@@ -12278,7 +12287,7 @@ exports = module.exports = __webpack_require__(9)(undefined);
 
 
 // module
-exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n", ""]);
+exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n.tooltips {\n    position: relative;\n    display: inline;\n}\n.tooltips span {\n    position: absolute;\n    width: 300px;\n    color: #FFFFFF;\n    background: #000000;\n    line-height: 24px;\n    text-align: center;\n    visibility: hidden;\n    border-radius: 6px;\n    font-family: \"Helvetica Neue, Helvetica, Arial, sans-serif\";\n    font-weight: bold;\n    padding-right: 5px;\n    padding-left: 5px;\n}\n.tooltips span:after {\n    content: '';\n    position: absolute;\n    top: 100%;\n    left: 50%;\n    margin-left: -8px;\n    width: 0;\n    height: 0;\n    border-top: 8px solid #000000;\n    border-right: 8px solid transparent;\n    border-left: 8px solid transparent;\n}\n:hover.tooltips span {\n    visibility: visible;\n    opacity: 0.8;\n    bottom: 30px;\n    left: 50%;\n    margin-left: -76px;\n    z-index: 999;\n}\n", ""]);
 
 // exports
 
@@ -12556,7 +12565,7 @@ module.exports = function normalizeComponent (
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "row"
-  }, [_c('div', {
+  }, [_vm._m(0), _vm._v(" "), _c('div', {
     staticClass: "col-md-3"
   }, [_c('div', {
     staticClass: "row totals"
@@ -12585,11 +12594,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('div', {
       staticClass: "col-xs-4"
     }, [_c('span', {
-      staticClass: "glyphicon glyphicon-info-sign",
+      staticClass: "glyphicon glyphicon-info-sign tooltips",
       attrs: {
         "aria-hidden": "true"
       }
-    }), _vm._v(" " + _vm._s(building.name) + " (" + _vm._s(building.owned) + ")\n                ")]), _vm._v(" "), _c('div', {
+    }, [_c('span', [_vm._v(_vm._s(building.description))])]), _vm._v("\n                    " + _vm._s(building.name) + " (" + _vm._s(building.owned) + ")\n                ")]), _vm._v(" "), _c('div', {
       staticClass: "col-xs-2"
     }, [_c('button', {
       staticClass: "btn btn-default",
@@ -12609,20 +12618,27 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_c('div', {
       staticClass: "col-xs-12"
     }, [_c('span', {
-      staticClass: "glyphicon glyphicon-info-sign",
+      staticClass: "glyphicon glyphicon-info-sign tooltips",
       attrs: {
         "aria-hidden": "true"
       }
-    }), _vm._v(" "), _c('span', {
+    }, [_c('span', [_vm._v(_vm._s(_vm.upgradeText(upgrade)) + " ")])]), _vm._v(" "), _c('span', {
       staticClass: "upgrade-link",
       on: {
         "click": function($event) {
           _vm.buyUpgrade(upgrade)
         }
       }
-    }, [_vm._v(_vm._s(upgrade.name) + " (" + _vm._s(upgrade.cost) + ")")])])]) : _vm._e()
+    }, [_vm._v(_vm._s(upgrade.type) + ": " + _vm._s(upgrade.name) + " (" + _vm._s(upgrade.cost) + ")")])])]) : _vm._e()
   })], 2)])])
-},staticRenderFns: []}
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('a', {
+    staticClass: "tooltips",
+    attrs: {
+      "href": "#"
+    }
+  }, [_vm._v("CSS Tooltips"), _c('span', [_vm._v("Tooltip")])])
+}]}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()

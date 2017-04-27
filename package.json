@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/PrajnaAvidya/cracker-clicker#readme",
   "dependencies": {
-    "vue": "^2.2.6"
+    "vue": "^2.2.6",
+    "vue2-filters": "^0.1.8"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",
@@ -30,7 +31,6 @@
     "vue-html-loader": "^1.2.4",
     "vue-loader": "^12.0.0",
     "vue-template-compiler": "^2.2.6",
-    "vue2-filters": "^0.1.8",
     "webpack": "^2.4.1"
   }
 }

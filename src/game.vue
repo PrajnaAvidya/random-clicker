@@ -1,5 +1,7 @@
 <template>
     <div class="row">
+        <a class="tooltips" href="#">CSS Tooltips<span>Tooltip</span></a>
+
         <div class="col-md-3">
             <div class="row totals">
                 <span class="total-crackers"><h1>{{ crackers | whole }} crackers</h1></span>
@@ -19,8 +21,8 @@
                 <div class="row building" v-for="building in buildings" v-if="building.owned > 0 || showBuilding(building)">
                     <div class="col-xs-4">
 
-                        <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{ building.name }} ({{ building.owned
-                        }})
+                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span>{{ building.description }}</span></span>
+                        {{ building.name }} ({{ building.owned }})
                     </div>
                     <div class="col-xs-2">
                         <button class="btn btn-default" @click="buyBuilding(building)">Buy ({{ buildingCost(building) }})</button>
@@ -35,8 +37,8 @@
 
                 <div class="row upgrade" v-for="upgrade in orderBy(upgrades, 'cost')" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
                     <div class="col-xs-12">
-                        <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.name }} ({{ upgrade.cost }})</span>
+                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span>{{ upgradeText(upgrade) }} </span></span>
+                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost }})</span>
                     </div>
                 </div>
             </div>
@@ -73,9 +75,9 @@
                     // 2% etc
 
                     // finger (cursor)
-                    { type: 'Finger', name: 'Double Tap', needed: 1, cost: 100, multiplier: 2, description: 'Doubles your finger clicks', active: false },
-                    { type: 'Finger', name: 'Quattro Tap', needed: 1, cost: 500, multiplier: 2, description: 'Doubles your finger clicks (again)', active: false },
-                    { type: 'Finger', name: 'Mega Tap', needed: 10, cost: 10000, multiplier: 2, description: 'Doubles your finger clicks (again!)', active: false },
+                    { type: 'Finger', name: 'Double Tap', needed: 1, cost: 100, multiplier: 2, description: 'Tap faster', active: false },
+                    { type: 'Finger', name: 'Quattro Tap', needed: 1, cost: 500, multiplier: 2, description: 'Tap faster!', active: false },
+                    { type: 'Finger', name: 'Mega Tap', needed: 10, cost: 10000, multiplier: 2, description: 'Tap even faster!!', active: false },
                     { type: 'Finger', name: 'Middle Finger', needed: 20, cost: 100000, addition: 0.1, description: 'Put that thing away.', active: false },
                     { type: 'Finger', name: 'Double Middle Finger', needed: 40, cost: 10000000, addition: 0.5, description: 'Put those away.', active: false },
                     { type: 'Finger', name: 'Extra Middle Fingers', needed: 80, cost: 100000000, addition: 5, description: "Now that's just rude.", active: false },
@@ -139,7 +141,7 @@
             }
         },
         computed: {
-            //
+
         },
         methods: {
             // clicking/cps
@@ -252,6 +254,15 @@
                 });
                 return production;
             },
+            upgradeText: function (upgrade) {
+                let upgradeText = upgrade.description;
+                if (upgrade.multiplier != null) {
+                    upgradeText += ' (Multiplies ' + upgrade.type + ' production by ' + upgrade.multiplier + ')';
+                } else if (upgrade.addition != null) {
+                    upgradeText += ' (Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned)';
+                }
+                return upgradeText;
+            },
 
             // tick
             tick: function () {
@@ -288,5 +299,47 @@
     
     .upgrade {
         margin-bottom: 5px;
+    }
+    
+    .tooltips {
+        position: relative;
+        display: inline;
+    }
+    
+    .tooltips span {
+        position: absolute;
+        width: 300px;
+        color: #FFFFFF;
+        background: #000000;
+        line-height: 24px;
+        text-align: center;
+        visibility: hidden;
+        border-radius: 6px;
+        font-family: "Helvetica Neue, Helvetica, Arial, sans-serif";
+        font-weight: bold;
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+    
+    .tooltips span:after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -8px;
+        width: 0;
+        height: 0;
+        border-top: 8px solid #000000;
+        border-right: 8px solid transparent;
+        border-left: 8px solid transparent;
+    }
+    
+     :hover.tooltips span {
+        visibility: visible;
+        opacity: 0.8;
+        bottom: 30px;
+        left: 50%;
+        margin-left: -76px;
+        z-index: 999;
     }
 </style>
