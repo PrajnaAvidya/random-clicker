@@ -9,4 +9,4 @@ other non-standard upgrades
 sell buildings
 hide next building name until can afford
 save data
-migrate ALL numbers to big.js
+better flavor texts
