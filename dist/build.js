@@ -9648,7 +9648,7 @@ exports.default = {
             var multiplier = (0, _big2.default)(1);
             this.activeUpgrades(buildingType).forEach(function (upgrade) {
                 if (upgrade.multiplier != null) {
-                    multiplier.times(upgrade.multiplier);
+                    multiplier = multiplier.times(upgrade.multiplier);
                 }
             });
             return multiplier;
@@ -9657,7 +9657,7 @@ exports.default = {
             var addition = (0, _big2.default)(0);
             this.activeUpgrades('Finger').forEach(function (upgrade) {
                 if (upgrade.addition != null) {
-                    addition.plus(upgrade.addition);
+                    addition = addition.plus(upgrade.addition);
                 }
             });
             return addition * this.otherBuildingCount('Finger');

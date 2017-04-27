@@ -305,7 +305,7 @@
                 let multiplier = Big(1);
                 this.activeUpgrades(buildingType).forEach(function (upgrade) {
                     if (upgrade.multiplier != null) {
-                        multiplier.times(upgrade.multiplier);
+                        multiplier = multiplier.times(upgrade.multiplier);
                     }
                 });
                 return multiplier;
@@ -314,7 +314,7 @@
                 let addition = Big(0);
                 this.activeUpgrades('Finger').forEach(function (upgrade) {
                     if (upgrade.addition != null) {
-                        addition.plus(upgrade.addition);
+                        addition = addition.plus(upgrade.addition);
                     }
                 });
                 return addition * this.otherBuildingCount('Finger');
