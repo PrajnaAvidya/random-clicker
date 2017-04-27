@@ -56,7 +56,7 @@
     export default {
         data: function () {
             return {
-                crackers: Big(1000000000000000),
+                crackers: Big(0),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -286,12 +286,12 @@
                 if (value < 10) {
                     return Number((value).toFixed(1));
                 } else {
-                    return parseInt(value);
+                    return Math.ceil(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
             },
             crackers: function (value) {
                 if (value < 9999999) {
-                    return parseInt(value);
+                    return Math.ceil(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
                     return value.toExponential(3);
                 }

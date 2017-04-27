@@ -10096,7 +10096,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = {
     data: function data() {
         return {
-            crackers: (0, _big2.default)(1000000000000000),
+            crackers: (0, _big2.default)(0),
             totalCrackers: (0, _big2.default)(0),
             clicks: (0, _big2.default)(0),
             cps: (0, _big2.default)(0),
@@ -10287,12 +10287,12 @@ exports.default = {
             if (value < 10) {
                 return Number(value.toFixed(1));
             } else {
-                return parseInt(value);
+                return Math.ceil(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
         },
         crackers: function crackers(value) {
             if (value < 9999999) {
-                return parseInt(value);
+                return Math.ceil(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             } else {
                 return value.toExponential(3);
             }
