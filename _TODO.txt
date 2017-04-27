@@ -12,7 +12,6 @@ save data
 better names/flavor texts
 prettier numbers (million/billion/trillion/etc)
 show upcoming upgrades
-fix sort for upgrades
 
 
 1E6 = 1 million

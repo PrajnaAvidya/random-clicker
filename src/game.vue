@@ -39,7 +39,7 @@
             <div class="row upgrades">
                 <h3>Upgrades</h3>
 
-                <div class="row upgrade" v-for="upgrade in orderBy(upgrades, 'cost')" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
+                <div class="row upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
                     <div class="col-xs-12">
                         <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
                         <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | crackers }})</span>
@@ -56,7 +56,7 @@
     export default {
         data: function () {
             return {
-                crackers: Big(0),
+                crackers: Big(1E24),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -171,6 +171,21 @@
                     { type: 'Food Lab', name: 'Need Name', needed: 200, cost: Big(165E18), multiplier: 2, description: "Need Description", active: false },
                     { type: 'Food Lab', name: 'Need Name', needed: 250, cost: Big(165E21), multiplier: 2, description: "Need Description", active: false },
                 ],
+                _sortedUpgrades: null
+            }
+        },
+        computed: {
+            sortedUpgrades: function () {
+                if (this._sortedUpgrades == null) {
+                    // sort upgrades by cost (1 time)
+                    let sortedUpgrades = this.upgrades;
+                    sortedUpgrades.sort(function (a, b) {
+                        return a.cost.minus(b.cost);
+                    });
+                    this._sortedUpgrades = sortedUpgrades;
+                }
+
+                return this._sortedUpgrades;
             }
         },
         methods: {
@@ -304,6 +319,14 @@
                     upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
                 }
                 return upgradeText;
+            },
+            sortedUpgrades: function () {
+                /*upgrades.sort(function (a, b) {
+                    //console.log(a);
+                    return 1;
+                });*/
+                console.log(upgrades);
+                return upgrades;
             },
 
             // tick
