@@ -1,3 +1,4 @@
+cps % as info
 achivements
 - ui
 - building achievements
