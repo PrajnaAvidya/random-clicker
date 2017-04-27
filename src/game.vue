@@ -28,7 +28,8 @@
                     <div class="col-xs-3">
 
                         <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="buildingText(building)"></span></span>
-                        {{ building.name }}<br />({{ building.owned }} owned)
+                        <span v-bind:class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
+                        <br /> ({{ building.owned }} owned)
                     </div>
                     <div class="col-xs-2">
                         <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | crackers }})</button>
@@ -58,7 +59,7 @@
     export default {
         data: function () {
             return {
-                crackers: Big(100000),
+                crackers: Big(0),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -66,21 +67,21 @@
                 buyAmount: 1,
 
                 buildings: [
-                    { name: 'Cursor', baseCost: Big(15), buyCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
-                    { name: 'Grandma', baseCost: Big(100), buyCost: Big(100), baseCps: Big(1), currentCps: Big(1), description: "", showAt: Big(0), owned: 0 },
-                    { name: 'Farm', baseCost: Big(1100), buyCost: Big(1100), baseCps: Big(8), currentCps: Big(8), description: "", showAt: Big(15), owned: 0 },
-                    { name: 'Mine', baseCost: Big(12000), buyCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "", showAt: Big(100), owned: 0 },
-                    { name: 'Factory', baseCost: Big(130000), buyCost: Big(130000), baseCps: Big(260), currentCps: Big(260), description: "", showAt: Big(1100), owned: 0 },
-                    { name: 'Bank', baseCost: Big(1.4E6), buyCost: Big(1.4E6), baseCps: Big(1400), currentCps: Big(1400), description: "", showAt: Big(12000), owned: 0 },
-                    { name: 'Temple', baseCost: Big(20E6), buyCost: Big(20E6), baseCps: Big(7800), currentCps: Big(7800), description: "", showAt: Big(130000), owned: 0 },
-                    { name: 'Wizard Tower', baseCost: Big(330E6), buyCost: Big(330E6), baseCps: Big(44000), currentCps: Big(44000), description: "", showAt: Big(1.4E6), owned: 0 },
+                    { name: 'Cursor', baseCost: Big(15), buyCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Autoclicks once every 10 seconds.", unlocked: false, showAt: 0, owned: 0 },
+                    { name: 'Grandma', baseCost: Big(100), buyCost: Big(100), baseCps: Big(1), currentCps: Big(1), description: "", unlocked: false, showAt: Big(0), owned: 0 },
+                    { name: 'Farm', baseCost: Big(1100), buyCost: Big(1100), baseCps: Big(8), currentCps: Big(8), description: "", unlocked: false, showAt: Big(15), owned: 0 },
+                    { name: 'Mine', baseCost: Big(12000), buyCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "", unlocked: false, showAt: Big(100), owned: 0 },
+                    { name: 'Factory', baseCost: Big(130000), buyCost: Big(130000), baseCps: Big(260), currentCps: Big(260), description: "", unlocked: false, showAt: Big(1100), owned: 0 },
+                    { name: 'Bank', baseCost: Big(1.4E6), buyCost: Big(1.4E6), baseCps: Big(1400), currentCps: Big(1400), description: "", unlocked: false, showAt: Big(12000), owned: 0 },
+                    { name: 'Temple', baseCost: Big(20E6), buyCost: Big(20E6), baseCps: Big(7800), currentCps: Big(7800), description: "", unlocked: false, showAt: Big(130000), owned: 0 },
+                    { name: 'Wizard Tower', baseCost: Big(330E6), buyCost: Big(330E6), baseCps: Big(44000), currentCps: Big(44000), description: "", unlocked: false, showAt: Big(1.4E6), owned: 0 },
                     // no upgrades:
-                    { name: 'Shipment', baseCost: Big(5.1E9), buyCost: Big(5.1E9), baseCps: Big(260000), currentCps: Big(260000), description: "", showAt: Big(20E6), owned: 0 },
-                    { name: 'Alchemy Lab', baseCost: Big(75E9), buyCost: Big(75E9), baseCps: Big(1.6E6), currentCps: Big(1.6E6), description: "", showAt: Big(330E6), owned: 0 },
-                    { name: 'Portal', baseCost: Big(1E12), buyCost: Big(1E12), baseCps: Big(10E6), currentCps: Big(10E6), description: "", showAt: Big(5.1E9), owned: 0 },
-                    { name: 'Time Machine', baseCost: Big(14E12), buyCost: Big(14E12), baseCps: Big(65E6), currentCps: Big(65E6), description: "", showAt: Big(75E9), owned: 0 },
-                    { name: 'Antimatter Condenser', baseCost: Big(170E12), buyCost: Big(170E12), baseCps: Big(430E6), currentCps: Big(430E6), description: "", showAt: Big(1E12), owned: 0 },
-                    { name: 'Prism', baseCost: Big(2.1E15), buyCost: Big(2.1E15), baseCps: Big(2.9E12), currentCps: Big(2.9E12), description: "", showAt: Big(14E12), owned: 0 },
+                    { name: 'Shipment', baseCost: Big(5.1E9), buyCost: Big(5.1E9), baseCps: Big(260000), currentCps: Big(260000), description: "", unlocked: false, showAt: Big(20E6), owned: 0 },
+                    { name: 'Alchemy Lab', baseCost: Big(75E9), buyCost: Big(75E9), baseCps: Big(1.6E6), currentCps: Big(1.6E6), description: "", unlocked: false, showAt: Big(330E6), owned: 0 },
+                    { name: 'Portal', baseCost: Big(1E12), buyCost: Big(1E12), baseCps: Big(10E6), currentCps: Big(10E6), description: "", unlocked: false, showAt: Big(5.1E9), owned: 0 },
+                    { name: 'Time Machine', baseCost: Big(14E12), buyCost: Big(14E12), baseCps: Big(65E6), currentCps: Big(65E6), description: "", unlocked: false, showAt: Big(75E9), owned: 0 },
+                    { name: 'Antimatter Condenser', baseCost: Big(170E12), buyCost: Big(170E12), baseCps: Big(430E6), currentCps: Big(430E6), description: "", unlocked: false, showAt: Big(1E12), owned: 0 },
+                    { name: 'Prism', baseCost: Big(2.1E15), buyCost: Big(2.1E15), baseCps: Big(2.9E12), currentCps: Big(2.9E12), description: "", unlocked: false, showAt: Big(14E12), owned: 0 },
                 ],
 
                 upgrades: [
@@ -244,6 +245,9 @@
 
             // buildings
             showBuilding: function (building) {
+                if (building.unlocked == false && this.totalCrackers.gte(building.baseCost)) {
+                    building.unlocked = true;
+                }
                 return this.totalCrackers.gte(building.showAt);
             },
             canBuyBuilding: function (building) {
@@ -283,6 +287,9 @@
                 });
             },
             buildingText: function (building) {
+                if (building.unlocked == false) {
+                    return null;
+                }
                 let buildingText = building.description;
                 buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
                 buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.round(building.currentCps * building.owned) + " crackers per second";
@@ -486,5 +493,15 @@
         left: 50%;
         margin-left: -76px;
         z-index: 999;
+    }
+    
+    .redacted {
+        color: black;
+        background-color: black;
+        white-space: nowrap;
+        -moz-transform: rotate(.8deg) skewx(-12deg);
+        -moz-box-shadow: 3px 0 2px #444;
+        border: 1px dotted #555;
+        background: -moz-linear-gradient(180deg, #000, #222);
     }
 </style>

@@ -9480,16 +9480,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = {
     data: function data() {
         return {
-            crackers: (0, _big2.default)(100000),
+            crackers: (0, _big2.default)(0),
             totalCrackers: (0, _big2.default)(0),
             clicks: (0, _big2.default)(0),
             cps: (0, _big2.default)(0),
             clickPower: (0, _big2.default)(1),
             buyAmount: 1,
 
-            buildings: [{ name: 'Cursor', baseCost: (0, _big2.default)(15), buyCost: (0, _big2.default)(15), baseCps: (0, _big2.default)(0.1), currentCps: (0, _big2.default)(0.1), description: "Autoclicks once every 10 seconds.", showAt: 0, owned: 0 }, { name: 'Grandma', baseCost: (0, _big2.default)(100), buyCost: (0, _big2.default)(100), baseCps: (0, _big2.default)(1), currentCps: (0, _big2.default)(1), description: "", showAt: (0, _big2.default)(0), owned: 0 }, { name: 'Farm', baseCost: (0, _big2.default)(1100), buyCost: (0, _big2.default)(1100), baseCps: (0, _big2.default)(8), currentCps: (0, _big2.default)(8), description: "", showAt: (0, _big2.default)(15), owned: 0 }, { name: 'Mine', baseCost: (0, _big2.default)(12000), buyCost: (0, _big2.default)(12000), baseCps: (0, _big2.default)(47), currentCps: (0, _big2.default)(47), description: "", showAt: (0, _big2.default)(100), owned: 0 }, { name: 'Factory', baseCost: (0, _big2.default)(130000), buyCost: (0, _big2.default)(130000), baseCps: (0, _big2.default)(260), currentCps: (0, _big2.default)(260), description: "", showAt: (0, _big2.default)(1100), owned: 0 }, { name: 'Bank', baseCost: (0, _big2.default)(1.4E6), buyCost: (0, _big2.default)(1.4E6), baseCps: (0, _big2.default)(1400), currentCps: (0, _big2.default)(1400), description: "", showAt: (0, _big2.default)(12000), owned: 0 }, { name: 'Temple', baseCost: (0, _big2.default)(20E6), buyCost: (0, _big2.default)(20E6), baseCps: (0, _big2.default)(7800), currentCps: (0, _big2.default)(7800), description: "", showAt: (0, _big2.default)(130000), owned: 0 }, { name: 'Wizard Tower', baseCost: (0, _big2.default)(330E6), buyCost: (0, _big2.default)(330E6), baseCps: (0, _big2.default)(44000), currentCps: (0, _big2.default)(44000), description: "", showAt: (0, _big2.default)(1.4E6), owned: 0 },
+            buildings: [{ name: 'Cursor', baseCost: (0, _big2.default)(15), buyCost: (0, _big2.default)(15), baseCps: (0, _big2.default)(0.1), currentCps: (0, _big2.default)(0.1), description: "Autoclicks once every 10 seconds.", unlocked: false, showAt: 0, owned: 0 }, { name: 'Grandma', baseCost: (0, _big2.default)(100), buyCost: (0, _big2.default)(100), baseCps: (0, _big2.default)(1), currentCps: (0, _big2.default)(1), description: "", unlocked: false, showAt: (0, _big2.default)(0), owned: 0 }, { name: 'Farm', baseCost: (0, _big2.default)(1100), buyCost: (0, _big2.default)(1100), baseCps: (0, _big2.default)(8), currentCps: (0, _big2.default)(8), description: "", unlocked: false, showAt: (0, _big2.default)(15), owned: 0 }, { name: 'Mine', baseCost: (0, _big2.default)(12000), buyCost: (0, _big2.default)(12000), baseCps: (0, _big2.default)(47), currentCps: (0, _big2.default)(47), description: "", unlocked: false, showAt: (0, _big2.default)(100), owned: 0 }, { name: 'Factory', baseCost: (0, _big2.default)(130000), buyCost: (0, _big2.default)(130000), baseCps: (0, _big2.default)(260), currentCps: (0, _big2.default)(260), description: "", unlocked: false, showAt: (0, _big2.default)(1100), owned: 0 }, { name: 'Bank', baseCost: (0, _big2.default)(1.4E6), buyCost: (0, _big2.default)(1.4E6), baseCps: (0, _big2.default)(1400), currentCps: (0, _big2.default)(1400), description: "", unlocked: false, showAt: (0, _big2.default)(12000), owned: 0 }, { name: 'Temple', baseCost: (0, _big2.default)(20E6), buyCost: (0, _big2.default)(20E6), baseCps: (0, _big2.default)(7800), currentCps: (0, _big2.default)(7800), description: "", unlocked: false, showAt: (0, _big2.default)(130000), owned: 0 }, { name: 'Wizard Tower', baseCost: (0, _big2.default)(330E6), buyCost: (0, _big2.default)(330E6), baseCps: (0, _big2.default)(44000), currentCps: (0, _big2.default)(44000), description: "", unlocked: false, showAt: (0, _big2.default)(1.4E6), owned: 0 },
             // no upgrades:
-            { name: 'Shipment', baseCost: (0, _big2.default)(5.1E9), buyCost: (0, _big2.default)(5.1E9), baseCps: (0, _big2.default)(260000), currentCps: (0, _big2.default)(260000), description: "", showAt: (0, _big2.default)(20E6), owned: 0 }, { name: 'Alchemy Lab', baseCost: (0, _big2.default)(75E9), buyCost: (0, _big2.default)(75E9), baseCps: (0, _big2.default)(1.6E6), currentCps: (0, _big2.default)(1.6E6), description: "", showAt: (0, _big2.default)(330E6), owned: 0 }, { name: 'Portal', baseCost: (0, _big2.default)(1E12), buyCost: (0, _big2.default)(1E12), baseCps: (0, _big2.default)(10E6), currentCps: (0, _big2.default)(10E6), description: "", showAt: (0, _big2.default)(5.1E9), owned: 0 }, { name: 'Time Machine', baseCost: (0, _big2.default)(14E12), buyCost: (0, _big2.default)(14E12), baseCps: (0, _big2.default)(65E6), currentCps: (0, _big2.default)(65E6), description: "", showAt: (0, _big2.default)(75E9), owned: 0 }, { name: 'Antimatter Condenser', baseCost: (0, _big2.default)(170E12), buyCost: (0, _big2.default)(170E12), baseCps: (0, _big2.default)(430E6), currentCps: (0, _big2.default)(430E6), description: "", showAt: (0, _big2.default)(1E12), owned: 0 }, { name: 'Prism', baseCost: (0, _big2.default)(2.1E15), buyCost: (0, _big2.default)(2.1E15), baseCps: (0, _big2.default)(2.9E12), currentCps: (0, _big2.default)(2.9E12), description: "", showAt: (0, _big2.default)(14E12), owned: 0 }],
+            { name: 'Shipment', baseCost: (0, _big2.default)(5.1E9), buyCost: (0, _big2.default)(5.1E9), baseCps: (0, _big2.default)(260000), currentCps: (0, _big2.default)(260000), description: "", unlocked: false, showAt: (0, _big2.default)(20E6), owned: 0 }, { name: 'Alchemy Lab', baseCost: (0, _big2.default)(75E9), buyCost: (0, _big2.default)(75E9), baseCps: (0, _big2.default)(1.6E6), currentCps: (0, _big2.default)(1.6E6), description: "", unlocked: false, showAt: (0, _big2.default)(330E6), owned: 0 }, { name: 'Portal', baseCost: (0, _big2.default)(1E12), buyCost: (0, _big2.default)(1E12), baseCps: (0, _big2.default)(10E6), currentCps: (0, _big2.default)(10E6), description: "", unlocked: false, showAt: (0, _big2.default)(5.1E9), owned: 0 }, { name: 'Time Machine', baseCost: (0, _big2.default)(14E12), buyCost: (0, _big2.default)(14E12), baseCps: (0, _big2.default)(65E6), currentCps: (0, _big2.default)(65E6), description: "", unlocked: false, showAt: (0, _big2.default)(75E9), owned: 0 }, { name: 'Antimatter Condenser', baseCost: (0, _big2.default)(170E12), buyCost: (0, _big2.default)(170E12), baseCps: (0, _big2.default)(430E6), currentCps: (0, _big2.default)(430E6), description: "", unlocked: false, showAt: (0, _big2.default)(1E12), owned: 0 }, { name: 'Prism', baseCost: (0, _big2.default)(2.1E15), buyCost: (0, _big2.default)(2.1E15), baseCps: (0, _big2.default)(2.9E12), currentCps: (0, _big2.default)(2.9E12), description: "", unlocked: false, showAt: (0, _big2.default)(14E12), owned: 0 }],
 
             upgrades: [
             // production
@@ -9560,6 +9560,9 @@ exports.default = {
 
         // buildings
         showBuilding: function showBuilding(building) {
+            if (building.unlocked == false && this.totalCrackers.gte(building.baseCost)) {
+                building.unlocked = true;
+            }
             return this.totalCrackers.gte(building.showAt);
         },
         canBuyBuilding: function canBuyBuilding(building) {
@@ -9599,6 +9602,9 @@ exports.default = {
             });
         },
         buildingText: function buildingText(building) {
+            if (building.unlocked == false) {
+                return null;
+            }
             var buildingText = building.description;
             buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
             buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.round(building.currentCps * building.owned) + " crackers per second";
@@ -9728,6 +9734,7 @@ exports.default = {
         }.bind(this), 100);
     }
 }; //
+//
 //
 //
 //
@@ -12880,7 +12887,7 @@ exports = module.exports = __webpack_require__(9)(undefined);
 
 
 // module
-exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.buy-sell-buttons {\n    margin-bottom: 20px;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.buildings,\n.upgrades {\n    margin-top: 50px;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n.tooltips {\n    position: relative;\n    display: inline;\n}\n.tooltips span {\n    position: absolute;\n    width: 300px;\n    color: #FFFFFF;\n    background: #000000;\n    line-height: 24px;\n    text-align: center;\n    visibility: hidden;\n    border-radius: 6px;\n    font-family: \"Helvetica Neue, Helvetica, Arial, sans-serif\";\n    font-weight: bold;\n    padding-right: 5px;\n    padding-left: 5px;\n}\n.tooltips span:after {\n    content: '';\n    position: absolute;\n    top: 100%;\n    left: 50%;\n    margin-left: -8px;\n    width: 0;\n    height: 0;\n    border-top: 8px solid #000000;\n    border-right: 8px solid transparent;\n    border-left: 8px solid transparent;\n}\n:hover.tooltips span {\n    visibility: visible;\n    opacity: 0.8;\n    bottom: 30px;\n    left: 50%;\n    margin-left: -76px;\n    z-index: 999;\n}\n", ""]);
+exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.buy-sell-buttons {\n    margin-bottom: 20px;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.buildings,\n.upgrades {\n    margin-top: 50px;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n.tooltips {\n    position: relative;\n    display: inline;\n}\n.tooltips span {\n    position: absolute;\n    width: 300px;\n    color: #FFFFFF;\n    background: #000000;\n    line-height: 24px;\n    text-align: center;\n    visibility: hidden;\n    border-radius: 6px;\n    font-family: \"Helvetica Neue, Helvetica, Arial, sans-serif\";\n    font-weight: bold;\n    padding-right: 5px;\n    padding-left: 5px;\n}\n.tooltips span:after {\n    content: '';\n    position: absolute;\n    top: 100%;\n    left: 50%;\n    margin-left: -8px;\n    width: 0;\n    height: 0;\n    border-top: 8px solid #000000;\n    border-right: 8px solid transparent;\n    border-left: 8px solid transparent;\n}\n:hover.tooltips span {\n    visibility: visible;\n    opacity: 0.8;\n    bottom: 30px;\n    left: 50%;\n    margin-left: -76px;\n    z-index: 999;\n}\n.redacted {\n    color: black;\n    background-color: black;\n    white-space: nowrap;\n    -moz-transform: rotate(.8deg) skewx(-12deg);\n    -moz-box-shadow: 3px 0 2px #444;\n    border: 1px dotted #555;\n    background: -moz-linear-gradient(180deg, #000, #222);\n}\n", ""]);
 
 // exports
 
@@ -13229,7 +13236,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       domProps: {
         "innerHTML": _vm._s(_vm.buildingText(building))
       }
-    })]), _vm._v("\n                    " + _vm._s(building.name)), _c('br'), _vm._v("(" + _vm._s(building.owned) + " owned)\n                ")]), _vm._v(" "), _c('div', {
+    })]), _vm._v(" "), _c('span', {
+      class: {
+        redacted: building.unlocked == false
+      }
+    }, [_vm._v(_vm._s(building.name))]), _vm._v(" "), _c('br'), _vm._v(" (" + _vm._s(building.owned) + " owned)\n                ")]), _vm._v(" "), _c('div', {
       staticClass: "col-xs-2"
     }, [_c('button', {
       staticClass: "btn btn-default",
