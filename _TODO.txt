@@ -14,6 +14,7 @@ better names/flavor texts
 - maybe procedurally generate names/descriptions every game?
 prettier numbers (million/billion/trillion/etc)
 show upcoming upgrades
+showAt computed property
 
 
 1E6 = 1 million

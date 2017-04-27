@@ -58,7 +58,7 @@
     export default {
         data: function () {
             return {
-                crackers: Big(0),
+                crackers: Big(1E24),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -66,14 +66,21 @@
                 buyAmount: 1,
 
                 buildings: [
-                    { name: 'Finger', baseCost: Big(15), buyCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
-                    { name: 'Toddler', baseCost: Big(100), buyCost: Big(100), baseCps: Big(1), currentCps: Big(1), description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: Big(0), owned: 0 },
-                    { name: 'Kosher Bakery', baseCost: Big(1100), buyCost: Big(1100), baseCps: Big(8), currentCps: Big(8), description: "These guys seem to know what they're doing.", showAt: Big(15), owned: 0 },
-                    { name: 'Non-Kosher Bakery', baseCost: Big(12000), buyCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "These guys don't follow the rules!", showAt: Big(100), owned: 0 },
-                    { name: 'Tea Club', baseCost: Big(130000), buyCost: Big(130000), baseCps: Big(260), currentCps: Big(260), description: "These ladies LOVE crackers with their tea", showAt: Big(1100), owned: 0 },
-                    { name: 'Cracker Factory', baseCost: Big(1.4E6), buyCost: Big(1.4E6), baseCps: Big(1400), currentCps: Big(1400), description: "Seems only logical", showAt: Big(12000), owned: 0 },
-                    { name: 'Cracker Warehouse', baseCost: Big(20E6), buyCost: Big(20E6), baseCps: Big(7800), currentCps: Big(7800), description: "We need more space to store all these crackers!", showAt: Big(130000), owned: 0 },
-                    { name: 'Food Lab', baseCost: Big(330E6), buyCost: Big(330E6), baseCps: Big(44000), currentCps: Big(44000), description: "Genetically engineered crackers?", showAt: Big(1.4E6), owned: 0 },
+                    { name: 'Cursor', baseCost: Big(15), buyCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
+                    { name: 'Grandma', baseCost: Big(100), buyCost: Big(100), baseCps: Big(1), currentCps: Big(1), description: "", showAt: Big(0), owned: 0 },
+                    { name: 'Farm', baseCost: Big(1100), buyCost: Big(1100), baseCps: Big(8), currentCps: Big(8), description: "", showAt: Big(15), owned: 0 },
+                    { name: 'Mine', baseCost: Big(12000), buyCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "!", showAt: Big(100), owned: 0 },
+                    { name: 'Factory', baseCost: Big(130000), buyCost: Big(130000), baseCps: Big(260), currentCps: Big(260), description: "", showAt: Big(1100), owned: 0 },
+                    { name: 'Bank', baseCost: Big(1.4E6), buyCost: Big(1.4E6), baseCps: Big(1400), currentCps: Big(1400), description: "", showAt: Big(12000), owned: 0 },
+                    { name: 'Temple', baseCost: Big(20E6), buyCost: Big(20E6), baseCps: Big(7800), currentCps: Big(7800), description: "", showAt: Big(130000), owned: 0 },
+                    { name: 'Wizard Tower', baseCost: Big(330E6), buyCost: Big(330E6), baseCps: Big(44000), currentCps: Big(44000), description: "", showAt: Big(1.4E6), owned: 0 },
+                    // no upgrades:
+                    { name: 'Shipment', baseCost: Big(5.1E9), buyCost: Big(5.1E9), baseCps: Big(260000), currentCps: Big(260000), description: "", showAt: Big(20E6), owned: 0 },
+                    { name: 'Alchemy Lab', baseCost: Big(75E9), buyCost: Big(75E9), baseCps: Big(1.6E6), currentCps: Big(1.6E6), description: "", showAt: Big(330E6), owned: 0 },
+                    { name: 'Portal', baseCost: Big(1E12), buyCost: Big(1E12), baseCps: Big(10E6), currentCps: Big(10E6), description: "", showAt: Big(5.1E9), owned: 0 },
+                    { name: 'Time Machine', baseCost: Big(14E12), buyCost: Big(14E12), baseCps: Big(65E6), currentCps: Big(65E6), description: "", showAt: Big(75E9), owned: 0 },
+                    { name: 'Antimatter Condenser', baseCost: Big(170E12), buyCost: Big(170E12), baseCps: Big(430E6), currentCps: Big(430E6), description: "", showAt: Big(1E12), owned: 0 },
+                    { name: 'Prism', baseCost: Big(2.1E15), buyCost: Big(2.1E15), baseCps: Big(2.9E12), currentCps: Big(2.9E12), description: "", showAt: Big(14E12), owned: 0 },
                 ],
 
                 upgrades: [
@@ -90,89 +97,81 @@
                     { type: 'Cracker', name: 'Need Name', needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02, description: 'Need Description', active: false },
                     // 4% etc
 
-                    // finger (cursor)
-                    { type: 'Finger', name: 'Double Tap', needed: 1, cost: Big(100), multiplier: 2, description: 'Tap faster', active: false },
-                    { type: 'Finger', name: 'Quattro Tap', needed: 1, cost: Big(500), multiplier: 2, description: 'Tap faster!', active: false },
-                    { type: 'Finger', name: 'Mega Tap', needed: 10, cost: Big(10000), multiplier: 2, description: 'Tap even faster!!', active: false },
-                    { type: 'Finger', name: 'Middle Finger', needed: 20, cost: Big(100000), addition: 0.1, description: 'Put that thing away.', active: false },
-                    { type: 'Finger', name: 'Double Middle Finger', needed: 40, cost: Big(10E6), addition: 0.5, description: 'Put those away.', active: false },
-                    { type: 'Finger', name: 'Extra Middle Fingers', needed: 80, cost: Big(100E6), addition: 5, description: "Now that's just rude.", active: false },
-                    { type: 'Finger', name: 'Super Finger', needed: 120, cost: Big(1E9), addition: 50, description: "No decorum at all.", active: false },
-                    { type: 'Finger', name: 'Super Duper Finger', needed: 160, cost: Big(10E9), addition: 500, description: "Need Description", active: false },
-                    { type: 'Finger', name: 'Mega Finger', needed: 200, cost: Big(10E12), addition: 5000, description: "Need Description", active: false },
-                    { type: 'Finger', name: 'Turbo Finger', needed: 240, cost: Big(100E12), addition: 50000, description: "Need Description", active: false },
-                    { type: 'Finger', name: 'Ultra Finger', needed: 280, cost: Big(1E12), addition: 500000, description: "Need Description", active: false },
-                    { type: 'Finger', name: 'Ultimate Finger', needed: 320, cost: Big(10E15), addition: 5000000, description: "Need Description", active: false },
+                    { type: 'Cursor', name: 'Double Tap', needed: 1, cost: Big(100), multiplier: 2, description: 'Tap faster', active: false },
+                    { type: 'Cursor', name: 'Quattro Tap', needed: 1, cost: Big(500), multiplier: 2, description: 'Tap faster!', active: false },
+                    { type: 'Cursor', name: 'Mega Tap', needed: 10, cost: Big(10000), multiplier: 2, description: 'Tap even faster!!', active: false },
+                    { type: 'Cursor', name: 'Middle Cursor', needed: 20, cost: Big(100000), addition: 0.1, description: 'Put that thing away.', active: false },
+                    { type: 'Cursor', name: 'Double Middle Cursor', needed: 40, cost: Big(10E6), addition: 0.5, description: 'Put those away.', active: false },
+                    { type: 'Cursor', name: 'Extra Middle Cursors', needed: 80, cost: Big(100E6), addition: 5, description: "Now that's just rude.", active: false },
+                    { type: 'Cursor', name: 'Super Cursor', needed: 120, cost: Big(1E9), addition: 50, description: "No decorum at all.", active: false },
+                    { type: 'Cursor', name: 'Super Duper Cursor', needed: 160, cost: Big(10E9), addition: 500, description: "Need Description", active: false },
+                    { type: 'Cursor', name: 'Mega Cursor', needed: 200, cost: Big(10E12), addition: 5000, description: "Need Description", active: false },
+                    { type: 'Cursor', name: 'Turbo Cursor', needed: 240, cost: Big(100E12), addition: 50000, description: "Need Description", active: false },
+                    { type: 'Cursor', name: 'Ultra Cursor', needed: 280, cost: Big(1E12), addition: 500000, description: "Need Description", active: false },
+                    { type: 'Cursor', name: 'Ultimate Cursor', needed: 320, cost: Big(10E15), addition: 5000000, description: "Need Description", active: false },
 
-                    // toddler (grandma)
-                    { type: 'Toddler', name: 'Timeout', needed: 1, cost: Big(1000), multiplier: 2, description: 'These toddlers need to learn some discipline', active: false },
-                    { type: 'Toddler', name: 'Daycare', needed: 5, cost: Big(5000), multiplier: 2, description: 'Finally, some me time!', active: false },
-                    { type: 'Toddler', name: 'Play Date', needed: 25, cost: Big(50000), multiplier: 2, description: 'An active social life is good for productivity', active: false },
-                    { type: 'Toddler', name: 'ADHD Meds', needed: 50, cost: Big(5E6), multiplier: 2, description: "That's better...", active: false },
-                    { type: 'Toddler', name: 'Jack', needed: 100, cost: Big(500E6), multiplier: 2, description: "Like that movie?", active: false },
-                    { type: 'Toddler', name: 'Jack & Jill', needed: 150, cost: Big(50E9), multiplier: 2, description: "The worst Adam Sandler movie", active: false },
-                    { type: 'Toddler', name: 'Need Name', needed: 200, cost: Big(50E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Toddler', name: 'Need Name', needed: 250, cost: Big(50E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Grandma', name: 'Timeout', needed: 1, cost: Big(1000), multiplier: 2, description: 'These toddlers need to learn some discipline', active: false },
+                    { type: 'Grandma', name: 'Daycare', needed: 5, cost: Big(5000), multiplier: 2, description: 'Finally, some me time!', active: false },
+                    { type: 'Grandma', name: 'Play Date', needed: 25, cost: Big(50000), multiplier: 2, description: 'An active social life is good for productivity', active: false },
+                    { type: 'Grandma', name: 'ADHD Meds', needed: 50, cost: Big(5E6), multiplier: 2, description: "That's better...", active: false },
+                    { type: 'Grandma', name: 'Jack', needed: 100, cost: Big(500E6), multiplier: 2, description: "Like that movie?", active: false },
+                    { type: 'Grandma', name: 'Jack & Jill', needed: 150, cost: Big(50E9), multiplier: 2, description: "The worst Adam Sandler movie", active: false },
+                    { type: 'Grandma', name: 'Need Name', needed: 200, cost: Big(50E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Grandma', name: 'Need Name', needed: 250, cost: Big(50E15), multiplier: 2, description: "Need Description", active: false },
 
-                    // kosher bakery (farm)
-                    { type: 'Kosher Bakery', name: 'Torah', needed: 1, cost: Big(11000), multiplier: 2, description: 'Got to follow the rules', active: false },
-                    { type: 'Kosher Bakery', name: 'Another Torah', needed: 5, cost: Big(55000), multiplier: 2, description: 'More to go around', active: false },
-                    { type: 'Kosher Bakery', name: 'Rabbi', needed: 25, cost: Big(550000), multiplier: 2, description: "This rabbi doesn't come cheap", active: false },
-                    { type: 'Kosher Bakery', name: 'Rabbi Council', needed: 50, cost: Big(55E6), multiplier: 2, description: "These rabbis don't come cheap", active: false },
-                    { type: 'Kosher Bakery', name: 'Passover Bonus', needed: 100, cost: Big(5.5E9), multiplier: 2, description: "What does that even mean?", active: false },
-                    { type: 'Kosher Bakery', name: 'Need Name', needed: 150, cost: Big(550E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Kosher Bakery', name: 'Need Name', needed: 200, cost: Big(550E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Kosher Bakery', name: 'Need Name', needed: 250, cost: Big(550E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Farm', name: 'Torah', needed: 1, cost: Big(11000), multiplier: 2, description: 'Got to follow the rules', active: false },
+                    { type: 'Farm', name: 'Another Torah', needed: 5, cost: Big(55000), multiplier: 2, description: 'More to go around', active: false },
+                    { type: 'Farm', name: 'Rabbi', needed: 25, cost: Big(550000), multiplier: 2, description: "This rabbi doesn't come cheap", active: false },
+                    { type: 'Farm', name: 'Rabbi Council', needed: 50, cost: Big(55E6), multiplier: 2, description: "These rabbis don't come cheap", active: false },
+                    { type: 'Farm', name: 'Passover Bonus', needed: 100, cost: Big(5.5E9), multiplier: 2, description: "What does that even mean?", active: false },
+                    { type: 'Farm', name: 'Need Name', needed: 150, cost: Big(550E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Farm', name: 'Need Name', needed: 200, cost: Big(550E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Farm', name: 'Need Name', needed: 250, cost: Big(550E15), multiplier: 2, description: "Need Description", active: false },
 
-                    // non-kosher bakery (mine)
-                    { type: 'Non-Kosher Bakery', name: 'Knockoff Torah', needed: 1, cost: Big(120000), multiplier: 2, description: "This doesn't seem legit...", active: false },
-                    { type: 'Non-Kosher Bakery', name: 'Another Knockoff Torah', needed: 5, cost: Big(600000), multiplier: 2, description: "??", active: false },
-                    { type: 'Non-Kosher Bakery', name: 'Fake Rabbi', needed: 25, cost: Big(6E6), multiplier: 2, description: "I don't think his beard is real", active: false },
-                    { type: 'Non-Kosher Bakery', name: 'Fake Rabbi Council', needed: 50, cost: Big(600E6), multiplier: 2, description: "I have a bad feeling about this", active: false },
-                    { type: 'Non-Kosher Bakery', name: 'Fake Passover Bonus', needed: 100, cost: Big(60E9), multiplier: 2, description: "What does that even mean?!", active: false },
-                    { type: 'Non-Kosher Bakery', name: 'Need Name', needed: 150, cost: Big(6E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Non-Kosher Bakery', name: 'Need Name', needed: 200, cost: Big(6E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Non-Kosher Bakery', name: 'Need Name', needed: 250, cost: Big(6E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Mine', name: 'Knockoff Torah', needed: 1, cost: Big(120000), multiplier: 2, description: "This doesn't seem legit...", active: false },
+                    { type: 'Mine', name: 'Another Knockoff Torah', needed: 5, cost: Big(600000), multiplier: 2, description: "??", active: false },
+                    { type: 'Mine', name: 'Fake Rabbi', needed: 25, cost: Big(6E6), multiplier: 2, description: "I don't think his beard is real", active: false },
+                    { type: 'Mine', name: 'Fake Rabbi Council', needed: 50, cost: Big(600E6), multiplier: 2, description: "I have a bad feeling about this", active: false },
+                    { type: 'Mine', name: 'Fake Passover Bonus', needed: 100, cost: Big(60E9), multiplier: 2, description: "What does that even mean?!", active: false },
+                    { type: 'Mine', name: 'Need Name', needed: 150, cost: Big(6E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Mine', name: 'Need Name', needed: 200, cost: Big(6E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Mine', name: 'Need Name', needed: 250, cost: Big(6E18), multiplier: 2, description: "Need Description", active: false },
 
-                    // tea club (factory)
-                    { type: 'Tea Club', name: 'Strumpets', needed: 1, cost: Big(1.3E6), multiplier: 2, description: "What are we, savages?", active: false },
-                    { type: 'Tea Club', name: 'Valet', needed: 5, cost: Big(6.5E6), multiplier: 2, description: "I'm too rich to park my car", active: false },
-                    { type: 'Tea Club', name: 'Servant', needed: 25, cost: Big(65E6), multiplier: 2, description: "It's not technically slavery!", active: false },
-                    { type: 'Tea Club', name: 'Free trade tea', needed: 50, cost: Big(6.5E9), multiplier: 2, description: "I feel so much better about this", active: false },
-                    { type: 'Tea Club', name: 'Slavery tea', needed: 100, cost: Big(650E9), multiplier: 2, description: "Suffering tastes better", active: false },
-                    { type: 'Tea Club', name: 'Need Name', needed: 150, cost: Big(65E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Tea Club', name: 'Need Name', needed: 200, cost: Big(65E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Tea Club', name: 'Need Name', needed: 250, cost: Big(65E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Factory', name: 'Strumpets', needed: 1, cost: Big(1.3E6), multiplier: 2, description: "What are we, savages?", active: false },
+                    { type: 'Factory', name: 'Valet', needed: 5, cost: Big(6.5E6), multiplier: 2, description: "I'm too rich to park my car", active: false },
+                    { type: 'Factory', name: 'Servant', needed: 25, cost: Big(65E6), multiplier: 2, description: "It's not technically slavery!", active: false },
+                    { type: 'Factory', name: 'Free trade tea', needed: 50, cost: Big(6.5E9), multiplier: 2, description: "I feel so much better about this", active: false },
+                    { type: 'Factory', name: 'Slavery tea', needed: 100, cost: Big(650E9), multiplier: 2, description: "Suffering tastes better", active: false },
+                    { type: 'Factory', name: 'Need Name', needed: 150, cost: Big(65E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Factory', name: 'Need Name', needed: 200, cost: Big(65E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Factory', name: 'Need Name', needed: 250, cost: Big(65E18), multiplier: 2, description: "Need Description", active: false },
 
-                    // cracker factory (bank)
-                    { type: 'Cracker Factory', name: 'Strumpets', needed: 1, cost: Big(14E6), multiplier: 2, description: "What are we, savages?", active: false },
-                    { type: 'Cracker Factory', name: 'Valet', needed: 5, cost: Big(70E6), multiplier: 2, description: "I'm too rich to park my car", active: false },
-                    { type: 'Cracker Factory', name: 'Servant', needed: 25, cost: Big(700E6), multiplier: 2, description: "It's not technically slavery!", active: false },
-                    { type: 'Cracker Factory', name: 'Free trade tea', needed: 50, cost: Big(70E9), multiplier: 2, description: "I feel so much better about this", active: false },
-                    { type: 'Cracker Factory', name: 'Slavery tea', needed: 100, cost: Big(7E12), multiplier: 2, description: "Suffering tastes better", active: false },
-                    { type: 'Cracker Factory', name: 'Need Name', needed: 150, cost: Big(700E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Cracker Factory', name: 'Need Name', needed: 200, cost: Big(700E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Cracker Factory', name: 'Need Name', needed: 250, cost: Big(700E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Bank', name: 'Strumpets', needed: 1, cost: Big(14E6), multiplier: 2, description: "What are we, savages?", active: false },
+                    { type: 'Bank', name: 'Valet', needed: 5, cost: Big(70E6), multiplier: 2, description: "I'm too rich to park my car", active: false },
+                    { type: 'Bank', name: 'Servant', needed: 25, cost: Big(700E6), multiplier: 2, description: "It's not technically slavery!", active: false },
+                    { type: 'Bank', name: 'Free trade tea', needed: 50, cost: Big(70E9), multiplier: 2, description: "I feel so much better about this", active: false },
+                    { type: 'Bank', name: 'Slavery tea', needed: 100, cost: Big(7E12), multiplier: 2, description: "Suffering tastes better", active: false },
+                    { type: 'Bank', name: 'Need Name', needed: 150, cost: Big(700E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Bank', name: 'Need Name', needed: 200, cost: Big(700E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Bank', name: 'Need Name', needed: 250, cost: Big(700E18), multiplier: 2, description: "Need Description", active: false },
 
-                    // cracker warehouse (temple)
-                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 1, cost: Big(200E6), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 5, cost: Big(1E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 25, cost: Big(10E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 50, cost: Big(1E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 100, cost: Big(100E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 150, cost: Big(10E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 200, cost: Big(10E18), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Cracker Warehouse', name: 'Need Name', needed: 250, cost: Big(10E21), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 1, cost: Big(200E6), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 5, cost: Big(1E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 25, cost: Big(10E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 50, cost: Big(1E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 100, cost: Big(100E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 150, cost: Big(10E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 200, cost: Big(10E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Temple', name: 'Need Name', needed: 250, cost: Big(10E21), multiplier: 2, description: "Need Description", active: false },
 
-                    // food lab (wizard tower)
-                    { type: 'Food Lab', name: 'Need Name', needed: 1, cost: Big(3.3E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Food Lab', name: 'Need Name', needed: 5, cost: Big(16.5E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Food Lab', name: 'Need Name', needed: 25, cost: Big(165E9), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Food Lab', name: 'Need Name', needed: 50, cost: Big(16.5E12), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Food Lab', name: 'Need Name', needed: 100, cost: Big(1.65E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Food Lab', name: 'Need Name', needed: 150, cost: Big(165E15), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Food Lab', name: 'Need Name', needed: 200, cost: Big(165E18), multiplier: 2, description: "Need Description", active: false },
-                    { type: 'Food Lab', name: 'Need Name', needed: 250, cost: Big(165E21), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 1, cost: Big(3.3E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 5, cost: Big(16.5E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 25, cost: Big(165E9), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 50, cost: Big(16.5E12), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 100, cost: Big(1.65E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 150, cost: Big(165E15), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 200, cost: Big(165E18), multiplier: 2, description: "Need Description", active: false },
+                    { type: 'Wizard Tower', name: 'Need Name', needed: 250, cost: Big(165E21), multiplier: 2, description: "Need Description", active: false },
                 ],
 
                 _sortedUpgrades: null,
@@ -191,11 +190,11 @@
                     { type: 'Cracker', name: 'Clickathon', clicks: Big(100000) },
 
                     // buildings
-                    { type: 'Finger', name: 'Click', total: Big(1) },
-                    { type: 'Finger', name: 'Double Click', total: Big(2) },
+                    { type: 'Cursor', name: 'Click', total: Big(1) },
+                    { type: 'Cursor', name: 'Double Click', total: Big(2) },
 
-                    { type: 'Toddler', name: 'Toddler basics', total: Big(1) },
-                    { type: 'Toddler', name: 'Toddler proficiency', total: Big(50) },
+                    { type: 'Grandma', name: 'Grandma basics', total: Big(1) },
+                    { type: 'Grandma', name: 'Grandma proficiency', total: Big(50) },
                 ],
             }
         },
@@ -223,7 +222,7 @@
                 this.totalCrackers = this.totalCrackers.plus(this.clickPower);
             },
             recalculateClickPower: function () {
-                this.clickPower = this.upgradeMultiplier('Finger').plus(this.upgradeAddition());
+                this.clickPower = this.upgradeMultiplier('Cursor').plus(this.upgradeAddition());
             },
             recalculateCps: function () {
                 let cps = Big(0);
@@ -334,12 +333,12 @@
             },
             upgradeAddition: function () {
                 let addition = Big(0);
-                this.activeUpgrades('Finger').forEach(function (upgrade) {
+                this.activeUpgrades('Cursor').forEach(function (upgrade) {
                     if (upgrade.addition != null) {
                         addition = addition.plus(upgrade.addition);
                     }
                 });
-                return addition * this.otherBuildingCount('Finger');
+                return addition * this.otherBuildingCount('Cursor');
             },
             upgradeProduction: function () {
                 let production = 1;
