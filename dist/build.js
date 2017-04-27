@@ -10132,8 +10132,6 @@ Object.defineProperty(exports, "__esModule", {
 //
 //
 //
-//
-//
 
 exports.default = {
     data: function data() {
@@ -10144,7 +10142,7 @@ exports.default = {
             cps: 0,
             clickPower: 1,
 
-            buildings: [{ name: 'Finger', baseCost: 15, baseCps: 0.1, description: 'Growing extra fingers will allow you to click more often.', showAt: 0, owned: 0 }, { name: 'Toddler', baseCost: 100, baseCps: 1, description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: 0, owned: 0 }, { name: 'Kosher Bakery', baseCost: 1100, baseCps: 8, description: "These guys seem to know what they're doing.", showAt: 15, owned: 0 }, { name: 'Non-Kosher Bakery', baseCost: 12000, baseCps: 47, description: "These guys don't follow the rules!", showAt: 100, owned: 0 }, { name: 'Tea Club', baseCost: 130000, baseCps: 260, description: "These people LOVE crackers with their tea", showAt: 1100, owned: 0 }, { name: 'Cracker Factory', baseCost: 1400000, baseCps: 1400, description: "Seems only logical", showAt: 12000, owned: 0 }],
+            buildings: [{ name: 'Finger', baseCost: 15, baseCps: 0.1, currentCps: 0.1, description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 }, { name: 'Toddler', baseCost: 100, baseCps: 1, currentCps: 1, description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: 0, owned: 0 }, { name: 'Kosher Bakery', baseCost: 1100, baseCps: 8, currentCps: 8, description: "These guys seem to know what they're doing.", showAt: 15, owned: 0 }, { name: 'Non-Kosher Bakery', baseCost: 12000, baseCps: 47, currentCps: 47, description: "These guys don't follow the rules!", showAt: 100, owned: 0 }, { name: 'Tea Club', baseCost: 130000, baseCps: 260, currentCps: 260, description: "These people LOVE crackers with their tea", showAt: 1100, owned: 0 }, { name: 'Cracker Factory', baseCost: 1400000, baseCps: 1400, currentCps: 1400, description: "Seems only logical", showAt: 12000, owned: 0 }],
 
             upgrades: [
             // production
@@ -10200,7 +10198,9 @@ exports.default = {
             var cps = 0;
             var vm = this;
             this.ownedBuildings().forEach(function (building) {
-                cps += building.baseCps * building.owned * vm.upgradeMultiplier(building.name);
+                var buildingCps = building.baseCps * vm.upgradeMultiplier(building.name);
+                building.currentCps = buildingCps;
+                cps += buildingCps * building.owned;
             });
 
             // add finger additive upgrades
@@ -10246,6 +10246,12 @@ exports.default = {
             return this.buildings.filter(function (building) {
                 return building.owned > 0;
             });
+        },
+        buildingText: function buildingText(building) {
+            var buildingText = building.description;
+            buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
+            buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + building.currentCps * building.owned + " crackers per second";
+            return buildingText;
         },
 
         // upgrades
@@ -10300,9 +10306,9 @@ exports.default = {
         upgradeText: function upgradeText(upgrade) {
             var upgradeText = upgrade.description;
             if (upgrade.multiplier != null) {
-                upgradeText += ' (Multiplies ' + upgrade.type + ' production by ' + upgrade.multiplier + ')';
+                upgradeText += '<br/>Multiplies ' + upgrade.type + ' production by ' + upgrade.multiplier + 'x';
             } else if (upgrade.addition != null) {
-                upgradeText += ' (Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned)';
+                upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
             }
             return upgradeText;
         },
@@ -12287,7 +12293,7 @@ exports = module.exports = __webpack_require__(9)(undefined);
 
 
 // module
-exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n.tooltips {\n    position: relative;\n    display: inline;\n}\n.tooltips span {\n    position: absolute;\n    width: 300px;\n    color: #FFFFFF;\n    background: #000000;\n    line-height: 24px;\n    text-align: center;\n    visibility: hidden;\n    border-radius: 6px;\n    font-family: \"Helvetica Neue, Helvetica, Arial, sans-serif\";\n    font-weight: bold;\n    padding-right: 5px;\n    padding-left: 5px;\n}\n.tooltips span:after {\n    content: '';\n    position: absolute;\n    top: 100%;\n    left: 50%;\n    margin-left: -8px;\n    width: 0;\n    height: 0;\n    border-top: 8px solid #000000;\n    border-right: 8px solid transparent;\n    border-left: 8px solid transparent;\n}\n:hover.tooltips span {\n    visibility: visible;\n    opacity: 0.8;\n    bottom: 30px;\n    left: 50%;\n    margin-left: -76px;\n    z-index: 999;\n}\n", ""]);
+exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.buildings,\n.upgrades {\n    margin-top: 50px;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n.tooltips {\n    position: relative;\n    display: inline;\n}\n.tooltips span {\n    position: absolute;\n    width: 300px;\n    color: #FFFFFF;\n    background: #000000;\n    line-height: 24px;\n    text-align: center;\n    visibility: hidden;\n    border-radius: 6px;\n    font-family: \"Helvetica Neue, Helvetica, Arial, sans-serif\";\n    font-weight: bold;\n    padding-right: 5px;\n    padding-left: 5px;\n}\n.tooltips span:after {\n    content: '';\n    position: absolute;\n    top: 100%;\n    left: 50%;\n    margin-left: -8px;\n    width: 0;\n    height: 0;\n    border-top: 8px solid #000000;\n    border-right: 8px solid transparent;\n    border-left: 8px solid transparent;\n}\n:hover.tooltips span {\n    visibility: visible;\n    opacity: 0.8;\n    bottom: 30px;\n    left: 50%;\n    margin-left: -76px;\n    z-index: 999;\n}\n", ""]);
 
 // exports
 
@@ -12565,7 +12571,7 @@ module.exports = function normalizeComponent (
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "row"
-  }, [_vm._m(0), _vm._v(" "), _c('div', {
+  }, [_c('div', {
     staticClass: "col-md-3"
   }, [_c('div', {
     staticClass: "row totals"
@@ -12598,7 +12604,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       attrs: {
         "aria-hidden": "true"
       }
-    }, [_c('span', [_vm._v(_vm._s(building.description))])]), _vm._v("\n                    " + _vm._s(building.name) + " (" + _vm._s(building.owned) + ")\n                ")]), _vm._v(" "), _c('div', {
+    }, [_c('span', {
+      domProps: {
+        "innerHTML": _vm._s(_vm.buildingText(building))
+      }
+    })]), _vm._v("\n                    " + _vm._s(building.name) + " (" + _vm._s(building.owned) + ")\n                ")]), _vm._v(" "), _c('div', {
       staticClass: "col-xs-2"
     }, [_c('button', {
       staticClass: "btn btn-default",
@@ -12622,7 +12632,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       attrs: {
         "aria-hidden": "true"
       }
-    }, [_c('span', [_vm._v(_vm._s(_vm.upgradeText(upgrade)) + " ")])]), _vm._v(" "), _c('span', {
+    }, [_c('span', {
+      domProps: {
+        "innerHTML": _vm._s(_vm.upgradeText(upgrade))
+      }
+    })]), _vm._v(" "), _c('span', {
       staticClass: "upgrade-link",
       on: {
         "click": function($event) {
@@ -12631,14 +12645,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }, [_vm._v(_vm._s(upgrade.type) + ": " + _vm._s(upgrade.name) + " (" + _vm._s(upgrade.cost) + ")")])])]) : _vm._e()
   })], 2)])])
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('a', {
-    staticClass: "tooltips",
-    attrs: {
-      "href": "#"
-    }
-  }, [_vm._v("CSS Tooltips"), _c('span', [_vm._v("Tooltip")])])
-}]}
+},staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()

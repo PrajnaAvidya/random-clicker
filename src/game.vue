@@ -1,7 +1,5 @@
 <template>
     <div class="row">
-        <a class="tooltips" href="#">CSS Tooltips<span>Tooltip</span></a>
-
         <div class="col-md-3">
             <div class="row totals">
                 <span class="total-crackers"><h1>{{ crackers | whole }} crackers</h1></span>
@@ -21,7 +19,7 @@
                 <div class="row building" v-for="building in buildings" v-if="building.owned > 0 || showBuilding(building)">
                     <div class="col-xs-4">
 
-                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span>{{ building.description }}</span></span>
+                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="buildingText(building)"></span></span>
                         {{ building.name }} ({{ building.owned }})
                     </div>
                     <div class="col-xs-2">
@@ -37,7 +35,7 @@
 
                 <div class="row upgrade" v-for="upgrade in orderBy(upgrades, 'cost')" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
                     <div class="col-xs-12">
-                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span>{{ upgradeText(upgrade) }} </span></span>
+                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
                         <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost }})</span>
                     </div>
                 </div>
@@ -57,12 +55,12 @@
                 clickPower: 1,
 
                 buildings: [
-                    { name: 'Finger', baseCost: 15, baseCps: 0.1, description: 'Growing extra fingers will allow you to click more often.', showAt: 0, owned: 0 },
-                    { name: 'Toddler', baseCost: 100, baseCps: 1, description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: 0, owned: 0 },
-                    { name: 'Kosher Bakery', baseCost: 1100, baseCps: 8, description: "These guys seem to know what they're doing.", showAt: 15, owned: 0 },
-                    { name: 'Non-Kosher Bakery', baseCost: 12000, baseCps: 47, description: "These guys don't follow the rules!", showAt: 100, owned: 0 },
-                    { name: 'Tea Club', baseCost: 130000, baseCps: 260, description: "These people LOVE crackers with their tea", showAt: 1100, owned: 0 },
-                    { name: 'Cracker Factory', baseCost: 1400000, baseCps: 1400, description: "Seems only logical", showAt: 12000, owned: 0 },
+                    { name: 'Finger', baseCost: 15, baseCps: 0.1, currentCps: 0.1, description: "Growing extra fingers will allow you to click more often. Autoclicks once every 10 seconds.", showAt: 0, owned: 0 },
+                    { name: 'Toddler', baseCost: 100, baseCps: 1, currentCps: 1, description: "These toddlers will eat crackers if you tell them they're cookies.", showAt: 0, owned: 0 },
+                    { name: 'Kosher Bakery', baseCost: 1100, baseCps: 8, currentCps: 8, description: "These guys seem to know what they're doing.", showAt: 15, owned: 0 },
+                    { name: 'Non-Kosher Bakery', baseCost: 12000, baseCps: 47, currentCps: 47, description: "These guys don't follow the rules!", showAt: 100, owned: 0 },
+                    { name: 'Tea Club', baseCost: 130000, baseCps: 260, currentCps: 260, description: "These people LOVE crackers with their tea", showAt: 1100, owned: 0 },
+                    { name: 'Cracker Factory', baseCost: 1400000, baseCps: 1400, currentCps: 1400, description: "Seems only logical", showAt: 12000, owned: 0 },
                 ],
 
                 upgrades: [
@@ -157,7 +155,9 @@
                 let cps = 0;
                 let vm = this;
                 this.ownedBuildings().forEach(function (building) {
-                    cps += building.baseCps * building.owned * vm.upgradeMultiplier(building.name);
+                    let buildingCps = building.baseCps * vm.upgradeMultiplier(building.name);
+                    building.currentCps = buildingCps;
+                    cps += buildingCps * building.owned;
                 });
 
                 // add finger additive upgrades
@@ -203,6 +203,12 @@
                 return this.buildings.filter(function (building) {
                     return building.owned > 0;
                 });
+            },
+            buildingText: function (building) {
+                let buildingText = building.description;
+                buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
+                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + (building.currentCps * building.owned) + " crackers per second";
+                return buildingText;
             },
 
             // upgrades
@@ -257,9 +263,9 @@
             upgradeText: function (upgrade) {
                 let upgradeText = upgrade.description;
                 if (upgrade.multiplier != null) {
-                    upgradeText += ' (Multiplies ' + upgrade.type + ' production by ' + upgrade.multiplier + ')';
+                    upgradeText += '<br/>Multiplies ' + upgrade.type + ' production by ' + upgrade.multiplier + 'x';
                 } else if (upgrade.addition != null) {
-                    upgradeText += ' (Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned)';
+                    upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
                 }
                 return upgradeText;
             },
@@ -291,6 +297,11 @@
     
     .upgrade-link {
         text-decoration: underline;
+    }
+    
+    .buildings,
+    .upgrades {
+        margin-top: 50px;
     }
     
     .building {
