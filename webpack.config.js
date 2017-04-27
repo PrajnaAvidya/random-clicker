@@ -11,6 +11,7 @@ module.exports = {
     module: {
         // Special compilation rules
         loaders: [
+            // babel
             {
                 // Ask webpack to check: If this file ends with .js, then apply some transforms
                 test: /\.js$/,
@@ -18,6 +19,12 @@ module.exports = {
                 loader: 'babel-loader',
                 // don't transform node_modules folder (which don't need to be compiled)
                 exclude: /node_modules/
+            },
+
+            // vue
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader'
             }
         ]
     },
