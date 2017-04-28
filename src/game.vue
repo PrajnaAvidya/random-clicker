@@ -72,7 +72,7 @@
             return {
                 enableLoad: true,
 
-                crackers: Big(0),
+                crackers: Big(10000000),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -136,9 +136,19 @@
         methods: {
             // clicking/cps
             crackerClick: function () {
-                this.clicks = this.clicks.plus(this.clickPower);
-                this.crackers = this.crackers.plus(this.clickPower);
-                this.totalCrackers = this.totalCrackers.plus(this.clickPower);
+                let vm = this;
+                let loopAmount = Big(10);
+                if (this.clickPower < 10) {
+                    loopAmount = Big(this.clickPower);
+                }
+                let clickAmount = this.clickPower.div(loopAmount);
+                for (let i = 0; i < loopAmount; i++) {
+                    setTimeout(function timer() {
+                        vm.clicks = vm.clicks.plus(clickAmount);
+                        vm.crackers = vm.crackers.plus(clickAmount);
+                        vm.totalCrackers = vm.totalCrackers.plus(clickAmount);
+                    }, i * 250 / loopAmount);
+                }
             },
             recalculateClickPower: function () {
                 this.clickPower = this.upgradeMultiplier(this.buildingNames[0]).plus(this.upgradeAddition());
@@ -382,8 +392,8 @@
 
             // tick function
             tick: function () {
-                this.crackers = this.crackers.plus(this.cps.div(10));
-                this.totalCrackers = this.totalCrackers.plus(this.cps.div(10));
+                this.crackers = this.crackers.plus(this.cps.div(50));
+                this.totalCrackers = this.totalCrackers.plus(this.cps.div(50));
             },
 
             // misc/setup
@@ -546,7 +556,7 @@
 
             setInterval(function () {
                 this.tick();
-            }.bind(this), 100);
+            }.bind(this), 20);
 
             setInterval(function () {
                 this.checkAchievements();

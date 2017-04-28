@@ -17,7 +17,8 @@ generated descriptions
 sounds
 hard reset button
 just show next locked building upgrade instead of the -10 method
-sequential numbers - this seems like a big "juice" thing
+also the dismissable achievements
+dynamic fps based on performance
 
 1E6 = 1 million
 1E9 = 1 billion

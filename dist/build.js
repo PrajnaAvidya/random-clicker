@@ -10705,7 +10705,7 @@ exports.default = {
         return {
             enableLoad: true,
 
-            crackers: (0, _big2.default)(0),
+            crackers: (0, _big2.default)(10000000),
             totalCrackers: (0, _big2.default)(0),
             clicks: (0, _big2.default)(0),
             cps: (0, _big2.default)(0),
@@ -10754,9 +10754,19 @@ exports.default = {
     methods: {
         // clicking/cps
         crackerClick: function crackerClick() {
-            this.clicks = this.clicks.plus(this.clickPower);
-            this.crackers = this.crackers.plus(this.clickPower);
-            this.totalCrackers = this.totalCrackers.plus(this.clickPower);
+            var vm = this;
+            var loopAmount = (0, _big2.default)(10);
+            if (this.clickPower < 10) {
+                loopAmount = (0, _big2.default)(this.clickPower);
+            }
+            var clickAmount = this.clickPower.div(loopAmount);
+            for (var i = 0; i < loopAmount; i++) {
+                setTimeout(function timer() {
+                    vm.clicks = vm.clicks.plus(clickAmount);
+                    vm.crackers = vm.crackers.plus(clickAmount);
+                    vm.totalCrackers = vm.totalCrackers.plus(clickAmount);
+                }, i * 250 / loopAmount);
+            }
         },
         recalculateClickPower: function recalculateClickPower() {
             this.clickPower = this.upgradeMultiplier(this.buildingNames[0]).plus(this.upgradeAddition());
@@ -11000,8 +11010,8 @@ exports.default = {
 
         // tick function
         tick: function tick() {
-            this.crackers = this.crackers.plus(this.cps.div(10));
-            this.totalCrackers = this.totalCrackers.plus(this.cps.div(10));
+            this.crackers = this.crackers.plus(this.cps.div(50));
+            this.totalCrackers = this.totalCrackers.plus(this.cps.div(50));
         },
 
         // misc/setup
@@ -11164,7 +11174,7 @@ exports.default = {
 
         setInterval(function () {
             this.tick();
-        }.bind(this), 100);
+        }.bind(this), 20);
 
         setInterval(function () {
             this.checkAchievements();
