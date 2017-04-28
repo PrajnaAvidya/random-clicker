@@ -9486,6 +9486,9 @@ exports.default = {
             cps: (0, _big2.default)(0),
             clickPower: (0, _big2.default)(1),
             buyAmount: 1,
+            showUpgrades: false,
+            showAchievements: false,
+            achievementCount: 0,
 
             buildings: [{ name: 'Cursor', baseCost: (0, _big2.default)(15), buyCost: (0, _big2.default)(15), baseCps: (0, _big2.default)(0.1), currentCps: (0, _big2.default)(0.1), description: "Autoclicks once every 10 seconds.", unlocked: false, showAt: 0, owned: 0 }, { name: 'Grandma', baseCost: (0, _big2.default)(100), buyCost: (0, _big2.default)(100), baseCps: (0, _big2.default)(1), currentCps: (0, _big2.default)(1), description: "", unlocked: false, showAt: (0, _big2.default)(0), owned: 0 }, { name: 'Farm', baseCost: (0, _big2.default)(1100), buyCost: (0, _big2.default)(1100), baseCps: (0, _big2.default)(8), currentCps: (0, _big2.default)(8), description: "", unlocked: false, showAt: (0, _big2.default)(15), owned: 0 }, { name: 'Mine', baseCost: (0, _big2.default)(12000), buyCost: (0, _big2.default)(12000), baseCps: (0, _big2.default)(47), currentCps: (0, _big2.default)(47), description: "", unlocked: false, showAt: (0, _big2.default)(100), owned: 0 }, { name: 'Factory', baseCost: (0, _big2.default)(130000), buyCost: (0, _big2.default)(130000), baseCps: (0, _big2.default)(260), currentCps: (0, _big2.default)(260), description: "", unlocked: false, showAt: (0, _big2.default)(1100), owned: 0 }, { name: 'Bank', baseCost: (0, _big2.default)(1.4E6), buyCost: (0, _big2.default)(1.4E6), baseCps: (0, _big2.default)(1400), currentCps: (0, _big2.default)(1400), description: "", unlocked: false, showAt: (0, _big2.default)(12000), owned: 0 }, { name: 'Temple', baseCost: (0, _big2.default)(20E6), buyCost: (0, _big2.default)(20E6), baseCps: (0, _big2.default)(7800), currentCps: (0, _big2.default)(7800), description: "", unlocked: false, showAt: (0, _big2.default)(130000), owned: 0 }, { name: 'Wizard Tower', baseCost: (0, _big2.default)(330E6), buyCost: (0, _big2.default)(330E6), baseCps: (0, _big2.default)(44000), currentCps: (0, _big2.default)(44000), description: "", unlocked: false, showAt: (0, _big2.default)(1.4E6), owned: 0 },
             // no upgrades:
@@ -9500,18 +9503,18 @@ exports.default = {
 
             _sortedUpgrades: null,
 
-            achivements: [
+            achievements: [
             // total crackers
-            { type: 'Cracker', name: 'Cracker', total: (0, _big2.default)(1) }, { type: 'Cracker', name: 'Crackers', total: (0, _big2.default)(1000) },
+            { type: 'Cracker', name: 'Cracker', total: (0, _big2.default)(1), unlocked: false }, { type: 'Cracker', name: 'Crackers', total: (0, _big2.default)(1000), unlocked: false },
 
             // cps
-            { type: 'Cracker', name: 'Casual baking', cps: (0, _big2.default)(1) }, { type: 'Cracker', name: 'Hardcore baking', cps: (0, _big2.default)(10) },
+            { type: 'Cracker', name: 'Casual baking', cps: (0, _big2.default)(1), unlocked: false }, { type: 'Cracker', name: 'Hardcore baking', cps: (0, _big2.default)(10), unlocked: false },
 
             // clicking
-            { type: 'Cracker', name: 'Clicktastic', clicks: (0, _big2.default)(10000) }, { type: 'Cracker', name: 'Clickathon', clicks: (0, _big2.default)(100000) },
+            { type: 'Cracker', name: 'Clicktastic', clicks: (0, _big2.default)(10000), unlocked: false }, { type: 'Cracker', name: 'Clickathon', clicks: (0, _big2.default)(100000), unlocked: false },
 
             // buildings
-            { type: 'Cursor', name: 'Click', total: (0, _big2.default)(1) }, { type: 'Cursor', name: 'Double Click', total: (0, _big2.default)(2) }, { type: 'Grandma', name: 'Grandma basics', total: (0, _big2.default)(1) }, { type: 'Grandma', name: 'Grandma proficiency', total: (0, _big2.default)(50) }]
+            { type: 'Cursor', name: 'Click', total: (0, _big2.default)(1), unlocked: false }, { type: 'Cursor', name: 'Double Click', total: (0, _big2.default)(2), unlocked: false }, { type: 'Grandma', name: 'Grandma basics', total: (0, _big2.default)(1), unlocked: false }, { type: 'Grandma', name: 'Grandma proficiency', total: (0, _big2.default)(50), unlocked: false }]
         };
     },
 
@@ -9573,6 +9576,8 @@ exports.default = {
                 this.crackers = this.crackers.minus(this.buildingCost(building));
                 building.owned += this.buyAmount;
 
+                this.showUpgrades = true;
+
                 this.recalculateCps();
                 this.recalculateClickPower();
                 this.recalculateBuyCosts();
@@ -9607,7 +9612,7 @@ exports.default = {
             }
             var buildingText = building.description;
             buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
-            buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.round(building.currentCps * building.owned) + " crackers per second";
+            buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(building.currentCps * building.owned) + " crackers per second";
             return buildingText;
         },
         setBuyAmount: function setBuyAmount(amount) {
@@ -9694,20 +9699,55 @@ exports.default = {
             return upgradeText;
         },
 
-        // tick
+        // achievements
+        checkAchievements: function checkAchievements() {
+            var vm = this;
+            this.lockedAchievements().forEach(function (achievement) {
+                if (achievement.cps != null) {
+                    if (vm.cps.gte(achievement.cps)) {
+                        vm.unlockAchievement(achievement);
+                    }
+                } else if (achievement.clicks != null) {
+                    if (vm.clicks.gte(achievement.clicks)) {
+                        vm.unlockAchievement(achievement);
+                    }
+                } else if (achievement.type == 'Cracker') {
+                    if (vm.totalCrackers.gte(achievement.total)) {
+                        vm.unlockAchievement(achievement);
+                    }
+                } else {
+                    if (vm.buildingCount(achievement.type) >= achievement.total) {
+                        vm.unlockAchievement(achievement);
+                    }
+                }
+            });
+        },
+        lockedAchievements: function lockedAchievements() {
+            return this.achievements.filter(function (achievement) {
+                return achievement.unlocked == false;
+            });
+        },
+        unlockAchievement: function unlockAchievement(achievement) {
+            achievement.unlocked = true;
+            this.achievementCount++;
+            this.showAchievements = true;
+        },
+        achievementText: function achievementText(achievement) {
+            if (achievement.cps != null) {
+                return 'Reached a total of ' + achievement.cps + ' cps';
+            } else if (achievement.clicks != null) {
+                return 'Generated a total of ' + achievement.clicks + ' crackers using clicks';
+            } else if (achievement.type == 'Cracker') {
+                return 'Generated a total of ' + achievement.total + ' crackers';
+            } else {
+                return 'Built a total of ' + achievement.total + ' ' + achievement.type;
+            }
+        },
+
+        // tick function
         tick: function tick() {
             this.crackers = this.crackers.plus(this.cps.div(10));
             this.totalCrackers = this.totalCrackers.plus(this.cps.div(10));
-        },
-
-        round: function round(value) {
-            if (value < 10) {
-                return Number(value.toFixed(1));
-            } else if (value <= 9999999999) {
-                return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            } else {
-                return value.toExponential(3);
-            }
         }
     },
     filters: {
@@ -9732,8 +9772,22 @@ exports.default = {
         setInterval(function () {
             this.tick();
         }.bind(this), 100);
+
+        setInterval(function () {
+            this.checkAchievements();
+        }.bind(this), 2000);
     }
 }; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -12887,7 +12941,7 @@ exports = module.exports = __webpack_require__(9)(undefined);
 
 
 // module
-exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.buy-sell-buttons {\n    margin-bottom: 20px;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.buildings,\n.upgrades {\n    margin-top: 50px;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n.tooltips {\n    position: relative;\n    display: inline;\n}\n.tooltips span {\n    position: absolute;\n    width: 300px;\n    color: #FFFFFF;\n    background: #000000;\n    line-height: 24px;\n    text-align: center;\n    visibility: hidden;\n    border-radius: 6px;\n    font-family: \"Helvetica Neue, Helvetica, Arial, sans-serif\";\n    font-weight: bold;\n    padding-right: 5px;\n    padding-left: 5px;\n}\n.tooltips span:after {\n    content: '';\n    position: absolute;\n    top: 100%;\n    left: 50%;\n    margin-left: -8px;\n    width: 0;\n    height: 0;\n    border-top: 8px solid #000000;\n    border-right: 8px solid transparent;\n    border-left: 8px solid transparent;\n}\n:hover.tooltips span {\n    visibility: visible;\n    opacity: 0.8;\n    bottom: 30px;\n    left: 50%;\n    margin-left: -76px;\n    z-index: 999;\n}\n.redacted {\n    color: black;\n    background-color: black;\n    white-space: nowrap;\n    -moz-transform: rotate(.8deg) skewx(-12deg);\n    -moz-box-shadow: 3px 0 2px #444;\n    border: 1px dotted #555;\n    background: -moz-linear-gradient(180deg, #000, #222);\n}\n", ""]);
+exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\n    text-align: center;\n}\n.buy-sell-buttons {\n    margin-bottom: 20px;\n}\n.upgrade-link {\n    text-decoration: underline;\n}\n.buildings,\n.upgrades,\n.achievements {\n    margin-top: 50px;\n}\n.building {\n    margin-bottom: 10px;\n}\n.upgrade {\n    margin-bottom: 5px;\n}\n.tooltips {\n    position: relative;\n    display: inline;\n}\n.tooltips span {\n    position: absolute;\n    width: 300px;\n    color: #FFFFFF;\n    background: #000000;\n    line-height: 24px;\n    text-align: center;\n    visibility: hidden;\n    border-radius: 6px;\n    font-family: \"Helvetica Neue, Helvetica, Arial, sans-serif\";\n    font-weight: bold;\n    padding-right: 5px;\n    padding-left: 5px;\n}\n.tooltips span:after {\n    content: '';\n    position: absolute;\n    top: 100%;\n    left: 50%;\n    margin-left: -8px;\n    width: 0;\n    height: 0;\n    border-top: 8px solid #000000;\n    border-right: 8px solid transparent;\n    border-left: 8px solid transparent;\n}\n:hover.tooltips span {\n    visibility: visible;\n    opacity: 0.8;\n    bottom: 30px;\n    left: 50%;\n    margin-left: -76px;\n    z-index: 999;\n}\n.redacted {\n    color: black;\n    background-color: black;\n    white-space: nowrap;\n    -moz-transform: rotate(.8deg) skewx(-12deg);\n    -moz-box-shadow: 3px 0 2px #444;\n    border: 1px dotted #555;\n    background: -moz-linear-gradient(180deg, #000, #222);\n}\n", ""]);
 
 // exports
 
@@ -13255,7 +13309,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_vm._v("Buy (" + _vm._s(_vm._f("crackers")(building.buyCost)) + ")")])])]) : _vm._e()
   })], 2)]), _vm._v(" "), _c('div', {
     staticClass: "col-md-3"
-  }, [_c('div', {
+  }, [(_vm.showUpgrades) ? _c('div', {
     staticClass: "row upgrades"
   }, [_c('h3', [_vm._v("Upgrades")]), _vm._v(" "), _vm._l((_vm.sortedUpgrades), function(upgrade) {
     return (!upgrade.active && _vm.canBuyUpgrade(upgrade)) ? _c('div', {
@@ -13279,7 +13333,24 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v(_vm._s(upgrade.type) + ": " + _vm._s(upgrade.name) + " (" + _vm._s(_vm._f("crackers")(upgrade.cost)) + ")")])])]) : _vm._e()
-  })], 2)])])
+  })], 2) : _vm._e(), _vm._v(" "), (_vm.showAchievements) ? _c('div', {
+    staticClass: "row achievements"
+  }, [_c('h3', [_vm._v("Achievements")]), _vm._v(" "), _c('div', {
+    staticClass: "col-xs-12"
+  }, _vm._l((_vm.achievements), function(achievement) {
+    return (achievement.unlocked) ? _c('div', {
+      staticClass: "row achievement"
+    }, [_c('span', {
+      staticClass: "glyphicon glyphicon-info-sign tooltips",
+      attrs: {
+        "aria-hidden": "true"
+      }
+    }, [_c('span', {
+      domProps: {
+        "innerHTML": _vm._s(_vm.achievementText(achievement))
+      }
+    })]), _vm._v("\n                    " + _vm._s(achievement.name) + "\n                ")]) : _vm._e()
+  }))]) : _vm._e()])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

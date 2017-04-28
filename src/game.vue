@@ -39,13 +39,23 @@
         </div>
 
         <div class="col-md-3">
-            <div class="row upgrades">
+            <div class="row upgrades" v-if="showUpgrades">
                 <h3>Upgrades</h3>
 
                 <div class="row upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
                     <div class="col-xs-12">
                         <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
                         <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | crackers }})</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row achievements" v-if="showAchievements">
+                <h3>Achievements</h3>
+                <div class="col-xs-12">
+                    <div class="row achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
+                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="achievementText(achievement)"></span></span>
+                        {{ achievement.name }}
                     </div>
                 </div>
             </div>
@@ -65,6 +75,9 @@
                 cps: Big(0),
                 clickPower: Big(1),
                 buyAmount: 1,
+                showUpgrades: false,
+                showAchievements: false,
+                achievementCount: 0,
 
                 buildings: [
                     { name: 'Cursor', baseCost: Big(15), buyCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "Autoclicks once every 10 seconds.", unlocked: false, showAt: 0, owned: 0 },
@@ -177,25 +190,25 @@
 
                 _sortedUpgrades: null,
 
-                achivements: [
+                achievements: [
                     // total crackers
-                    { type: 'Cracker', name: 'Cracker', total: Big(1) },
-                    { type: 'Cracker', name: 'Crackers', total: Big(1000) },
+                    { type: 'Cracker', name: 'Cracker', total: Big(1), unlocked: false },
+                    { type: 'Cracker', name: 'Crackers', total: Big(1000), unlocked: false },
 
                     // cps
-                    { type: 'Cracker', name: 'Casual baking', cps: Big(1) },
-                    { type: 'Cracker', name: 'Hardcore baking', cps: Big(10) },
+                    { type: 'Cracker', name: 'Casual baking', cps: Big(1), unlocked: false },
+                    { type: 'Cracker', name: 'Hardcore baking', cps: Big(10), unlocked: false },
 
                     // clicking
-                    { type: 'Cracker', name: 'Clicktastic', clicks: Big(10000) },
-                    { type: 'Cracker', name: 'Clickathon', clicks: Big(100000) },
+                    { type: 'Cracker', name: 'Clicktastic', clicks: Big(10000), unlocked: false },
+                    { type: 'Cracker', name: 'Clickathon', clicks: Big(100000), unlocked: false },
 
                     // buildings
-                    { type: 'Cursor', name: 'Click', total: Big(1) },
-                    { type: 'Cursor', name: 'Double Click', total: Big(2) },
+                    { type: 'Cursor', name: 'Click', total: Big(1), unlocked: false },
+                    { type: 'Cursor', name: 'Double Click', total: Big(2), unlocked: false },
 
-                    { type: 'Grandma', name: 'Grandma basics', total: Big(1) },
-                    { type: 'Grandma', name: 'Grandma proficiency', total: Big(50) },
+                    { type: 'Grandma', name: 'Grandma basics', total: Big(1), unlocked: false },
+                    { type: 'Grandma', name: 'Grandma proficiency', total: Big(50), unlocked: false },
                 ],
             }
         },
@@ -258,6 +271,8 @@
                     this.crackers = this.crackers.minus(this.buildingCost(building));
                     building.owned += this.buyAmount;
 
+                    this.showUpgrades = true;
+
                     this.recalculateCps();
                     this.recalculateClickPower();
                     this.recalculateBuyCosts();
@@ -292,7 +307,7 @@
                 }
                 let buildingText = building.description;
                 buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
-                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.round(building.currentCps * building.owned) + " crackers per second";
+                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(building.currentCps * building.owned) + " crackers per second";
                 return buildingText;
             },
             setBuyAmount: function (amount) {
@@ -379,20 +394,55 @@
                 return upgradeText;
             },
 
-            // tick
+            // achievements
+            checkAchievements: function () {
+                let vm = this;
+                this.lockedAchievements().forEach(function (achievement) {
+                    if (achievement.cps != null) {
+                        if (vm.cps.gte(achievement.cps)) {
+                            vm.unlockAchievement(achievement);
+                        }
+                    } else if (achievement.clicks != null) {
+                        if (vm.clicks.gte(achievement.clicks)) {
+                            vm.unlockAchievement(achievement);
+                        }
+                    } else if (achievement.type == 'Cracker') {
+                        if (vm.totalCrackers.gte(achievement.total)) {
+                            vm.unlockAchievement(achievement);
+                        }
+                    } else {
+                        if (vm.buildingCount(achievement.type) >= achievement.total) {
+                            vm.unlockAchievement(achievement);
+                        }
+                    }
+                });
+            },
+            lockedAchievements: function () {
+                return this.achievements.filter(function (achievement) {
+                    return achievement.unlocked == false;
+                });
+            },
+            unlockAchievement: function (achievement) {
+                achievement.unlocked = true;
+                this.achievementCount++;
+                this.showAchievements = true;
+            },
+            achievementText: function (achievement) {
+                if (achievement.cps != null) {
+                    return 'Reached a total of ' + achievement.cps + ' cps';
+                } else if (achievement.clicks != null) {
+                    return 'Generated a total of ' + achievement.clicks + ' crackers using clicks';
+                } else if (achievement.type == 'Cracker') {
+                    return 'Generated a total of ' + achievement.total + ' crackers';
+                } else {
+                    return 'Built a total of ' + achievement.total + ' ' + achievement.type;
+                }
+            },
+
+            // tick function
             tick: function () {
                 this.crackers = this.crackers.plus(this.cps.div(10));
                 this.totalCrackers = this.totalCrackers.plus(this.cps.div(10));
-            },
-
-            round: function (value) {
-                if (value < 10) {
-                    return Number((value).toFixed(1));
-                } else if (value <= 9999999999) {
-                    return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    return value.toExponential(3);
-                }
             }
         },
         filters: {
@@ -417,6 +467,10 @@
             setInterval(function () {
                 this.tick();
             }.bind(this), 100);
+
+            setInterval(function () {
+                this.checkAchievements();
+            }.bind(this), 2000);
         }
     }
 
@@ -441,7 +495,8 @@
     }
     
     .buildings,
-    .upgrades {
+    .upgrades,
+    .achievements {
         margin-top: 50px;
     }
     
