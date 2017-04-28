@@ -1249,13 +1249,13 @@ module.exports = g;
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(15)
+  __webpack_require__(18)
 }
-var Component = __webpack_require__(13)(
+var Component = __webpack_require__(16)(
   /* script */
   __webpack_require__(4),
   /* template */
-  __webpack_require__(14),
+  __webpack_require__(17),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -10620,6 +10620,10 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _stringify = __webpack_require__(7);
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
 var _gameData = __webpack_require__(5);
 
 var _gameData2 = _interopRequireDefault(_gameData);
@@ -10699,7 +10703,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = {
     data: function data() {
         return {
-            crackers: (0, _big2.default)(100),
+            enableLoad: true,
+
+            crackers: (0, _big2.default)(0),
             totalCrackers: (0, _big2.default)(0),
             clicks: (0, _big2.default)(0),
             cps: (0, _big2.default)(0),
@@ -10992,6 +10998,99 @@ exports.default = {
                 vm.achievements.push(achievement);
             });
         },
+        saveGame: function saveGame() {
+            var saveData = {
+                crackers: this.crackers,
+                totalCrackers: this.totalCrackers,
+                clicks: this.clicks,
+                cps: this.cps,
+                clickPower: this.clickPower,
+                buyAmount: this.buyAmount,
+                showUpgrades: this.showUpgrades,
+                showAchievements: this.showAchievements,
+                achievementCount: this.achievementCount,
+                buildingNames: this.buildingNames,
+                buildings: this.buildings,
+                upgrades: this.upgrades,
+                achievements: this.achievements
+            };
+
+            localStorage.setItem('SaveGame', (0, _stringify2.default)(saveData));
+        },
+        loadGame: function loadGame(saveJson) {
+            var saveData = JSON.parse(saveJson);
+            var vm = this;
+
+            this.crackers = (0, _big2.default)(saveData.crackers);
+            this.totalCrackers = (0, _big2.default)(saveData.totalCrackers);
+            this.clicks = (0, _big2.default)(saveData.clicks);
+            this.cps = (0, _big2.default)(saveData.cps);
+            this.clickPower = (0, _big2.default)(saveData.clickPower);
+            this.buyAmount = saveData.buyAmount;
+            this.showUpgrades = saveData.showUpgrades;
+            this.showAchievements = saveData.showAchievements;
+            this.achievementCount = saveData.achievementCount;
+            this.buildingNames = saveData.buildingNames;
+
+            // parse buildings/upgrades/achievements (cast numbers to big.js)
+            this.buildings = [];
+            saveData.buildings.forEach(function (saveBuilding) {
+                var building = {
+                    name: saveBuilding.name,
+                    baseCost: (0, _big2.default)(saveBuilding.baseCost),
+                    buyCost: (0, _big2.default)(saveBuilding.buyCost),
+                    baseCps: (0, _big2.default)(saveBuilding.baseCps),
+                    currentCps: (0, _big2.default)(saveBuilding.currentCps),
+                    description: saveBuilding.description,
+                    unlocked: saveBuilding.unlocked,
+                    showAt: saveBuilding.showAt,
+                    owned: saveBuilding.owned
+                };
+                vm.buildings.push(building);
+            });
+
+            this.upgrades = [];
+            saveData.upgrades.forEach(function (saveUpgrade) {
+                var upgrade = {
+                    type: saveUpgrade.type,
+                    name: saveUpgrade.name,
+                    needed: saveUpgrade.needed,
+                    cost: (0, _big2.default)(saveUpgrade.cost),
+
+                    description: saveUpgrade.description,
+                    unlocked: saveUpgrade.unlocked,
+                    active: saveUpgrade.active
+                };
+                if (saveUpgrade.addition != null) {
+                    upgrade.addition = saveUpgrade.addition;
+                }
+                if (saveUpgrade.multiplier != null) {
+                    upgrade.multiplier = saveUpgrade.multiplier;
+                }
+
+                vm.upgrades.push(upgrade);
+            });
+
+            this.achievements = [];
+            saveData.achievements.forEach(function (saveAchievement) {
+                var achievement = {
+                    type: saveAchievement.type,
+                    name: saveAchievement.name,
+                    unlocked: saveAchievement.unlocked
+                };
+                if (saveAchievement.total != null) {
+                    achievement.total = (0, _big2.default)(saveAchievement.total);
+                }
+                if (saveAchievement.cps != null) {
+                    achievement.cps = (0, _big2.default)(saveAchievement.cps);
+                }
+                if (saveAchievement.clicks != null) {
+                    achievement.clicks = (0, _big2.default)(saveAchievement.clicks);
+                }
+
+                vm.achievements.push(achievement);
+            });
+        },
         shuffleArray: function shuffleArray(array) {
             for (var i = array.length - 1; i > 0; i--) {
                 var j = Math.floor(Math.random() * (i + 1));
@@ -11021,9 +11120,13 @@ exports.default = {
         }
     },
     mounted: function mounted() {
-        this.generateBuildings();
-        this.generateUpgrades();
-        this.generateAchievements();
+        if (this.enableLoad && localStorage.getItem('SaveGame') != null) {
+            this.loadGame(localStorage.getItem('SaveGame'));
+        } else {
+            this.generateBuildings();
+            this.generateUpgrades();
+            this.generateAchievements();
+        }
 
         setInterval(function () {
             this.tick();
@@ -11032,6 +11135,10 @@ exports.default = {
         setInterval(function () {
             this.checkAchievements();
         }.bind(this), 2000);
+
+        setInterval(function () {
+            this.saveGame();
+        }.bind(this), 60000);
     }
 };
 
@@ -11086,6 +11193,12 @@ new _vue2.default({
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(10), __esModule: true };
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11206,7 +11319,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11220,9 +11333,9 @@ function fromByteArray (uint8) {
 
 
 
-var base64 = __webpack_require__(7)
-var ieee754 = __webpack_require__(11)
-var isArray = __webpack_require__(12)
+var base64 = __webpack_require__(8)
+var ieee754 = __webpack_require__(14)
+var isArray = __webpack_require__(15)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -13003,10 +13116,27 @@ function isnan (val) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(10)(undefined);
+var core  = __webpack_require__(11)
+  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
+module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
+  return $JSON.stringify.apply($JSON, arguments);
+};
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+var core = module.exports = {version: '2.4.0'};
+if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(13)(undefined);
 // imports
 
 
@@ -13017,7 +13147,7 @@ exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\
 
 
 /***/ }),
-/* 10 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {/*
@@ -13096,10 +13226,10 @@ function toComment(sourceMap) {
   return '/*# ' + data + ' */';
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9).Buffer))
 
 /***/ }),
-/* 11 */
+/* 14 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -13189,7 +13319,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 12 */
+/* 15 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -13200,7 +13330,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 13 */
+/* 16 */
 /***/ (function(module, exports) {
 
 /* globals __VUE_SSR_CONTEXT__ */
@@ -13283,7 +13413,7 @@ module.exports = function normalizeComponent (
 
 
 /***/ }),
-/* 14 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -13431,17 +13561,17 @@ if (false) {
 }
 
 /***/ }),
-/* 15 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(9);
+var content = __webpack_require__(12);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(16)("6d484bdb", content, false);
+var update = __webpack_require__(19)("6d484bdb", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -13457,7 +13587,7 @@ if(false) {
 }
 
 /***/ }),
-/* 16 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -13476,7 +13606,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(17)
+var listToStyles = __webpack_require__(20)
 
 /*
 type StyleObject = {
@@ -13678,7 +13808,7 @@ function applyToTag (styleElement, obj) {
 
 
 /***/ }),
-/* 17 */
+/* 20 */
 /***/ (function(module, exports) {
 
 /**

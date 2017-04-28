@@ -9,7 +9,6 @@ achivements
 other non-standard upgrades
 - toddler forms
 sell buildings
-save data
 prettier numbers (million/billion/trillion/etc)
 show upcoming upgrades
 showAt computed property

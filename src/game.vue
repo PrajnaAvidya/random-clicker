@@ -70,7 +70,9 @@
     export default {
         data: function () {
             return {
-                crackers: Big(100),
+                enableLoad: true,
+
+                crackers: Big(0),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -378,6 +380,99 @@
                     vm.achievements.push(achievement);
                 });
             },
+            saveGame: function () {
+                let saveData = {
+                    crackers: this.crackers,
+                    totalCrackers: this.totalCrackers,
+                    clicks: this.clicks,
+                    cps: this.cps,
+                    clickPower: this.clickPower,
+                    buyAmount: this.buyAmount,
+                    showUpgrades: this.showUpgrades,
+                    showAchievements: this.showAchievements,
+                    achievementCount: this.achievementCount,
+                    buildingNames: this.buildingNames,
+                    buildings: this.buildings,
+                    upgrades: this.upgrades,
+                    achievements: this.achievements,
+                };
+
+                localStorage.setItem('SaveGame', JSON.stringify(saveData));
+            },
+            loadGame: function (saveJson) {
+                let saveData = JSON.parse(saveJson);
+                let vm = this;
+
+                this.crackers = Big(saveData.crackers);
+                this.totalCrackers = Big(saveData.totalCrackers);
+                this.clicks = Big(saveData.clicks);
+                this.cps = Big(saveData.cps);
+                this.clickPower = Big(saveData.clickPower);
+                this.buyAmount = saveData.buyAmount;
+                this.showUpgrades = saveData.showUpgrades;
+                this.showAchievements = saveData.showAchievements;
+                this.achievementCount = saveData.achievementCount;
+                this.buildingNames = saveData.buildingNames;
+
+                // parse buildings/upgrades/achievements (cast numbers to big.js)
+                this.buildings = [];
+                saveData.buildings.forEach(function (saveBuilding) {
+                    let building = {
+                        name: saveBuilding.name,
+                        baseCost: Big(saveBuilding.baseCost),
+                        buyCost: Big(saveBuilding.buyCost),
+                        baseCps: Big(saveBuilding.baseCps),
+                        currentCps: Big(saveBuilding.currentCps),
+                        description: saveBuilding.description,
+                        unlocked: saveBuilding.unlocked,
+                        showAt: saveBuilding.showAt,
+                        owned: saveBuilding.owned
+                    };
+                    vm.buildings.push(building);
+                });
+
+                this.upgrades = [];
+                saveData.upgrades.forEach(function (saveUpgrade) {
+                    let upgrade = {
+                        type: saveUpgrade.type,
+                        name: saveUpgrade.name,
+                        needed: saveUpgrade.needed,
+                        cost: Big(saveUpgrade.cost),
+
+                        description: saveUpgrade.description,
+                        unlocked: saveUpgrade.unlocked,
+                        active: saveUpgrade.active
+                    };
+                    if (saveUpgrade.addition != null) {
+                        upgrade.addition = saveUpgrade.addition;
+                    }
+                    if (saveUpgrade.multiplier != null) {
+                        upgrade.multiplier = saveUpgrade.multiplier;
+                    }
+
+                    vm.upgrades.push(upgrade);
+                });
+
+                this.achievements = [];
+                saveData.achievements.forEach(function (saveAchievement) {
+                    let achievement = {
+                        type: saveAchievement.type,
+                        name: saveAchievement.name,
+                        unlocked: saveAchievement.unlocked
+                    };
+                    if (saveAchievement.total != null) {
+                        achievement.total = Big(saveAchievement.total);
+                    }
+                    if (saveAchievement.cps != null) {
+                        achievement.cps = Big(saveAchievement.cps);
+                    }
+                    if (saveAchievement.clicks != null) {
+                        achievement.clicks = Big(saveAchievement.clicks);
+                    }
+
+                    vm.achievements.push(achievement);
+                });
+            },
             shuffleArray: function (array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     let j = Math.floor(Math.random() * (i + 1));
@@ -407,9 +502,13 @@
             }
         },
         mounted: function () {
-            this.generateBuildings();
-            this.generateUpgrades();
-            this.generateAchievements();
+            if (this.enableLoad && localStorage.getItem('SaveGame') != null) {
+                this.loadGame(localStorage.getItem('SaveGame'));
+            } else {
+                this.generateBuildings();
+                this.generateUpgrades();
+                this.generateAchievements();
+            }
 
             setInterval(function () {
                 this.tick();
@@ -418,6 +517,10 @@
             setInterval(function () {
                 this.checkAchievements();
             }.bind(this), 2000);
+
+            setInterval(function () {
+                this.saveGame();
+            }.bind(this), 60000);
         }
     }
 
