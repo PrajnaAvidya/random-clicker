@@ -10740,7 +10740,7 @@ exports.default = {
 
     computed: {
         sortedUpgrades: function sortedUpgrades() {
-            if (this._sortedUpgrades == null) {
+            if (!this._sortedUpgrades) {
                 // sort upgrades by cost (1 time)
                 var sortedUpgrades = this.upgrades;
                 sortedUpgrades.sort(function (a, b) {
@@ -10842,9 +10842,11 @@ exports.default = {
             if (building.unlocked == false) {
                 return null;
             }
+            var buildingCps = building.currentCps * building.owned;
+            var buildingCpsPercent = 100 * buildingCps / this.cps;
             var buildingText = building.description;
             buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
-            buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(building.currentCps * building.owned) + " crackers per second";
+            buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " crackers per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
             return buildingText;
         },
         setBuyAmount: function setBuyAmount(amount) {
@@ -11180,18 +11182,17 @@ exports.default = {
             this.saveGame();
         }
 
-        /*setInterval(function () {
-            this.tick();
-        }.bind(this), 20);*/
-
+        // check achievements every couple seconds
         setInterval(function () {
             this.checkAchievements();
         }.bind(this), 2000);
 
+        // auto save every 30 seconds
         setInterval(function () {
             this.saveGame();
-        }.bind(this), 60000);
+        }.bind(this), 30000);
 
+        // start tick loop (dynamic fps)
         window.requestAnimationFrame(this.tick);
     }
 };

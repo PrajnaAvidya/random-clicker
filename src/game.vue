@@ -224,9 +224,11 @@
                 if (building.unlocked == false) {
                     return null;
                 }
+                let buildingCps = building.currentCps * building.owned;
+                let buildingCpsPercent = 100 * buildingCps / this.cps;
                 let buildingText = building.description;
                 buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
-                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(building.currentCps * building.owned) + " crackers per second";
+                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " crackers per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
                 return buildingText;
             },
             setBuyAmount: function (amount) {
