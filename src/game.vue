@@ -122,7 +122,7 @@
 
         computed: {
             sortedUpgrades: function () {
-                if (this._sortedUpgrades == null) {
+                if (!this._sortedUpgrades) {
                     // sort upgrades by cost (1 time)
                     let sortedUpgrades = this.upgrades;
                     sortedUpgrades.sort(function (a, b) {
@@ -562,18 +562,17 @@
                 this.saveGame();
             }
 
-            /*setInterval(function () {
-                this.tick();
-            }.bind(this), 20);*/
-
+            // check achievements every couple seconds
             setInterval(function () {
                 this.checkAchievements();
             }.bind(this), 2000);
 
+            // auto save every 30 seconds
             setInterval(function () {
                 this.saveGame();
-            }.bind(this), 60000);
+            }.bind(this), 30000);
 
+            // start tick loop (dynamic fps)
             window.requestAnimationFrame(this.tick);
         }
     }
