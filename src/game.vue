@@ -72,6 +72,8 @@
             return {
                 enableLoad: true,
 
+                lastFrame: 0,
+
                 crackers: Big(10000000),
                 totalCrackers: Big(0),
                 clicks: Big(0),
@@ -391,9 +393,15 @@
             },
 
             // tick function
-            tick: function () {
-                this.crackers = this.crackers.plus(this.cps.div(50));
-                this.totalCrackers = this.totalCrackers.plus(this.cps.div(50));
+            tick: function (timestamp) {
+                let progress = timestamp - this.lastFrame;
+                this.lastFrame = timestamp;
+
+                let division = 1000 / progress;
+                this.crackers = this.crackers.plus(this.cps.div(division));
+                this.totalCrackers = this.totalCrackers.plus(this.cps.div(division))
+
+                window.requestAnimationFrame(this.tick);
             },
 
             // misc/setup
@@ -554,9 +562,9 @@
                 this.saveGame();
             }
 
-            setInterval(function () {
+            /*setInterval(function () {
                 this.tick();
-            }.bind(this), 20);
+            }.bind(this), 20);*/
 
             setInterval(function () {
                 this.checkAchievements();
@@ -565,6 +573,8 @@
             setInterval(function () {
                 this.saveGame();
             }.bind(this), 60000);
+
+            window.requestAnimationFrame(this.tick);
         }
     }
 
