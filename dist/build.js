@@ -10940,6 +10940,9 @@ exports.default = {
             var upgradeText = upgrade.description;
             if (upgrade.multiplier != null) {
                 upgradeText += '<br/>Multiplies ' + upgrade.type + ' production by ' + upgrade.multiplier + 'x';
+                if (upgrade.type == this.buildingNames[0]) {
+                    upgradeText += '<br/>Also multiplies clicks';
+                }
             } else if (upgrade.addition != null) {
                 upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
             }
