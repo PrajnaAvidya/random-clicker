@@ -63,11 +63,1160 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;/* big.js v3.1.3 https://github.com/MikeMcl/big.js/LICENCE */
+;(function (global) {
+    'use strict';
+
+/*
+  big.js v3.1.3
+  A small, fast, easy-to-use library for arbitrary-precision decimal arithmetic.
+  https://github.com/MikeMcl/big.js/
+  Copyright (c) 2014 Michael Mclaughlin <M8ch88l@gmail.com>
+  MIT Expat Licence
+*/
+
+/***************************** EDITABLE DEFAULTS ******************************/
+
+    // The default values below must be integers within the stated ranges.
+
+    /*
+     * The maximum number of decimal places of the results of operations
+     * involving division: div and sqrt, and pow with negative exponents.
+     */
+    var DP = 20,                           // 0 to MAX_DP
+
+        /*
+         * The rounding mode used when rounding to the above decimal places.
+         *
+         * 0 Towards zero (i.e. truncate, no rounding).       (ROUND_DOWN)
+         * 1 To nearest neighbour. If equidistant, round up.  (ROUND_HALF_UP)
+         * 2 To nearest neighbour. If equidistant, to even.   (ROUND_HALF_EVEN)
+         * 3 Away from zero.                                  (ROUND_UP)
+         */
+        RM = 1,                            // 0, 1, 2 or 3
+
+        // The maximum value of DP and Big.DP.
+        MAX_DP = 1E6,                      // 0 to 1000000
+
+        // The maximum magnitude of the exponent argument to the pow method.
+        MAX_POWER = 1E6,                   // 1 to 1000000
+
+        /*
+         * The exponent value at and beneath which toString returns exponential
+         * notation.
+         * JavaScript's Number type: -7
+         * -1000000 is the minimum recommended exponent value of a Big.
+         */
+        E_NEG = -7,                   // 0 to -1000000
+
+        /*
+         * The exponent value at and above which toString returns exponential
+         * notation.
+         * JavaScript's Number type: 21
+         * 1000000 is the maximum recommended exponent value of a Big.
+         * (This limit is not enforced or checked.)
+         */
+        E_POS = 21,                   // 0 to 1000000
+
+/******************************************************************************/
+
+        // The shared prototype object.
+        P = {},
+        isValid = /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i,
+        Big;
+
+
+    /*
+     * Create and return a Big constructor.
+     *
+     */
+    function bigFactory() {
+
+        /*
+         * The Big constructor and exported function.
+         * Create and return a new instance of a Big number object.
+         *
+         * n {number|string|Big} A numeric value.
+         */
+        function Big(n) {
+            var x = this;
+
+            // Enable constructor usage without new.
+            if (!(x instanceof Big)) {
+                return n === void 0 ? bigFactory() : new Big(n);
+            }
+
+            // Duplicate.
+            if (n instanceof Big) {
+                x.s = n.s;
+                x.e = n.e;
+                x.c = n.c.slice();
+            } else {
+                parse(x, n);
+            }
+
+            /*
+             * Retain a reference to this Big constructor, and shadow
+             * Big.prototype.constructor which points to Object.
+             */
+            x.constructor = Big;
+        }
+
+        Big.prototype = P;
+        Big.DP = DP;
+        Big.RM = RM;
+        Big.E_NEG = E_NEG;
+        Big.E_POS = E_POS;
+
+        return Big;
+    }
+
+
+    // Private functions
+
+
+    /*
+     * Return a string representing the value of Big x in normal or exponential
+     * notation to dp fixed decimal places or significant digits.
+     *
+     * x {Big} The Big to format.
+     * dp {number} Integer, 0 to MAX_DP inclusive.
+     * toE {number} 1 (toExponential), 2 (toPrecision) or undefined (toFixed).
+     */
+    function format(x, dp, toE) {
+        var Big = x.constructor,
+
+            // The index (normal notation) of the digit that may be rounded up.
+            i = dp - (x = new Big(x)).e,
+            c = x.c;
+
+        // Round?
+        if (c.length > ++dp) {
+            rnd(x, i, Big.RM);
+        }
+
+        if (!c[0]) {
+            ++i;
+        } else if (toE) {
+            i = dp;
+
+        // toFixed
+        } else {
+            c = x.c;
+
+            // Recalculate i as x.e may have changed if value rounded up.
+            i = x.e + i + 1;
+        }
+
+        // Append zeros?
+        for (; c.length < i; c.push(0)) {
+        }
+        i = x.e;
+
+        /*
+         * toPrecision returns exponential notation if the number of
+         * significant digits specified is less than the number of digits
+         * necessary to represent the integer part of the value in normal
+         * notation.
+         */
+        return toE === 1 || toE && (dp <= i || i <= Big.E_NEG) ?
+
+          // Exponential notation.
+          (x.s < 0 && c[0] ? '-' : '') +
+            (c.length > 1 ? c[0] + '.' + c.join('').slice(1) : c[0]) +
+              (i < 0 ? 'e' : 'e+') + i
+
+          // Normal notation.
+          : x.toString();
+    }
+
+
+    /*
+     * Parse the number or string value passed to a Big constructor.
+     *
+     * x {Big} A Big number instance.
+     * n {number|string} A numeric value.
+     */
+    function parse(x, n) {
+        var e, i, nL;
+
+        // Minus zero?
+        if (n === 0 && 1 / n < 0) {
+            n = '-0';
+
+        // Ensure n is string and check validity.
+        } else if (!isValid.test(n += '')) {
+            throwErr(NaN);
+        }
+
+        // Determine sign.
+        x.s = n.charAt(0) == '-' ? (n = n.slice(1), -1) : 1;
+
+        // Decimal point?
+        if ((e = n.indexOf('.')) > -1) {
+            n = n.replace('.', '');
+        }
+
+        // Exponential form?
+        if ((i = n.search(/e/i)) > 0) {
+
+            // Determine exponent.
+            if (e < 0) {
+                e = i;
+            }
+            e += +n.slice(i + 1);
+            n = n.substring(0, i);
+
+        } else if (e < 0) {
+
+            // Integer.
+            e = n.length;
+        }
+
+        // Determine leading zeros.
+        for (i = 0; n.charAt(i) == '0'; i++) {
+        }
+
+        if (i == (nL = n.length)) {
+
+            // Zero.
+            x.c = [ x.e = 0 ];
+        } else {
+
+            // Determine trailing zeros.
+            for (; n.charAt(--nL) == '0';) {
+            }
+
+            x.e = e - i - 1;
+            x.c = [];
+
+            // Convert string to array of digits without leading/trailing zeros.
+            for (e = 0; i <= nL; x.c[e++] = +n.charAt(i++)) {
+            }
+        }
+
+        return x;
+    }
+
+
+    /*
+     * Round Big x to a maximum of dp decimal places using rounding mode rm.
+     * Called by div, sqrt and round.
+     *
+     * x {Big} The Big to round.
+     * dp {number} Integer, 0 to MAX_DP inclusive.
+     * rm {number} 0, 1, 2 or 3 (DOWN, HALF_UP, HALF_EVEN, UP)
+     * [more] {boolean} Whether the result of division was truncated.
+     */
+    function rnd(x, dp, rm, more) {
+        var u,
+            xc = x.c,
+            i = x.e + dp + 1;
+
+        if (rm === 1) {
+
+            // xc[i] is the digit after the digit that may be rounded up.
+            more = xc[i] >= 5;
+        } else if (rm === 2) {
+            more = xc[i] > 5 || xc[i] == 5 &&
+              (more || i < 0 || xc[i + 1] !== u || xc[i - 1] & 1);
+        } else if (rm === 3) {
+            more = more || xc[i] !== u || i < 0;
+        } else {
+            more = false;
+
+            if (rm !== 0) {
+                throwErr('!Big.RM!');
+            }
+        }
+
+        if (i < 1 || !xc[0]) {
+
+            if (more) {
+
+                // 1, 0.1, 0.01, 0.001, 0.0001 etc.
+                x.e = -dp;
+                x.c = [1];
+            } else {
+
+                // Zero.
+                x.c = [x.e = 0];
+            }
+        } else {
+
+            // Remove any digits after the required decimal places.
+            xc.length = i--;
+
+            // Round up?
+            if (more) {
+
+                // Rounding up may mean the previous digit has to be rounded up.
+                for (; ++xc[i] > 9;) {
+                    xc[i] = 0;
+
+                    if (!i--) {
+                        ++x.e;
+                        xc.unshift(1);
+                    }
+                }
+            }
+
+            // Remove trailing zeros.
+            for (i = xc.length; !xc[--i]; xc.pop()) {
+            }
+        }
+
+        return x;
+    }
+
+
+    /*
+     * Throw a BigError.
+     *
+     * message {string} The error message.
+     */
+    function throwErr(message) {
+        var err = new Error(message);
+        err.name = 'BigError';
+
+        throw err;
+    }
+
+
+    // Prototype/instance methods
+
+
+    /*
+     * Return a new Big whose value is the absolute value of this Big.
+     */
+    P.abs = function () {
+        var x = new this.constructor(this);
+        x.s = 1;
+
+        return x;
+    };
+
+
+    /*
+     * Return
+     * 1 if the value of this Big is greater than the value of Big y,
+     * -1 if the value of this Big is less than the value of Big y, or
+     * 0 if they have the same value.
+    */
+    P.cmp = function (y) {
+        var xNeg,
+            x = this,
+            xc = x.c,
+            yc = (y = new x.constructor(y)).c,
+            i = x.s,
+            j = y.s,
+            k = x.e,
+            l = y.e;
+
+        // Either zero?
+        if (!xc[0] || !yc[0]) {
+            return !xc[0] ? !yc[0] ? 0 : -j : i;
+        }
+
+        // Signs differ?
+        if (i != j) {
+            return i;
+        }
+        xNeg = i < 0;
+
+        // Compare exponents.
+        if (k != l) {
+            return k > l ^ xNeg ? 1 : -1;
+        }
+
+        i = -1;
+        j = (k = xc.length) < (l = yc.length) ? k : l;
+
+        // Compare digit by digit.
+        for (; ++i < j;) {
+
+            if (xc[i] != yc[i]) {
+                return xc[i] > yc[i] ^ xNeg ? 1 : -1;
+            }
+        }
+
+        // Compare lengths.
+        return k == l ? 0 : k > l ^ xNeg ? 1 : -1;
+    };
+
+
+    /*
+     * Return a new Big whose value is the value of this Big divided by the
+     * value of Big y, rounded, if necessary, to a maximum of Big.DP decimal
+     * places using rounding mode Big.RM.
+     */
+    P.div = function (y) {
+        var x = this,
+            Big = x.constructor,
+            // dividend
+            dvd = x.c,
+            //divisor
+            dvs = (y = new Big(y)).c,
+            s = x.s == y.s ? 1 : -1,
+            dp = Big.DP;
+
+        if (dp !== ~~dp || dp < 0 || dp > MAX_DP) {
+            throwErr('!Big.DP!');
+        }
+
+        // Either 0?
+        if (!dvd[0] || !dvs[0]) {
+
+            // If both are 0, throw NaN
+            if (dvd[0] == dvs[0]) {
+                throwErr(NaN);
+            }
+
+            // If dvs is 0, throw +-Infinity.
+            if (!dvs[0]) {
+                throwErr(s / 0);
+            }
+
+            // dvd is 0, return +-0.
+            return new Big(s * 0);
+        }
+
+        var dvsL, dvsT, next, cmp, remI, u,
+            dvsZ = dvs.slice(),
+            dvdI = dvsL = dvs.length,
+            dvdL = dvd.length,
+            // remainder
+            rem = dvd.slice(0, dvsL),
+            remL = rem.length,
+            // quotient
+            q = y,
+            qc = q.c = [],
+            qi = 0,
+            digits = dp + (q.e = x.e - y.e) + 1;
+
+        q.s = s;
+        s = digits < 0 ? 0 : digits;
+
+        // Create version of divisor with leading zero.
+        dvsZ.unshift(0);
+
+        // Add zeros to make remainder as long as divisor.
+        for (; remL++ < dvsL; rem.push(0)) {
+        }
+
+        do {
+
+            // 'next' is how many times the divisor goes into current remainder.
+            for (next = 0; next < 10; next++) {
+
+                // Compare divisor and remainder.
+                if (dvsL != (remL = rem.length)) {
+                    cmp = dvsL > remL ? 1 : -1;
+                } else {
+
+                    for (remI = -1, cmp = 0; ++remI < dvsL;) {
+
+                        if (dvs[remI] != rem[remI]) {
+                            cmp = dvs[remI] > rem[remI] ? 1 : -1;
+                            break;
+                        }
+                    }
+                }
+
+                // If divisor < remainder, subtract divisor from remainder.
+                if (cmp < 0) {
+
+                    // Remainder can't be more than 1 digit longer than divisor.
+                    // Equalise lengths using divisor with extra leading zero?
+                    for (dvsT = remL == dvsL ? dvs : dvsZ; remL;) {
+
+                        if (rem[--remL] < dvsT[remL]) {
+                            remI = remL;
+
+                            for (; remI && !rem[--remI]; rem[remI] = 9) {
+                            }
+                            --rem[remI];
+                            rem[remL] += 10;
+                        }
+                        rem[remL] -= dvsT[remL];
+                    }
+                    for (; !rem[0]; rem.shift()) {
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            // Add the 'next' digit to the result array.
+            qc[qi++] = cmp ? next : ++next;
+
+            // Update the remainder.
+            if (rem[0] && cmp) {
+                rem[remL] = dvd[dvdI] || 0;
+            } else {
+                rem = [ dvd[dvdI] ];
+            }
+
+        } while ((dvdI++ < dvdL || rem[0] !== u) && s--);
+
+        // Leading zero? Do not remove if result is simply zero (qi == 1).
+        if (!qc[0] && qi != 1) {
+
+            // There can't be more than one zero.
+            qc.shift();
+            q.e--;
+        }
+
+        // Round?
+        if (qi > digits) {
+            rnd(q, dp, Big.RM, rem[0] !== u);
+        }
+
+        return q;
+    };
+
+
+    /*
+     * Return true if the value of this Big is equal to the value of Big y,
+     * otherwise returns false.
+     */
+    P.eq = function (y) {
+        return !this.cmp(y);
+    };
+
+
+    /*
+     * Return true if the value of this Big is greater than the value of Big y,
+     * otherwise returns false.
+     */
+    P.gt = function (y) {
+        return this.cmp(y) > 0;
+    };
+
+
+    /*
+     * Return true if the value of this Big is greater than or equal to the
+     * value of Big y, otherwise returns false.
+     */
+    P.gte = function (y) {
+        return this.cmp(y) > -1;
+    };
+
+
+    /*
+     * Return true if the value of this Big is less than the value of Big y,
+     * otherwise returns false.
+     */
+    P.lt = function (y) {
+        return this.cmp(y) < 0;
+    };
+
+
+    /*
+     * Return true if the value of this Big is less than or equal to the value
+     * of Big y, otherwise returns false.
+     */
+    P.lte = function (y) {
+         return this.cmp(y) < 1;
+    };
+
+
+    /*
+     * Return a new Big whose value is the value of this Big minus the value
+     * of Big y.
+     */
+    P.sub = P.minus = function (y) {
+        var i, j, t, xLTy,
+            x = this,
+            Big = x.constructor,
+            a = x.s,
+            b = (y = new Big(y)).s;
+
+        // Signs differ?
+        if (a != b) {
+            y.s = -b;
+            return x.plus(y);
+        }
+
+        var xc = x.c.slice(),
+            xe = x.e,
+            yc = y.c,
+            ye = y.e;
+
+        // Either zero?
+        if (!xc[0] || !yc[0]) {
+
+            // y is non-zero? x is non-zero? Or both are zero.
+            return yc[0] ? (y.s = -b, y) : new Big(xc[0] ? x : 0);
+        }
+
+        // Determine which is the bigger number.
+        // Prepend zeros to equalise exponents.
+        if (a = xe - ye) {
+
+            if (xLTy = a < 0) {
+                a = -a;
+                t = xc;
+            } else {
+                ye = xe;
+                t = yc;
+            }
+
+            t.reverse();
+            for (b = a; b--; t.push(0)) {
+            }
+            t.reverse();
+        } else {
+
+            // Exponents equal. Check digit by digit.
+            j = ((xLTy = xc.length < yc.length) ? xc : yc).length;
+
+            for (a = b = 0; b < j; b++) {
+
+                if (xc[b] != yc[b]) {
+                    xLTy = xc[b] < yc[b];
+                    break;
+                }
+            }
+        }
+
+        // x < y? Point xc to the array of the bigger number.
+        if (xLTy) {
+            t = xc;
+            xc = yc;
+            yc = t;
+            y.s = -y.s;
+        }
+
+        /*
+         * Append zeros to xc if shorter. No need to add zeros to yc if shorter
+         * as subtraction only needs to start at yc.length.
+         */
+        if (( b = (j = yc.length) - (i = xc.length) ) > 0) {
+
+            for (; b--; xc[i++] = 0) {
+            }
+        }
+
+        // Subtract yc from xc.
+        for (b = i; j > a;){
+
+            if (xc[--j] < yc[j]) {
+
+                for (i = j; i && !xc[--i]; xc[i] = 9) {
+                }
+                --xc[i];
+                xc[j] += 10;
+            }
+            xc[j] -= yc[j];
+        }
+
+        // Remove trailing zeros.
+        for (; xc[--b] === 0; xc.pop()) {
+        }
+
+        // Remove leading zeros and adjust exponent accordingly.
+        for (; xc[0] === 0;) {
+            xc.shift();
+            --ye;
+        }
+
+        if (!xc[0]) {
+
+            // n - n = +0
+            y.s = 1;
+
+            // Result must be zero.
+            xc = [ye = 0];
+        }
+
+        y.c = xc;
+        y.e = ye;
+
+        return y;
+    };
+
+
+    /*
+     * Return a new Big whose value is the value of this Big modulo the
+     * value of Big y.
+     */
+    P.mod = function (y) {
+        var yGTx,
+            x = this,
+            Big = x.constructor,
+            a = x.s,
+            b = (y = new Big(y)).s;
+
+        if (!y.c[0]) {
+            throwErr(NaN);
+        }
+
+        x.s = y.s = 1;
+        yGTx = y.cmp(x) == 1;
+        x.s = a;
+        y.s = b;
+
+        if (yGTx) {
+            return new Big(x);
+        }
+
+        a = Big.DP;
+        b = Big.RM;
+        Big.DP = Big.RM = 0;
+        x = x.div(y);
+        Big.DP = a;
+        Big.RM = b;
+
+        return this.minus( x.times(y) );
+    };
+
+
+    /*
+     * Return a new Big whose value is the value of this Big plus the value
+     * of Big y.
+     */
+    P.add = P.plus = function (y) {
+        var t,
+            x = this,
+            Big = x.constructor,
+            a = x.s,
+            b = (y = new Big(y)).s;
+
+        // Signs differ?
+        if (a != b) {
+            y.s = -b;
+            return x.minus(y);
+        }
+
+        var xe = x.e,
+            xc = x.c,
+            ye = y.e,
+            yc = y.c;
+
+        // Either zero?
+        if (!xc[0] || !yc[0]) {
+
+            // y is non-zero? x is non-zero? Or both are zero.
+            return yc[0] ? y : new Big(xc[0] ? x : a * 0);
+        }
+        xc = xc.slice();
+
+        // Prepend zeros to equalise exponents.
+        // Note: Faster to use reverse then do unshifts.
+        if (a = xe - ye) {
+
+            if (a > 0) {
+                ye = xe;
+                t = yc;
+            } else {
+                a = -a;
+                t = xc;
+            }
+
+            t.reverse();
+            for (; a--; t.push(0)) {
+            }
+            t.reverse();
+        }
+
+        // Point xc to the longer array.
+        if (xc.length - yc.length < 0) {
+            t = yc;
+            yc = xc;
+            xc = t;
+        }
+        a = yc.length;
+
+        /*
+         * Only start adding at yc.length - 1 as the further digits of xc can be
+         * left as they are.
+         */
+        for (b = 0; a;) {
+            b = (xc[--a] = xc[a] + yc[a] + b) / 10 | 0;
+            xc[a] %= 10;
+        }
+
+        // No need to check for zero, as +x + +y != 0 && -x + -y != 0
+
+        if (b) {
+            xc.unshift(b);
+            ++ye;
+        }
+
+         // Remove trailing zeros.
+        for (a = xc.length; xc[--a] === 0; xc.pop()) {
+        }
+
+        y.c = xc;
+        y.e = ye;
+
+        return y;
+    };
+
+
+    /*
+     * Return a Big whose value is the value of this Big raised to the power n.
+     * If n is negative, round, if necessary, to a maximum of Big.DP decimal
+     * places using rounding mode Big.RM.
+     *
+     * n {number} Integer, -MAX_POWER to MAX_POWER inclusive.
+     */
+    P.pow = function (n) {
+        var x = this,
+            one = new x.constructor(1),
+            y = one,
+            isNeg = n < 0;
+
+        if (n !== ~~n || n < -MAX_POWER || n > MAX_POWER) {
+            throwErr('!pow!');
+        }
+
+        n = isNeg ? -n : n;
+
+        for (;;) {
+
+            if (n & 1) {
+                y = y.times(x);
+            }
+            n >>= 1;
+
+            if (!n) {
+                break;
+            }
+            x = x.times(x);
+        }
+
+        return isNeg ? one.div(y) : y;
+    };
+
+
+    /*
+     * Return a new Big whose value is the value of this Big rounded to a
+     * maximum of dp decimal places using rounding mode rm.
+     * If dp is not specified, round to 0 decimal places.
+     * If rm is not specified, use Big.RM.
+     *
+     * [dp] {number} Integer, 0 to MAX_DP inclusive.
+     * [rm] 0, 1, 2 or 3 (ROUND_DOWN, ROUND_HALF_UP, ROUND_HALF_EVEN, ROUND_UP)
+     */
+    P.round = function (dp, rm) {
+        var x = this,
+            Big = x.constructor;
+
+        if (dp == null) {
+            dp = 0;
+        } else if (dp !== ~~dp || dp < 0 || dp > MAX_DP) {
+            throwErr('!round!');
+        }
+        rnd(x = new Big(x), dp, rm == null ? Big.RM : rm);
+
+        return x;
+    };
+
+
+    /*
+     * Return a new Big whose value is the square root of the value of this Big,
+     * rounded, if necessary, to a maximum of Big.DP decimal places using
+     * rounding mode Big.RM.
+     */
+    P.sqrt = function () {
+        var estimate, r, approx,
+            x = this,
+            Big = x.constructor,
+            xc = x.c,
+            i = x.s,
+            e = x.e,
+            half = new Big('0.5');
+
+        // Zero?
+        if (!xc[0]) {
+            return new Big(x);
+        }
+
+        // If negative, throw NaN.
+        if (i < 0) {
+            throwErr(NaN);
+        }
+
+        // Estimate.
+        i = Math.sqrt(x.toString());
+
+        // Math.sqrt underflow/overflow?
+        // Pass x to Math.sqrt as integer, then adjust the result exponent.
+        if (i === 0 || i === 1 / 0) {
+            estimate = xc.join('');
+
+            if (!(estimate.length + e & 1)) {
+                estimate += '0';
+            }
+
+            r = new Big( Math.sqrt(estimate).toString() );
+            r.e = ((e + 1) / 2 | 0) - (e < 0 || e & 1);
+        } else {
+            r = new Big(i.toString());
+        }
+
+        i = r.e + (Big.DP += 4);
+
+        // Newton-Raphson iteration.
+        do {
+            approx = r;
+            r = half.times( approx.plus( x.div(approx) ) );
+        } while ( approx.c.slice(0, i).join('') !==
+                       r.c.slice(0, i).join('') );
+
+        rnd(r, Big.DP -= 4, Big.RM);
+
+        return r;
+    };
+
+
+    /*
+     * Return a new Big whose value is the value of this Big times the value of
+     * Big y.
+     */
+    P.mul = P.times = function (y) {
+        var c,
+            x = this,
+            Big = x.constructor,
+            xc = x.c,
+            yc = (y = new Big(y)).c,
+            a = xc.length,
+            b = yc.length,
+            i = x.e,
+            j = y.e;
+
+        // Determine sign of result.
+        y.s = x.s == y.s ? 1 : -1;
+
+        // Return signed 0 if either 0.
+        if (!xc[0] || !yc[0]) {
+            return new Big(y.s * 0);
+        }
+
+        // Initialise exponent of result as x.e + y.e.
+        y.e = i + j;
+
+        // If array xc has fewer digits than yc, swap xc and yc, and lengths.
+        if (a < b) {
+            c = xc;
+            xc = yc;
+            yc = c;
+            j = a;
+            a = b;
+            b = j;
+        }
+
+        // Initialise coefficient array of result with zeros.
+        for (c = new Array(j = a + b); j--; c[j] = 0) {
+        }
+
+        // Multiply.
+
+        // i is initially xc.length.
+        for (i = b; i--;) {
+            b = 0;
+
+            // a is yc.length.
+            for (j = a + i; j > i;) {
+
+                // Current sum of products at this digit position, plus carry.
+                b = c[j] + yc[i] * xc[j - i - 1] + b;
+                c[j--] = b % 10;
+
+                // carry
+                b = b / 10 | 0;
+            }
+            c[j] = (c[j] + b) % 10;
+        }
+
+        // Increment result exponent if there is a final carry.
+        if (b) {
+            ++y.e;
+        }
+
+        // Remove any leading zero.
+        if (!c[0]) {
+            c.shift();
+        }
+
+        // Remove trailing zeros.
+        for (i = c.length; !c[--i]; c.pop()) {
+        }
+        y.c = c;
+
+        return y;
+    };
+
+
+    /*
+     * Return a string representing the value of this Big.
+     * Return exponential notation if this Big has a positive exponent equal to
+     * or greater than Big.E_POS, or a negative exponent equal to or less than
+     * Big.E_NEG.
+     */
+    P.toString = P.valueOf = P.toJSON = function () {
+        var x = this,
+            Big = x.constructor,
+            e = x.e,
+            str = x.c.join(''),
+            strL = str.length;
+
+        // Exponential notation?
+        if (e <= Big.E_NEG || e >= Big.E_POS) {
+            str = str.charAt(0) + (strL > 1 ? '.' + str.slice(1) : '') +
+              (e < 0 ? 'e' : 'e+') + e;
+
+        // Negative exponent?
+        } else if (e < 0) {
+
+            // Prepend zeros.
+            for (; ++e; str = '0' + str) {
+            }
+            str = '0.' + str;
+
+        // Positive exponent?
+        } else if (e > 0) {
+
+            if (++e > strL) {
+
+                // Append zeros.
+                for (e -= strL; e-- ; str += '0') {
+                }
+            } else if (e < strL) {
+                str = str.slice(0, e) + '.' + str.slice(e);
+            }
+
+        // Exponent zero.
+        } else if (strL > 1) {
+            str = str.charAt(0) + '.' + str.slice(1);
+        }
+
+        // Avoid '-0'
+        return x.s < 0 && x.c[0] ? '-' + str : str;
+    };
+
+
+    /*
+     ***************************************************************************
+     * If toExponential, toFixed, toPrecision and format are not required they
+     * can safely be commented-out or deleted. No redundant code will be left.
+     * format is used only by toExponential, toFixed and toPrecision.
+     ***************************************************************************
+     */
+
+
+    /*
+     * Return a string representing the value of this Big in exponential
+     * notation to dp fixed decimal places and rounded, if necessary, using
+     * Big.RM.
+     *
+     * [dp] {number} Integer, 0 to MAX_DP inclusive.
+     */
+    P.toExponential = function (dp) {
+
+        if (dp == null) {
+            dp = this.c.length - 1;
+        } else if (dp !== ~~dp || dp < 0 || dp > MAX_DP) {
+            throwErr('!toExp!');
+        }
+
+        return format(this, dp, 1);
+    };
+
+
+    /*
+     * Return a string representing the value of this Big in normal notation
+     * to dp fixed decimal places and rounded, if necessary, using Big.RM.
+     *
+     * [dp] {number} Integer, 0 to MAX_DP inclusive.
+     */
+    P.toFixed = function (dp) {
+        var str,
+            x = this,
+            Big = x.constructor,
+            neg = Big.E_NEG,
+            pos = Big.E_POS;
+
+        // Prevent the possibility of exponential notation.
+        Big.E_NEG = -(Big.E_POS = 1 / 0);
+
+        if (dp == null) {
+            str = x.toString();
+        } else if (dp === ~~dp && dp >= 0 && dp <= MAX_DP) {
+            str = format(x, x.e + dp);
+
+            // (-0).toFixed() is '0', but (-0.1).toFixed() is '-0'.
+            // (-0).toFixed(1) is '0.0', but (-0.01).toFixed(1) is '-0.0'.
+            if (x.s < 0 && x.c[0] && str.indexOf('-') < 0) {
+        //E.g. -0.5 if rounded to -0 will cause toString to omit the minus sign.
+                str = '-' + str;
+            }
+        }
+        Big.E_NEG = neg;
+        Big.E_POS = pos;
+
+        if (!str) {
+            throwErr('!toFix!');
+        }
+
+        return str;
+    };
+
+
+    /*
+     * Return a string representing the value of this Big rounded to sd
+     * significant digits using Big.RM. Use exponential notation if sd is less
+     * than the number of digits necessary to represent the integer part of the
+     * value in normal notation.
+     *
+     * sd {number} Integer, 1 to MAX_DP inclusive.
+     */
+    P.toPrecision = function (sd) {
+
+        if (sd == null) {
+            return this.toString();
+        } else if (sd !== ~~sd || sd < 1 || sd > MAX_DP) {
+            throwErr('!toPre!');
+        }
+
+        return format(this, sd - 1, 2);
+    };
+
+
+    // Export
+
+
+    Big = bigFactory();
+
+    //AMD.
+    if (true) {
+        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+            return Big;
+        }.call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+    // Node and other CommonJS-like environments that support module.exports.
+    } else if (typeof module !== 'undefined' && module.exports) {
+        module.exports = Big;
+
+    //Browser.
+    } else {
+        global.Big = Big;
+    }
+})(this);
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
 var g;
@@ -94,19 +1243,19 @@ module.exports = g;
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(14)
+  __webpack_require__(15)
 }
-var Component = __webpack_require__(12)(
+var Component = __webpack_require__(13)(
   /* script */
-  __webpack_require__(3),
+  __webpack_require__(4),
   /* template */
-  __webpack_require__(13),
+  __webpack_require__(14),
   /* styles */
   injectStyle,
   /* scopeId */
@@ -138,7 +1287,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -9458,10 +10607,10 @@ return Vue$3;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9471,16 +10620,86 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _big = __webpack_require__(6);
+var _gameData = __webpack_require__(5);
+
+var _gameData2 = _interopRequireDefault(_gameData);
+
+var _big = __webpack_require__(0);
 
 var _big2 = _interopRequireDefault(_big);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 exports.default = {
     data: function data() {
         return {
-            crackers: (0, _big2.default)(0),
+            crackers: (0, _big2.default)(100),
             totalCrackers: (0, _big2.default)(0),
             clicks: (0, _big2.default)(0),
             cps: (0, _big2.default)(0),
@@ -9490,16 +10709,12 @@ exports.default = {
             showAchievements: false,
             achievementCount: 0,
 
-            buildings: [{ name: 'Cursor', baseCost: (0, _big2.default)(15), buyCost: (0, _big2.default)(15), baseCps: (0, _big2.default)(0.1), currentCps: (0, _big2.default)(0.1), description: "Autoclicks once every 10 seconds.", unlocked: false, showAt: 0, owned: 0 }, { name: 'Grandma', baseCost: (0, _big2.default)(100), buyCost: (0, _big2.default)(100), baseCps: (0, _big2.default)(1), currentCps: (0, _big2.default)(1), description: "", unlocked: false, showAt: (0, _big2.default)(0), owned: 0 }, { name: 'Farm', baseCost: (0, _big2.default)(1100), buyCost: (0, _big2.default)(1100), baseCps: (0, _big2.default)(8), currentCps: (0, _big2.default)(8), description: "", unlocked: false, showAt: (0, _big2.default)(15), owned: 0 }, { name: 'Mine', baseCost: (0, _big2.default)(12000), buyCost: (0, _big2.default)(12000), baseCps: (0, _big2.default)(47), currentCps: (0, _big2.default)(47), description: "", unlocked: false, showAt: (0, _big2.default)(100), owned: 0 }, { name: 'Factory', baseCost: (0, _big2.default)(130000), buyCost: (0, _big2.default)(130000), baseCps: (0, _big2.default)(260), currentCps: (0, _big2.default)(260), description: "", unlocked: false, showAt: (0, _big2.default)(1100), owned: 0 }, { name: 'Bank', baseCost: (0, _big2.default)(1.4E6), buyCost: (0, _big2.default)(1.4E6), baseCps: (0, _big2.default)(1400), currentCps: (0, _big2.default)(1400), description: "", unlocked: false, showAt: (0, _big2.default)(12000), owned: 0 }, { name: 'Temple', baseCost: (0, _big2.default)(20E6), buyCost: (0, _big2.default)(20E6), baseCps: (0, _big2.default)(7800), currentCps: (0, _big2.default)(7800), description: "", unlocked: false, showAt: (0, _big2.default)(130000), owned: 0 }, { name: 'Wizard Tower', baseCost: (0, _big2.default)(330E6), buyCost: (0, _big2.default)(330E6), baseCps: (0, _big2.default)(44000), currentCps: (0, _big2.default)(44000), description: "", unlocked: false, showAt: (0, _big2.default)(1.4E6), owned: 0 },
-            // no upgrades:
-            { name: 'Shipment', baseCost: (0, _big2.default)(5.1E9), buyCost: (0, _big2.default)(5.1E9), baseCps: (0, _big2.default)(260000), currentCps: (0, _big2.default)(260000), description: "", unlocked: false, showAt: (0, _big2.default)(20E6), owned: 0 }, { name: 'Alchemy Lab', baseCost: (0, _big2.default)(75E9), buyCost: (0, _big2.default)(75E9), baseCps: (0, _big2.default)(1.6E6), currentCps: (0, _big2.default)(1.6E6), description: "", unlocked: false, showAt: (0, _big2.default)(330E6), owned: 0 }, { name: 'Portal', baseCost: (0, _big2.default)(1E12), buyCost: (0, _big2.default)(1E12), baseCps: (0, _big2.default)(10E6), currentCps: (0, _big2.default)(10E6), description: "", unlocked: false, showAt: (0, _big2.default)(5.1E9), owned: 0 }, { name: 'Time Machine', baseCost: (0, _big2.default)(14E12), buyCost: (0, _big2.default)(14E12), baseCps: (0, _big2.default)(65E6), currentCps: (0, _big2.default)(65E6), description: "", unlocked: false, showAt: (0, _big2.default)(75E9), owned: 0 }, { name: 'Antimatter Condenser', baseCost: (0, _big2.default)(170E12), buyCost: (0, _big2.default)(170E12), baseCps: (0, _big2.default)(430E6), currentCps: (0, _big2.default)(430E6), description: "", unlocked: false, showAt: (0, _big2.default)(1E12), owned: 0 }, { name: 'Prism', baseCost: (0, _big2.default)(2.1E15), buyCost: (0, _big2.default)(2.1E15), baseCps: (0, _big2.default)(2.9E12), currentCps: (0, _big2.default)(2.9E12), description: "", unlocked: false, showAt: (0, _big2.default)(14E12), owned: 0 }],
+            buildingNames: [],
+            buildings: [],
 
             upgrades: [
             // production
-            { type: 'Cracker', name: 'Store Brand Crackers', needed: (0, _big2.default)(50000), cost: (0, _big2.default)(999999), multiplier: 1.01, description: 'Meh', unlocked: false, active: false }, { type: 'Cracker', name: 'Fancy Store Crackers', needed: (0, _big2.default)(250000), cost: (0, _big2.default)(5E6), multiplier: 1.01, description: 'Ok I guess', unlocked: false, active: false }, { type: 'Cracker', name: 'Rye Crackers', needed: (0, _big2.default)(500000), cost: (0, _big2.default)(10E6), multiplier: 1.01, description: 'Better than cardboard', unlocked: false, active: false }, { type: 'Cracker', name: 'Sugared Crackers', needed: (0, _big2.default)(2.5E6), cost: (0, _big2.default)(50E6), multiplier: 1.01, description: 'Gross?', unlocked: false, active: false }, { type: 'Cracker', name: 'Saltine Crackers', needed: (0, _big2.default)(5E6), cost: (0, _big2.default)(100E6), multiplier: 1.01, description: 'That seems reasonable', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(25E6), cost: (0, _big2.default)(500E6), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(50E6), cost: (0, _big2.default)(1E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(250E6), cost: (0, _big2.default)(5E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(500E6), cost: (0, _big2.default)(10E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(2.5E9), cost: (0, _big2.default)(50E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
-            // 4% etc
-
-            { type: 'Cursor', name: 'Double Tap', needed: 1, cost: (0, _big2.default)(100), multiplier: 2, description: 'Tap faster', unlocked: false, active: false }, { type: 'Cursor', name: 'Quattro Tap', needed: 1, cost: (0, _big2.default)(500), multiplier: 2, description: 'Tap faster!', unlocked: false, active: false }, { type: 'Cursor', name: 'Mega Tap', needed: 10, cost: (0, _big2.default)(10000), multiplier: 2, description: 'Tap even faster!!', unlocked: false, active: false }, { type: 'Cursor', name: 'Middle Finger', needed: 20, cost: (0, _big2.default)(100000), addition: 0.1, description: 'Put that thing away.', unlocked: false, active: false }, { type: 'Cursor', name: 'Double Middle Finger', needed: 40, cost: (0, _big2.default)(10E6), addition: 0.5, description: 'Put those away.', unlocked: false, active: false }, { type: 'Cursor', name: 'Extra Middle Fingers', needed: 80, cost: (0, _big2.default)(100E6), addition: 5, description: "Now that's just rude.", unlocked: false, active: false }, { type: 'Cursor', name: 'Super Finger', needed: 120, cost: (0, _big2.default)(1E9), addition: 50, description: "No decorum at all.", unlocked: false, active: false }, { type: 'Cursor', name: 'Super Duper Finger', needed: 160, cost: (0, _big2.default)(10E9), addition: 500, description: "Need Description", unlocked: false, active: false }, { type: 'Cursor', name: 'Mega Finger', needed: 200, cost: (0, _big2.default)(10E12), addition: 5000, description: "Need Description", unlocked: false, active: false }, { type: 'Cursor', name: 'Turbo Finger', needed: 240, cost: (0, _big2.default)(100E12), addition: 50000, description: "Need Description", unlocked: false, active: false }, { type: 'Cursor', name: 'Ultra Finger', needed: 280, cost: (0, _big2.default)(1E12), addition: 500000, description: "Need Description", unlocked: false, active: false }, { type: 'Cursor', name: 'Ultimate Finger', needed: 320, cost: (0, _big2.default)(10E15), addition: 5000000, description: "Need Description", unlocked: false, active: false }, { type: 'Grandma', name: 'Timeout', needed: 1, cost: (0, _big2.default)(1000), multiplier: 2, description: 'These toddlers need to learn some discipline', unlocked: false, active: false }, { type: 'Grandma', name: 'Daycare', needed: 5, cost: (0, _big2.default)(5000), multiplier: 2, description: 'Finally, some me time!', unlocked: false, active: false }, { type: 'Grandma', name: 'Play Date', needed: 25, cost: (0, _big2.default)(50000), multiplier: 2, description: 'An active social life is good for productivity', unlocked: false, active: false }, { type: 'Grandma', name: 'ADHD Meds', needed: 50, cost: (0, _big2.default)(5E6), multiplier: 2, description: "That's better...", unlocked: false, active: false }, { type: 'Grandma', name: 'Jack', needed: 100, cost: (0, _big2.default)(500E6), multiplier: 2, description: "Like that movie?", unlocked: false, active: false }, { type: 'Grandma', name: 'Jack & Jill', needed: 150, cost: (0, _big2.default)(50E9), multiplier: 2, description: "The worst Adam Sandler movie", unlocked: false, active: false }, { type: 'Grandma', name: 'Need Name', needed: 200, cost: (0, _big2.default)(50E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Grandma', name: 'Need Name', needed: 250, cost: (0, _big2.default)(50E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Farm', name: 'Torah', needed: 1, cost: (0, _big2.default)(11000), multiplier: 2, description: 'Got to follow the rules', unlocked: false, active: false }, { type: 'Farm', name: 'Another Torah', needed: 5, cost: (0, _big2.default)(55000), multiplier: 2, description: 'More to go around', unlocked: false, active: false }, { type: 'Farm', name: 'Rabbi', needed: 25, cost: (0, _big2.default)(550000), multiplier: 2, description: "This rabbi doesn't come cheap", unlocked: false, active: false }, { type: 'Farm', name: 'Rabbi Council', needed: 50, cost: (0, _big2.default)(55E6), multiplier: 2, description: "These rabbis don't come cheap", unlocked: false, active: false }, { type: 'Farm', name: 'Passover Bonus', needed: 100, cost: (0, _big2.default)(5.5E9), multiplier: 2, description: "What does that even mean?", unlocked: false, active: false }, { type: 'Farm', name: 'Need Name', needed: 150, cost: (0, _big2.default)(550E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Farm', name: 'Need Name', needed: 200, cost: (0, _big2.default)(550E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Farm', name: 'Need Name', needed: 250, cost: (0, _big2.default)(550E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Mine', name: 'Knockoff Torah', needed: 1, cost: (0, _big2.default)(120000), multiplier: 2, description: "This doesn't seem legit...", unlocked: false, active: false }, { type: 'Mine', name: 'Another Knockoff Torah', needed: 5, cost: (0, _big2.default)(600000), multiplier: 2, description: "??", unlocked: false, active: false }, { type: 'Mine', name: 'Fake Rabbi', needed: 25, cost: (0, _big2.default)(6E6), multiplier: 2, description: "I don't think his beard is real", unlocked: false, active: false }, { type: 'Mine', name: 'Fake Rabbi Council', needed: 50, cost: (0, _big2.default)(600E6), multiplier: 2, description: "I have a bad feeling about this", unlocked: false, active: false }, { type: 'Mine', name: 'Fake Passover Bonus', needed: 100, cost: (0, _big2.default)(60E9), multiplier: 2, description: "What does that even mean?!", unlocked: false, active: false }, { type: 'Mine', name: 'Need Name', needed: 150, cost: (0, _big2.default)(6E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Mine', name: 'Need Name', needed: 200, cost: (0, _big2.default)(6E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Mine', name: 'Need Name', needed: 250, cost: (0, _big2.default)(6E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Factory', name: 'Strumpets', needed: 1, cost: (0, _big2.default)(1.3E6), multiplier: 2, description: "What are we, savages?", unlocked: false, active: false }, { type: 'Factory', name: 'Valet', needed: 5, cost: (0, _big2.default)(6.5E6), multiplier: 2, description: "I'm too rich to park my car", unlocked: false, active: false }, { type: 'Factory', name: 'Servant', needed: 25, cost: (0, _big2.default)(65E6), multiplier: 2, description: "It's not technically slavery!", unlocked: false, active: false }, { type: 'Factory', name: 'Free trade tea', needed: 50, cost: (0, _big2.default)(6.5E9), multiplier: 2, description: "I feel so much better about this", unlocked: false, active: false }, { type: 'Factory', name: 'Slavery tea', needed: 100, cost: (0, _big2.default)(650E9), multiplier: 2, description: "Suffering tastes better", unlocked: false, active: false }, { type: 'Factory', name: 'Need Name', needed: 150, cost: (0, _big2.default)(65E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Factory', name: 'Need Name', needed: 200, cost: (0, _big2.default)(65E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Factory', name: 'Need Name', needed: 250, cost: (0, _big2.default)(65E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Bank', name: 'Strumpets', needed: 1, cost: (0, _big2.default)(14E6), multiplier: 2, description: "What are we, savages?", unlocked: false, active: false }, { type: 'Bank', name: 'Valet', needed: 5, cost: (0, _big2.default)(70E6), multiplier: 2, description: "I'm too rich to park my car", unlocked: false, active: false }, { type: 'Bank', name: 'Servant', needed: 25, cost: (0, _big2.default)(700E6), multiplier: 2, description: "It's not technically slavery!", unlocked: false, active: false }, { type: 'Bank', name: 'Free trade tea', needed: 50, cost: (0, _big2.default)(70E9), multiplier: 2, description: "I feel so much better about this", unlocked: false, active: false }, { type: 'Bank', name: 'Slavery tea', needed: 100, cost: (0, _big2.default)(7E12), multiplier: 2, description: "Suffering tastes better", unlocked: false, active: false }, { type: 'Bank', name: 'Need Name', needed: 150, cost: (0, _big2.default)(700E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Bank', name: 'Need Name', needed: 200, cost: (0, _big2.default)(700E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Bank', name: 'Need Name', needed: 250, cost: (0, _big2.default)(700E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Temple', name: 'Need Name', needed: 1, cost: (0, _big2.default)(200E6), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Temple', name: 'Need Name', needed: 5, cost: (0, _big2.default)(1E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Temple', name: 'Need Name', needed: 25, cost: (0, _big2.default)(10E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Temple', name: 'Need Name', needed: 50, cost: (0, _big2.default)(1E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Temple', name: 'Need Name', needed: 100, cost: (0, _big2.default)(100E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Temple', name: 'Need Name', needed: 150, cost: (0, _big2.default)(10E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Temple', name: 'Need Name', needed: 200, cost: (0, _big2.default)(10E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Temple', name: 'Need Name', needed: 250, cost: (0, _big2.default)(10E21), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Wizard Tower', name: 'Need Name', needed: 1, cost: (0, _big2.default)(3.3E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Wizard Tower', name: 'Need Name', needed: 5, cost: (0, _big2.default)(16.5E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Wizard Tower', name: 'Need Name', needed: 25, cost: (0, _big2.default)(165E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Wizard Tower', name: 'Need Name', needed: 50, cost: (0, _big2.default)(16.5E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Wizard Tower', name: 'Need Name', needed: 100, cost: (0, _big2.default)(1.65E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Wizard Tower', name: 'Need Name', needed: 150, cost: (0, _big2.default)(165E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Wizard Tower', name: 'Need Name', needed: 200, cost: (0, _big2.default)(165E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 'Wizard Tower', name: 'Need Name', needed: 250, cost: (0, _big2.default)(165E21), multiplier: 2, description: "Need Description", unlocked: false, active: false }],
+            { type: 'Cracker', name: 'Store Brand Crackers', needed: (0, _big2.default)(50000), cost: (0, _big2.default)(999999), multiplier: 1.01, description: 'Meh', unlocked: false, active: false }, { type: 'Cracker', name: 'Fancy Store Crackers', needed: (0, _big2.default)(250000), cost: (0, _big2.default)(5E6), multiplier: 1.01, description: 'Ok I guess', unlocked: false, active: false }, { type: 'Cracker', name: 'Rye Crackers', needed: (0, _big2.default)(500000), cost: (0, _big2.default)(10E6), multiplier: 1.01, description: 'Better than cardboard', unlocked: false, active: false }, { type: 'Cracker', name: 'Sugared Crackers', needed: (0, _big2.default)(2.5E6), cost: (0, _big2.default)(50E6), multiplier: 1.01, description: 'Gross?', unlocked: false, active: false }, { type: 'Cracker', name: 'Saltine Crackers', needed: (0, _big2.default)(5E6), cost: (0, _big2.default)(100E6), multiplier: 1.01, description: 'That seems reasonable', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(25E6), cost: (0, _big2.default)(500E6), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(50E6), cost: (0, _big2.default)(1E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(250E6), cost: (0, _big2.default)(5E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(500E6), cost: (0, _big2.default)(10E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false }, { type: 'Cracker', name: 'Need Name', needed: (0, _big2.default)(2.5E9), cost: (0, _big2.default)(50E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false }],
 
             _sortedUpgrades: null,
 
@@ -9511,10 +10726,7 @@ exports.default = {
             { type: 'Cracker', name: 'Casual baking', cps: (0, _big2.default)(1), unlocked: false }, { type: 'Cracker', name: 'Hardcore baking', cps: (0, _big2.default)(10), unlocked: false },
 
             // clicking
-            { type: 'Cracker', name: 'Clicktastic', clicks: (0, _big2.default)(10000), unlocked: false }, { type: 'Cracker', name: 'Clickathon', clicks: (0, _big2.default)(100000), unlocked: false },
-
-            // buildings
-            { type: 'Cursor', name: 'Click', total: (0, _big2.default)(1), unlocked: false }, { type: 'Cursor', name: 'Double Click', total: (0, _big2.default)(2), unlocked: false }, { type: 'Grandma', name: 'Grandma basics', total: (0, _big2.default)(1), unlocked: false }, { type: 'Grandma', name: 'Grandma proficiency', total: (0, _big2.default)(50), unlocked: false }]
+            { type: 'Cracker', name: 'Clicktastic', clicks: (0, _big2.default)(10000), unlocked: false }, { type: 'Cracker', name: 'Clickathon', clicks: (0, _big2.default)(100000), unlocked: false }]
         };
     },
 
@@ -9541,7 +10753,7 @@ exports.default = {
             this.totalCrackers = this.totalCrackers.plus(this.clickPower);
         },
         recalculateClickPower: function recalculateClickPower() {
-            this.clickPower = this.upgradeMultiplier('Cursor').plus(this.upgradeAddition());
+            this.clickPower = this.upgradeMultiplier(this.buildingNames[0]).plus(this.upgradeAddition());
         },
         recalculateCps: function recalculateCps() {
             var cps = (0, _big2.default)(0);
@@ -9575,6 +10787,7 @@ exports.default = {
             if (this.canBuyBuilding(building, this.buyAmount)) {
                 this.crackers = this.crackers.minus(this.buildingCost(building));
                 building.owned += this.buyAmount;
+                building.unlocked = true; // just in case
 
                 this.showUpgrades = true;
 
@@ -9675,12 +10888,12 @@ exports.default = {
         },
         upgradeAddition: function upgradeAddition() {
             var addition = (0, _big2.default)(0);
-            this.activeUpgrades('Cursor').forEach(function (upgrade) {
+            this.activeUpgrades(this.buildingNames[0]).forEach(function (upgrade) {
                 if (upgrade.addition != null) {
                     addition = addition.plus(upgrade.addition);
                 }
             });
-            return addition * this.otherBuildingCount('Cursor');
+            return addition * this.otherBuildingCount(this.buildingNames[0]);
         },
         upgradeProduction: function upgradeProduction() {
             var production = 1;
@@ -9750,6 +10963,43 @@ exports.default = {
         tick: function tick() {
             this.crackers = this.crackers.plus(this.cps.div(10));
             this.totalCrackers = this.totalCrackers.plus(this.cps.div(10));
+        },
+
+        // misc/setup
+        generateBuildings: function generateBuildings() {
+            var buildingNames = this.shuffleArray(_gameData2.default.buildingNames);
+            for (var i = 0; i < _gameData2.default.buildings.length; i++) {
+                var buildingName = buildingNames.pop();
+                var building = _gameData2.default.buildings[i];
+                building.name = buildingName;
+                this.buildings.push(building);
+                this.buildingNames.push(buildingName);
+            }
+        },
+        generateUpgrades: function generateUpgrades() {
+            var vm = this;
+            _gameData2.default.buildingUpgrades.forEach(function (upgrade) {
+                var buildingIndex = upgrade.type;
+                upgrade.type = vm.buildingNames[buildingIndex];
+                vm.upgrades.push(upgrade);
+            });
+        },
+        generateAchievements: function generateAchievements() {
+            var vm = this;
+            _gameData2.default.buildingAchivements.forEach(function (achievement) {
+                var buildingIndex = achievement.type;
+                achievement.type = vm.buildingNames[buildingIndex];
+                vm.achievements.push(achievement);
+            });
+        },
+        shuffleArray: function shuffleArray(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+            return array;
         }
     },
     filters: {
@@ -9771,6 +11021,10 @@ exports.default = {
         }
     },
     mounted: function mounted() {
+        this.generateBuildings();
+        this.generateUpgrades();
+        this.generateAchievements();
+
         setInterval(function () {
             this.tick();
         }.bind(this), 100);
@@ -9779,84 +11033,47 @@ exports.default = {
             this.checkAchievements();
         }.bind(this), 2000);
     }
-}; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+};
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _vue = __webpack_require__(2);
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _big = __webpack_require__(0);
+
+var _big2 = _interopRequireDefault(_big);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+    buildingNames: ["Abbey", "A-frame", "Aircraft Hangar", "Airport Terminal", "Amphitheater", "Apartment Building", "Aqueduct", "Arch", "Arena", "Armory", "Assembly Hall", "Barn", "Barracks", "Beach House", "Boathouse", "Boarding House", "Bowling Alley", "Bridge", "Brownstone", "Bungalow", "Bunkhouse", "Bunker", "Cabana", "Cabin", "Capitol", "Carport", "Castle", "Catacomb", "Cathedral", "Chalet", "Chapel", "Chateau", "Church", "Cinema", "City Hall", "Clubhouse", "College", "Compound", "Concert Hall", "Condominium", "Conservatory", "Cottage", "Courthouse", "Crypt", "Depot", "Detached House", "Dock", "Dome", "Dormitory", "Double Wide", "Duplex", "Dwelling", "Earth-sheltered House", "Embassy", "Exposition Hall", "Factory", "Farm", "Farmhouse", "Ferry Slip", "Ferry Terminal", "Firehouse", "Fire Station", "Folly", "Forge", "Fort", "Fortress", "Foundry", "Gallery", "Garage", "Gas Station", "Gazebo", "Geodesic Dome", "Granary", "Greenhouse", "Gym", "Gymnasium", "Hall", "Hangar", "Haunted House", "Headquarters", "High-rise", "Home", "Hospital", "Hostel", "Hotel", "Hot House", "House", "Houseboat", "Housing Project", "Hunting Lodge", "Hut", "Igloo", "Jail", "Kiosk", "Laboratory", "Lean-to", "Library", "Lighthouse", "Lodge", "Log Cabin", "Longhouse", "Mall", "Manor", "Manse", "Mansion", "Marina", "Market", "Mausoleum", "Meeting Hall", "Mill", "Minaret", "Mobile Home", "Monastery", "Monument", "Mosque", "Motel", "Museum", "Nuclear Power Plant", "Nursing Home", "Observatory", "Office Building", "Opera House", "Outbuilding", "Outhouse", "Pagoda", "Palace", "Parking Garage", "Parliament", "Pavilion", "Plant", "Playhouse", "Police Station", "Pool House", "Post Office", "Power Plant", "Prefab Building", "Prison", "Pump House", "Pyramid", "Quonset Hut", "Railway Station", "Ranch", "Rectory", "Refinery", "Residence", "Restaurant", "Roller Rink", "Roundhouse", "Rowhouse", "School", "Shack", "Shed", "Shelter", "Shopping Center", "Shopping Mall", "Shrine", "Silo", "Skating Rink", "Skyscraper", "Skyway", "Smokestack", "Spire", "Split-level House", "Stable", "Stadium", "State House", "Station", "Steeple", "Store", "Storehouse", "Strip Mall", "Structure", "Studio", "Supermarket", "Symphony", "Synagogue", "Temple", "Tenement", "Tent", "Terminal", "Theater", "Tipi", "Toll House", "Tomb", "Tower", "Townhouse", "Treehouse", "Triplex", "Tudor House", "University", "Vault", "Vicarage", "Villa", "Warehouse", "Watermill", "Workshop", "Yurt"],
+
+    buildings: [{ name: 0, baseCost: (0, _big2.default)(15), buyCost: (0, _big2.default)(15), baseCps: (0, _big2.default)(0.1), currentCps: (0, _big2.default)(0.1), description: "", unlocked: false, showAt: 0, owned: 0 }, { name: 1, baseCost: (0, _big2.default)(100), buyCost: (0, _big2.default)(100), baseCps: (0, _big2.default)(1), currentCps: (0, _big2.default)(1), description: "", unlocked: false, showAt: (0, _big2.default)(0), owned: 0 }, { name: 2, baseCost: (0, _big2.default)(1100), buyCost: (0, _big2.default)(1100), baseCps: (0, _big2.default)(8), currentCps: (0, _big2.default)(8), description: "", unlocked: false, showAt: (0, _big2.default)(15), owned: 0 }, { name: 3, baseCost: (0, _big2.default)(12000), buyCost: (0, _big2.default)(12000), baseCps: (0, _big2.default)(47), currentCps: (0, _big2.default)(47), description: "", unlocked: false, showAt: (0, _big2.default)(100), owned: 0 }, { name: 4, baseCost: (0, _big2.default)(130000), buyCost: (0, _big2.default)(130000), baseCps: (0, _big2.default)(260), currentCps: (0, _big2.default)(260), description: "", unlocked: false, showAt: (0, _big2.default)(1100), owned: 0 }, { name: 5, baseCost: (0, _big2.default)(1.4E6), buyCost: (0, _big2.default)(1.4E6), baseCps: (0, _big2.default)(1400), currentCps: (0, _big2.default)(1400), description: "", unlocked: false, showAt: (0, _big2.default)(12000), owned: 0 }, { name: 6, baseCost: (0, _big2.default)(20E6), buyCost: (0, _big2.default)(20E6), baseCps: (0, _big2.default)(7800), currentCps: (0, _big2.default)(7800), description: "", unlocked: false, showAt: (0, _big2.default)(130000), owned: 0 }, { name: 7, baseCost: (0, _big2.default)(330E6), buyCost: (0, _big2.default)(330E6), baseCps: (0, _big2.default)(44000), currentCps: (0, _big2.default)(44000), description: "", unlocked: false, showAt: (0, _big2.default)(1.4E6), owned: 0 }, { name: 8, baseCost: (0, _big2.default)(5.1E9), buyCost: (0, _big2.default)(5.1E9), baseCps: (0, _big2.default)(260000), currentCps: (0, _big2.default)(260000), description: "", unlocked: false, showAt: (0, _big2.default)(20E6), owned: 0 }, { name: 9, baseCost: (0, _big2.default)(75E9), buyCost: (0, _big2.default)(75E9), baseCps: (0, _big2.default)(1.6E6), currentCps: (0, _big2.default)(1.6E6), description: "", unlocked: false, showAt: (0, _big2.default)(330E6), owned: 0 }, { name: 10, baseCost: (0, _big2.default)(1E12), buyCost: (0, _big2.default)(1E12), baseCps: (0, _big2.default)(10E6), currentCps: (0, _big2.default)(10E6), description: "", unlocked: false, showAt: (0, _big2.default)(5.1E9), owned: 0 }, { name: 11, baseCost: (0, _big2.default)(14E12), buyCost: (0, _big2.default)(14E12), baseCps: (0, _big2.default)(65E6), currentCps: (0, _big2.default)(65E6), description: "", unlocked: false, showAt: (0, _big2.default)(75E9), owned: 0 }, { name: 12, baseCost: (0, _big2.default)(170E12), buyCost: (0, _big2.default)(170E12), baseCps: (0, _big2.default)(430E6), currentCps: (0, _big2.default)(430E6), description: "", unlocked: false, showAt: (0, _big2.default)(1E12), owned: 0 }, { name: 13, baseCost: (0, _big2.default)(2.1E15), buyCost: (0, _big2.default)(2.1E15), baseCps: (0, _big2.default)(2.9E12), currentCps: (0, _big2.default)(2.9E12), description: "", unlocked: false, showAt: (0, _big2.default)(14E12), owned: 0 }],
+
+    buildingUpgrades: [{ type: 0, name: 'Double Tap', needed: 1, cost: (0, _big2.default)(100), multiplier: 2, description: 'Tap faster', unlocked: false, active: false }, { type: 0, name: 'Quattro Tap', needed: 1, cost: (0, _big2.default)(500), multiplier: 2, description: 'Tap faster!', unlocked: false, active: false }, { type: 0, name: 'Mega Tap', needed: 10, cost: (0, _big2.default)(10000), multiplier: 2, description: 'Tap even faster!!', unlocked: false, active: false }, { type: 0, name: 'Middle Finger', needed: 20, cost: (0, _big2.default)(100000), addition: 0.1, description: 'Put that thing away.', unlocked: false, active: false }, { type: 0, name: 'Double Middle Finger', needed: 40, cost: (0, _big2.default)(10E6), addition: 0.5, description: 'Put those away.', unlocked: false, active: false }, { type: 0, name: 'Extra Middle Fingers', needed: 80, cost: (0, _big2.default)(100E6), addition: 5, description: "Now that's just rude.", unlocked: false, active: false }, { type: 0, name: 'Super Finger', needed: 120, cost: (0, _big2.default)(1E9), addition: 50, description: "No decorum at all.", unlocked: false, active: false }, { type: 0, name: 'Super Duper Finger', needed: 160, cost: (0, _big2.default)(10E9), addition: 500, description: "Need Description", unlocked: false, active: false }, { type: 0, name: 'Mega Finger', needed: 200, cost: (0, _big2.default)(10E12), addition: 5000, description: "Need Description", unlocked: false, active: false }, { type: 0, name: 'Turbo Finger', needed: 240, cost: (0, _big2.default)(100E12), addition: 50000, description: "Need Description", unlocked: false, active: false }, { type: 0, name: 'Ultra Finger', needed: 280, cost: (0, _big2.default)(1E12), addition: 500000, description: "Need Description", unlocked: false, active: false }, { type: 0, name: 'Ultimate Finger', needed: 320, cost: (0, _big2.default)(10E15), addition: 5000000, description: "Need Description", unlocked: false, active: false }, { type: 1, name: 'Timeout', needed: 1, cost: (0, _big2.default)(1000), multiplier: 2, description: 'These toddlers need to learn some discipline', unlocked: false, active: false }, { type: 1, name: 'Daycare', needed: 5, cost: (0, _big2.default)(5000), multiplier: 2, description: 'Finally, some me time!', unlocked: false, active: false }, { type: 1, name: 'Play Date', needed: 25, cost: (0, _big2.default)(50000), multiplier: 2, description: 'An active social life is good for productivity', unlocked: false, active: false }, { type: 1, name: 'ADHD Meds', needed: 50, cost: (0, _big2.default)(5E6), multiplier: 2, description: "That's better...", unlocked: false, active: false }, { type: 1, name: 'Jack', needed: 100, cost: (0, _big2.default)(500E6), multiplier: 2, description: "Like that movie?", unlocked: false, active: false }, { type: 1, name: 'Jack & Jill', needed: 150, cost: (0, _big2.default)(50E9), multiplier: 2, description: "The worst Adam Sandler movie", unlocked: false, active: false }, { type: 1, name: 'Need Name', needed: 200, cost: (0, _big2.default)(50E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 1, name: 'Need Name', needed: 250, cost: (0, _big2.default)(50E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 2, name: 'Torah', needed: 1, cost: (0, _big2.default)(11000), multiplier: 2, description: 'Got to follow the rules', unlocked: false, active: false }, { type: 2, name: 'Another Torah', needed: 5, cost: (0, _big2.default)(55000), multiplier: 2, description: 'More to go around', unlocked: false, active: false }, { type: 2, name: 'Rabbi', needed: 25, cost: (0, _big2.default)(550000), multiplier: 2, description: "This rabbi doesn't come cheap", unlocked: false, active: false }, { type: 2, name: 'Rabbi Council', needed: 50, cost: (0, _big2.default)(55E6), multiplier: 2, description: "These rabbis don't come cheap", unlocked: false, active: false }, { type: 2, name: 'Passover Bonus', needed: 100, cost: (0, _big2.default)(5.5E9), multiplier: 2, description: "What does that even mean?", unlocked: false, active: false }, { type: 2, name: 'Need Name', needed: 150, cost: (0, _big2.default)(550E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 2, name: 'Need Name', needed: 200, cost: (0, _big2.default)(550E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 2, name: 'Need Name', needed: 250, cost: (0, _big2.default)(550E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 3, name: 'Knockoff Torah', needed: 1, cost: (0, _big2.default)(120000), multiplier: 2, description: "This doesn't seem legit...", unlocked: false, active: false }, { type: 3, name: 'Another Knockoff Torah', needed: 5, cost: (0, _big2.default)(600000), multiplier: 2, description: "??", unlocked: false, active: false }, { type: 3, name: 'Fake Rabbi', needed: 25, cost: (0, _big2.default)(6E6), multiplier: 2, description: "I don't think his beard is real", unlocked: false, active: false }, { type: 3, name: 'Fake Rabbi Council', needed: 50, cost: (0, _big2.default)(600E6), multiplier: 2, description: "I have a bad feeling about this", unlocked: false, active: false }, { type: 3, name: 'Fake Passover Bonus', needed: 100, cost: (0, _big2.default)(60E9), multiplier: 2, description: "What does that even mean?!", unlocked: false, active: false }, { type: 3, name: 'Need Name', needed: 150, cost: (0, _big2.default)(6E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 3, name: 'Need Name', needed: 200, cost: (0, _big2.default)(6E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 3, name: 'Need Name', needed: 250, cost: (0, _big2.default)(6E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 4, name: 'Strumpets', needed: 1, cost: (0, _big2.default)(1.3E6), multiplier: 2, description: "What are we, savages?", unlocked: false, active: false }, { type: 4, name: 'Valet', needed: 5, cost: (0, _big2.default)(6.5E6), multiplier: 2, description: "I'm too rich to park my car", unlocked: false, active: false }, { type: 4, name: 'Servant', needed: 25, cost: (0, _big2.default)(65E6), multiplier: 2, description: "It's not technically slavery!", unlocked: false, active: false }, { type: 4, name: 'Free trade tea', needed: 50, cost: (0, _big2.default)(6.5E9), multiplier: 2, description: "I feel so much better about this", unlocked: false, active: false }, { type: 4, name: 'Slavery tea', needed: 100, cost: (0, _big2.default)(650E9), multiplier: 2, description: "Suffering tastes better", unlocked: false, active: false }, { type: 4, name: 'Need Name', needed: 150, cost: (0, _big2.default)(65E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 4, name: 'Need Name', needed: 200, cost: (0, _big2.default)(65E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 4, name: 'Need Name', needed: 250, cost: (0, _big2.default)(65E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 5, name: 'Strumpets', needed: 1, cost: (0, _big2.default)(14E6), multiplier: 2, description: "What are we, savages?", unlocked: false, active: false }, { type: 5, name: 'Valet', needed: 5, cost: (0, _big2.default)(70E6), multiplier: 2, description: "I'm too rich to park my car", unlocked: false, active: false }, { type: 5, name: 'Servant', needed: 25, cost: (0, _big2.default)(700E6), multiplier: 2, description: "It's not technically slavery!", unlocked: false, active: false }, { type: 5, name: 'Free trade tea', needed: 50, cost: (0, _big2.default)(70E9), multiplier: 2, description: "I feel so much better about this", unlocked: false, active: false }, { type: 5, name: 'Slavery tea', needed: 100, cost: (0, _big2.default)(7E12), multiplier: 2, description: "Suffering tastes better", unlocked: false, active: false }, { type: 5, name: 'Need Name', needed: 150, cost: (0, _big2.default)(700E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 5, name: 'Need Name', needed: 200, cost: (0, _big2.default)(700E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 5, name: 'Need Name', needed: 250, cost: (0, _big2.default)(700E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 6, name: 'Need Name', needed: 1, cost: (0, _big2.default)(200E6), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 6, name: 'Need Name', needed: 5, cost: (0, _big2.default)(1E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 6, name: 'Need Name', needed: 25, cost: (0, _big2.default)(10E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 6, name: 'Need Name', needed: 50, cost: (0, _big2.default)(1E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 6, name: 'Need Name', needed: 100, cost: (0, _big2.default)(100E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 6, name: 'Need Name', needed: 150, cost: (0, _big2.default)(10E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 6, name: 'Need Name', needed: 200, cost: (0, _big2.default)(10E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 6, name: 'Need Name', needed: 250, cost: (0, _big2.default)(10E21), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 7, name: 'Need Name', needed: 1, cost: (0, _big2.default)(3.3E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 7, name: 'Need Name', needed: 5, cost: (0, _big2.default)(16.5E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 7, name: 'Need Name', needed: 25, cost: (0, _big2.default)(165E9), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 7, name: 'Need Name', needed: 50, cost: (0, _big2.default)(16.5E12), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 7, name: 'Need Name', needed: 100, cost: (0, _big2.default)(1.65E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 7, name: 'Need Name', needed: 150, cost: (0, _big2.default)(165E15), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 7, name: 'Need Name', needed: 200, cost: (0, _big2.default)(165E18), multiplier: 2, description: "Need Description", unlocked: false, active: false }, { type: 7, name: 'Need Name', needed: 250, cost: (0, _big2.default)(165E21), multiplier: 2, description: "Need Description", unlocked: false, active: false }],
+
+    buildingAchivements: [{ type: 0, name: 'Click', total: (0, _big2.default)(1), unlocked: false }, { type: 0, name: 'Double Click', total: (0, _big2.default)(2), unlocked: false }, { type: 1, name: 'Grandma basics', total: (0, _big2.default)(1), unlocked: false }, { type: 1, name: 'Grandma proficiency', total: (0, _big2.default)(50), unlocked: false }]
+};
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _vue = __webpack_require__(3);
 
 var _vue2 = _interopRequireDefault(_vue);
 
-var _game = __webpack_require__(1);
+var _game = __webpack_require__(2);
 
 var _game2 = _interopRequireDefault(_game);
 
@@ -9868,7 +11085,7 @@ new _vue2.default({
 });
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9989,1156 +11206,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_RESULT__;/* big.js v3.1.3 https://github.com/MikeMcl/big.js/LICENCE */
-;(function (global) {
-    'use strict';
-
-/*
-  big.js v3.1.3
-  A small, fast, easy-to-use library for arbitrary-precision decimal arithmetic.
-  https://github.com/MikeMcl/big.js/
-  Copyright (c) 2014 Michael Mclaughlin <M8ch88l@gmail.com>
-  MIT Expat Licence
-*/
-
-/***************************** EDITABLE DEFAULTS ******************************/
-
-    // The default values below must be integers within the stated ranges.
-
-    /*
-     * The maximum number of decimal places of the results of operations
-     * involving division: div and sqrt, and pow with negative exponents.
-     */
-    var DP = 20,                           // 0 to MAX_DP
-
-        /*
-         * The rounding mode used when rounding to the above decimal places.
-         *
-         * 0 Towards zero (i.e. truncate, no rounding).       (ROUND_DOWN)
-         * 1 To nearest neighbour. If equidistant, round up.  (ROUND_HALF_UP)
-         * 2 To nearest neighbour. If equidistant, to even.   (ROUND_HALF_EVEN)
-         * 3 Away from zero.                                  (ROUND_UP)
-         */
-        RM = 1,                            // 0, 1, 2 or 3
-
-        // The maximum value of DP and Big.DP.
-        MAX_DP = 1E6,                      // 0 to 1000000
-
-        // The maximum magnitude of the exponent argument to the pow method.
-        MAX_POWER = 1E6,                   // 1 to 1000000
-
-        /*
-         * The exponent value at and beneath which toString returns exponential
-         * notation.
-         * JavaScript's Number type: -7
-         * -1000000 is the minimum recommended exponent value of a Big.
-         */
-        E_NEG = -7,                   // 0 to -1000000
-
-        /*
-         * The exponent value at and above which toString returns exponential
-         * notation.
-         * JavaScript's Number type: 21
-         * 1000000 is the maximum recommended exponent value of a Big.
-         * (This limit is not enforced or checked.)
-         */
-        E_POS = 21,                   // 0 to 1000000
-
-/******************************************************************************/
-
-        // The shared prototype object.
-        P = {},
-        isValid = /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i,
-        Big;
-
-
-    /*
-     * Create and return a Big constructor.
-     *
-     */
-    function bigFactory() {
-
-        /*
-         * The Big constructor and exported function.
-         * Create and return a new instance of a Big number object.
-         *
-         * n {number|string|Big} A numeric value.
-         */
-        function Big(n) {
-            var x = this;
-
-            // Enable constructor usage without new.
-            if (!(x instanceof Big)) {
-                return n === void 0 ? bigFactory() : new Big(n);
-            }
-
-            // Duplicate.
-            if (n instanceof Big) {
-                x.s = n.s;
-                x.e = n.e;
-                x.c = n.c.slice();
-            } else {
-                parse(x, n);
-            }
-
-            /*
-             * Retain a reference to this Big constructor, and shadow
-             * Big.prototype.constructor which points to Object.
-             */
-            x.constructor = Big;
-        }
-
-        Big.prototype = P;
-        Big.DP = DP;
-        Big.RM = RM;
-        Big.E_NEG = E_NEG;
-        Big.E_POS = E_POS;
-
-        return Big;
-    }
-
-
-    // Private functions
-
-
-    /*
-     * Return a string representing the value of Big x in normal or exponential
-     * notation to dp fixed decimal places or significant digits.
-     *
-     * x {Big} The Big to format.
-     * dp {number} Integer, 0 to MAX_DP inclusive.
-     * toE {number} 1 (toExponential), 2 (toPrecision) or undefined (toFixed).
-     */
-    function format(x, dp, toE) {
-        var Big = x.constructor,
-
-            // The index (normal notation) of the digit that may be rounded up.
-            i = dp - (x = new Big(x)).e,
-            c = x.c;
-
-        // Round?
-        if (c.length > ++dp) {
-            rnd(x, i, Big.RM);
-        }
-
-        if (!c[0]) {
-            ++i;
-        } else if (toE) {
-            i = dp;
-
-        // toFixed
-        } else {
-            c = x.c;
-
-            // Recalculate i as x.e may have changed if value rounded up.
-            i = x.e + i + 1;
-        }
-
-        // Append zeros?
-        for (; c.length < i; c.push(0)) {
-        }
-        i = x.e;
-
-        /*
-         * toPrecision returns exponential notation if the number of
-         * significant digits specified is less than the number of digits
-         * necessary to represent the integer part of the value in normal
-         * notation.
-         */
-        return toE === 1 || toE && (dp <= i || i <= Big.E_NEG) ?
-
-          // Exponential notation.
-          (x.s < 0 && c[0] ? '-' : '') +
-            (c.length > 1 ? c[0] + '.' + c.join('').slice(1) : c[0]) +
-              (i < 0 ? 'e' : 'e+') + i
-
-          // Normal notation.
-          : x.toString();
-    }
-
-
-    /*
-     * Parse the number or string value passed to a Big constructor.
-     *
-     * x {Big} A Big number instance.
-     * n {number|string} A numeric value.
-     */
-    function parse(x, n) {
-        var e, i, nL;
-
-        // Minus zero?
-        if (n === 0 && 1 / n < 0) {
-            n = '-0';
-
-        // Ensure n is string and check validity.
-        } else if (!isValid.test(n += '')) {
-            throwErr(NaN);
-        }
-
-        // Determine sign.
-        x.s = n.charAt(0) == '-' ? (n = n.slice(1), -1) : 1;
-
-        // Decimal point?
-        if ((e = n.indexOf('.')) > -1) {
-            n = n.replace('.', '');
-        }
-
-        // Exponential form?
-        if ((i = n.search(/e/i)) > 0) {
-
-            // Determine exponent.
-            if (e < 0) {
-                e = i;
-            }
-            e += +n.slice(i + 1);
-            n = n.substring(0, i);
-
-        } else if (e < 0) {
-
-            // Integer.
-            e = n.length;
-        }
-
-        // Determine leading zeros.
-        for (i = 0; n.charAt(i) == '0'; i++) {
-        }
-
-        if (i == (nL = n.length)) {
-
-            // Zero.
-            x.c = [ x.e = 0 ];
-        } else {
-
-            // Determine trailing zeros.
-            for (; n.charAt(--nL) == '0';) {
-            }
-
-            x.e = e - i - 1;
-            x.c = [];
-
-            // Convert string to array of digits without leading/trailing zeros.
-            for (e = 0; i <= nL; x.c[e++] = +n.charAt(i++)) {
-            }
-        }
-
-        return x;
-    }
-
-
-    /*
-     * Round Big x to a maximum of dp decimal places using rounding mode rm.
-     * Called by div, sqrt and round.
-     *
-     * x {Big} The Big to round.
-     * dp {number} Integer, 0 to MAX_DP inclusive.
-     * rm {number} 0, 1, 2 or 3 (DOWN, HALF_UP, HALF_EVEN, UP)
-     * [more] {boolean} Whether the result of division was truncated.
-     */
-    function rnd(x, dp, rm, more) {
-        var u,
-            xc = x.c,
-            i = x.e + dp + 1;
-
-        if (rm === 1) {
-
-            // xc[i] is the digit after the digit that may be rounded up.
-            more = xc[i] >= 5;
-        } else if (rm === 2) {
-            more = xc[i] > 5 || xc[i] == 5 &&
-              (more || i < 0 || xc[i + 1] !== u || xc[i - 1] & 1);
-        } else if (rm === 3) {
-            more = more || xc[i] !== u || i < 0;
-        } else {
-            more = false;
-
-            if (rm !== 0) {
-                throwErr('!Big.RM!');
-            }
-        }
-
-        if (i < 1 || !xc[0]) {
-
-            if (more) {
-
-                // 1, 0.1, 0.01, 0.001, 0.0001 etc.
-                x.e = -dp;
-                x.c = [1];
-            } else {
-
-                // Zero.
-                x.c = [x.e = 0];
-            }
-        } else {
-
-            // Remove any digits after the required decimal places.
-            xc.length = i--;
-
-            // Round up?
-            if (more) {
-
-                // Rounding up may mean the previous digit has to be rounded up.
-                for (; ++xc[i] > 9;) {
-                    xc[i] = 0;
-
-                    if (!i--) {
-                        ++x.e;
-                        xc.unshift(1);
-                    }
-                }
-            }
-
-            // Remove trailing zeros.
-            for (i = xc.length; !xc[--i]; xc.pop()) {
-            }
-        }
-
-        return x;
-    }
-
-
-    /*
-     * Throw a BigError.
-     *
-     * message {string} The error message.
-     */
-    function throwErr(message) {
-        var err = new Error(message);
-        err.name = 'BigError';
-
-        throw err;
-    }
-
-
-    // Prototype/instance methods
-
-
-    /*
-     * Return a new Big whose value is the absolute value of this Big.
-     */
-    P.abs = function () {
-        var x = new this.constructor(this);
-        x.s = 1;
-
-        return x;
-    };
-
-
-    /*
-     * Return
-     * 1 if the value of this Big is greater than the value of Big y,
-     * -1 if the value of this Big is less than the value of Big y, or
-     * 0 if they have the same value.
-    */
-    P.cmp = function (y) {
-        var xNeg,
-            x = this,
-            xc = x.c,
-            yc = (y = new x.constructor(y)).c,
-            i = x.s,
-            j = y.s,
-            k = x.e,
-            l = y.e;
-
-        // Either zero?
-        if (!xc[0] || !yc[0]) {
-            return !xc[0] ? !yc[0] ? 0 : -j : i;
-        }
-
-        // Signs differ?
-        if (i != j) {
-            return i;
-        }
-        xNeg = i < 0;
-
-        // Compare exponents.
-        if (k != l) {
-            return k > l ^ xNeg ? 1 : -1;
-        }
-
-        i = -1;
-        j = (k = xc.length) < (l = yc.length) ? k : l;
-
-        // Compare digit by digit.
-        for (; ++i < j;) {
-
-            if (xc[i] != yc[i]) {
-                return xc[i] > yc[i] ^ xNeg ? 1 : -1;
-            }
-        }
-
-        // Compare lengths.
-        return k == l ? 0 : k > l ^ xNeg ? 1 : -1;
-    };
-
-
-    /*
-     * Return a new Big whose value is the value of this Big divided by the
-     * value of Big y, rounded, if necessary, to a maximum of Big.DP decimal
-     * places using rounding mode Big.RM.
-     */
-    P.div = function (y) {
-        var x = this,
-            Big = x.constructor,
-            // dividend
-            dvd = x.c,
-            //divisor
-            dvs = (y = new Big(y)).c,
-            s = x.s == y.s ? 1 : -1,
-            dp = Big.DP;
-
-        if (dp !== ~~dp || dp < 0 || dp > MAX_DP) {
-            throwErr('!Big.DP!');
-        }
-
-        // Either 0?
-        if (!dvd[0] || !dvs[0]) {
-
-            // If both are 0, throw NaN
-            if (dvd[0] == dvs[0]) {
-                throwErr(NaN);
-            }
-
-            // If dvs is 0, throw +-Infinity.
-            if (!dvs[0]) {
-                throwErr(s / 0);
-            }
-
-            // dvd is 0, return +-0.
-            return new Big(s * 0);
-        }
-
-        var dvsL, dvsT, next, cmp, remI, u,
-            dvsZ = dvs.slice(),
-            dvdI = dvsL = dvs.length,
-            dvdL = dvd.length,
-            // remainder
-            rem = dvd.slice(0, dvsL),
-            remL = rem.length,
-            // quotient
-            q = y,
-            qc = q.c = [],
-            qi = 0,
-            digits = dp + (q.e = x.e - y.e) + 1;
-
-        q.s = s;
-        s = digits < 0 ? 0 : digits;
-
-        // Create version of divisor with leading zero.
-        dvsZ.unshift(0);
-
-        // Add zeros to make remainder as long as divisor.
-        for (; remL++ < dvsL; rem.push(0)) {
-        }
-
-        do {
-
-            // 'next' is how many times the divisor goes into current remainder.
-            for (next = 0; next < 10; next++) {
-
-                // Compare divisor and remainder.
-                if (dvsL != (remL = rem.length)) {
-                    cmp = dvsL > remL ? 1 : -1;
-                } else {
-
-                    for (remI = -1, cmp = 0; ++remI < dvsL;) {
-
-                        if (dvs[remI] != rem[remI]) {
-                            cmp = dvs[remI] > rem[remI] ? 1 : -1;
-                            break;
-                        }
-                    }
-                }
-
-                // If divisor < remainder, subtract divisor from remainder.
-                if (cmp < 0) {
-
-                    // Remainder can't be more than 1 digit longer than divisor.
-                    // Equalise lengths using divisor with extra leading zero?
-                    for (dvsT = remL == dvsL ? dvs : dvsZ; remL;) {
-
-                        if (rem[--remL] < dvsT[remL]) {
-                            remI = remL;
-
-                            for (; remI && !rem[--remI]; rem[remI] = 9) {
-                            }
-                            --rem[remI];
-                            rem[remL] += 10;
-                        }
-                        rem[remL] -= dvsT[remL];
-                    }
-                    for (; !rem[0]; rem.shift()) {
-                    }
-                } else {
-                    break;
-                }
-            }
-
-            // Add the 'next' digit to the result array.
-            qc[qi++] = cmp ? next : ++next;
-
-            // Update the remainder.
-            if (rem[0] && cmp) {
-                rem[remL] = dvd[dvdI] || 0;
-            } else {
-                rem = [ dvd[dvdI] ];
-            }
-
-        } while ((dvdI++ < dvdL || rem[0] !== u) && s--);
-
-        // Leading zero? Do not remove if result is simply zero (qi == 1).
-        if (!qc[0] && qi != 1) {
-
-            // There can't be more than one zero.
-            qc.shift();
-            q.e--;
-        }
-
-        // Round?
-        if (qi > digits) {
-            rnd(q, dp, Big.RM, rem[0] !== u);
-        }
-
-        return q;
-    };
-
-
-    /*
-     * Return true if the value of this Big is equal to the value of Big y,
-     * otherwise returns false.
-     */
-    P.eq = function (y) {
-        return !this.cmp(y);
-    };
-
-
-    /*
-     * Return true if the value of this Big is greater than the value of Big y,
-     * otherwise returns false.
-     */
-    P.gt = function (y) {
-        return this.cmp(y) > 0;
-    };
-
-
-    /*
-     * Return true if the value of this Big is greater than or equal to the
-     * value of Big y, otherwise returns false.
-     */
-    P.gte = function (y) {
-        return this.cmp(y) > -1;
-    };
-
-
-    /*
-     * Return true if the value of this Big is less than the value of Big y,
-     * otherwise returns false.
-     */
-    P.lt = function (y) {
-        return this.cmp(y) < 0;
-    };
-
-
-    /*
-     * Return true if the value of this Big is less than or equal to the value
-     * of Big y, otherwise returns false.
-     */
-    P.lte = function (y) {
-         return this.cmp(y) < 1;
-    };
-
-
-    /*
-     * Return a new Big whose value is the value of this Big minus the value
-     * of Big y.
-     */
-    P.sub = P.minus = function (y) {
-        var i, j, t, xLTy,
-            x = this,
-            Big = x.constructor,
-            a = x.s,
-            b = (y = new Big(y)).s;
-
-        // Signs differ?
-        if (a != b) {
-            y.s = -b;
-            return x.plus(y);
-        }
-
-        var xc = x.c.slice(),
-            xe = x.e,
-            yc = y.c,
-            ye = y.e;
-
-        // Either zero?
-        if (!xc[0] || !yc[0]) {
-
-            // y is non-zero? x is non-zero? Or both are zero.
-            return yc[0] ? (y.s = -b, y) : new Big(xc[0] ? x : 0);
-        }
-
-        // Determine which is the bigger number.
-        // Prepend zeros to equalise exponents.
-        if (a = xe - ye) {
-
-            if (xLTy = a < 0) {
-                a = -a;
-                t = xc;
-            } else {
-                ye = xe;
-                t = yc;
-            }
-
-            t.reverse();
-            for (b = a; b--; t.push(0)) {
-            }
-            t.reverse();
-        } else {
-
-            // Exponents equal. Check digit by digit.
-            j = ((xLTy = xc.length < yc.length) ? xc : yc).length;
-
-            for (a = b = 0; b < j; b++) {
-
-                if (xc[b] != yc[b]) {
-                    xLTy = xc[b] < yc[b];
-                    break;
-                }
-            }
-        }
-
-        // x < y? Point xc to the array of the bigger number.
-        if (xLTy) {
-            t = xc;
-            xc = yc;
-            yc = t;
-            y.s = -y.s;
-        }
-
-        /*
-         * Append zeros to xc if shorter. No need to add zeros to yc if shorter
-         * as subtraction only needs to start at yc.length.
-         */
-        if (( b = (j = yc.length) - (i = xc.length) ) > 0) {
-
-            for (; b--; xc[i++] = 0) {
-            }
-        }
-
-        // Subtract yc from xc.
-        for (b = i; j > a;){
-
-            if (xc[--j] < yc[j]) {
-
-                for (i = j; i && !xc[--i]; xc[i] = 9) {
-                }
-                --xc[i];
-                xc[j] += 10;
-            }
-            xc[j] -= yc[j];
-        }
-
-        // Remove trailing zeros.
-        for (; xc[--b] === 0; xc.pop()) {
-        }
-
-        // Remove leading zeros and adjust exponent accordingly.
-        for (; xc[0] === 0;) {
-            xc.shift();
-            --ye;
-        }
-
-        if (!xc[0]) {
-
-            // n - n = +0
-            y.s = 1;
-
-            // Result must be zero.
-            xc = [ye = 0];
-        }
-
-        y.c = xc;
-        y.e = ye;
-
-        return y;
-    };
-
-
-    /*
-     * Return a new Big whose value is the value of this Big modulo the
-     * value of Big y.
-     */
-    P.mod = function (y) {
-        var yGTx,
-            x = this,
-            Big = x.constructor,
-            a = x.s,
-            b = (y = new Big(y)).s;
-
-        if (!y.c[0]) {
-            throwErr(NaN);
-        }
-
-        x.s = y.s = 1;
-        yGTx = y.cmp(x) == 1;
-        x.s = a;
-        y.s = b;
-
-        if (yGTx) {
-            return new Big(x);
-        }
-
-        a = Big.DP;
-        b = Big.RM;
-        Big.DP = Big.RM = 0;
-        x = x.div(y);
-        Big.DP = a;
-        Big.RM = b;
-
-        return this.minus( x.times(y) );
-    };
-
-
-    /*
-     * Return a new Big whose value is the value of this Big plus the value
-     * of Big y.
-     */
-    P.add = P.plus = function (y) {
-        var t,
-            x = this,
-            Big = x.constructor,
-            a = x.s,
-            b = (y = new Big(y)).s;
-
-        // Signs differ?
-        if (a != b) {
-            y.s = -b;
-            return x.minus(y);
-        }
-
-        var xe = x.e,
-            xc = x.c,
-            ye = y.e,
-            yc = y.c;
-
-        // Either zero?
-        if (!xc[0] || !yc[0]) {
-
-            // y is non-zero? x is non-zero? Or both are zero.
-            return yc[0] ? y : new Big(xc[0] ? x : a * 0);
-        }
-        xc = xc.slice();
-
-        // Prepend zeros to equalise exponents.
-        // Note: Faster to use reverse then do unshifts.
-        if (a = xe - ye) {
-
-            if (a > 0) {
-                ye = xe;
-                t = yc;
-            } else {
-                a = -a;
-                t = xc;
-            }
-
-            t.reverse();
-            for (; a--; t.push(0)) {
-            }
-            t.reverse();
-        }
-
-        // Point xc to the longer array.
-        if (xc.length - yc.length < 0) {
-            t = yc;
-            yc = xc;
-            xc = t;
-        }
-        a = yc.length;
-
-        /*
-         * Only start adding at yc.length - 1 as the further digits of xc can be
-         * left as they are.
-         */
-        for (b = 0; a;) {
-            b = (xc[--a] = xc[a] + yc[a] + b) / 10 | 0;
-            xc[a] %= 10;
-        }
-
-        // No need to check for zero, as +x + +y != 0 && -x + -y != 0
-
-        if (b) {
-            xc.unshift(b);
-            ++ye;
-        }
-
-         // Remove trailing zeros.
-        for (a = xc.length; xc[--a] === 0; xc.pop()) {
-        }
-
-        y.c = xc;
-        y.e = ye;
-
-        return y;
-    };
-
-
-    /*
-     * Return a Big whose value is the value of this Big raised to the power n.
-     * If n is negative, round, if necessary, to a maximum of Big.DP decimal
-     * places using rounding mode Big.RM.
-     *
-     * n {number} Integer, -MAX_POWER to MAX_POWER inclusive.
-     */
-    P.pow = function (n) {
-        var x = this,
-            one = new x.constructor(1),
-            y = one,
-            isNeg = n < 0;
-
-        if (n !== ~~n || n < -MAX_POWER || n > MAX_POWER) {
-            throwErr('!pow!');
-        }
-
-        n = isNeg ? -n : n;
-
-        for (;;) {
-
-            if (n & 1) {
-                y = y.times(x);
-            }
-            n >>= 1;
-
-            if (!n) {
-                break;
-            }
-            x = x.times(x);
-        }
-
-        return isNeg ? one.div(y) : y;
-    };
-
-
-    /*
-     * Return a new Big whose value is the value of this Big rounded to a
-     * maximum of dp decimal places using rounding mode rm.
-     * If dp is not specified, round to 0 decimal places.
-     * If rm is not specified, use Big.RM.
-     *
-     * [dp] {number} Integer, 0 to MAX_DP inclusive.
-     * [rm] 0, 1, 2 or 3 (ROUND_DOWN, ROUND_HALF_UP, ROUND_HALF_EVEN, ROUND_UP)
-     */
-    P.round = function (dp, rm) {
-        var x = this,
-            Big = x.constructor;
-
-        if (dp == null) {
-            dp = 0;
-        } else if (dp !== ~~dp || dp < 0 || dp > MAX_DP) {
-            throwErr('!round!');
-        }
-        rnd(x = new Big(x), dp, rm == null ? Big.RM : rm);
-
-        return x;
-    };
-
-
-    /*
-     * Return a new Big whose value is the square root of the value of this Big,
-     * rounded, if necessary, to a maximum of Big.DP decimal places using
-     * rounding mode Big.RM.
-     */
-    P.sqrt = function () {
-        var estimate, r, approx,
-            x = this,
-            Big = x.constructor,
-            xc = x.c,
-            i = x.s,
-            e = x.e,
-            half = new Big('0.5');
-
-        // Zero?
-        if (!xc[0]) {
-            return new Big(x);
-        }
-
-        // If negative, throw NaN.
-        if (i < 0) {
-            throwErr(NaN);
-        }
-
-        // Estimate.
-        i = Math.sqrt(x.toString());
-
-        // Math.sqrt underflow/overflow?
-        // Pass x to Math.sqrt as integer, then adjust the result exponent.
-        if (i === 0 || i === 1 / 0) {
-            estimate = xc.join('');
-
-            if (!(estimate.length + e & 1)) {
-                estimate += '0';
-            }
-
-            r = new Big( Math.sqrt(estimate).toString() );
-            r.e = ((e + 1) / 2 | 0) - (e < 0 || e & 1);
-        } else {
-            r = new Big(i.toString());
-        }
-
-        i = r.e + (Big.DP += 4);
-
-        // Newton-Raphson iteration.
-        do {
-            approx = r;
-            r = half.times( approx.plus( x.div(approx) ) );
-        } while ( approx.c.slice(0, i).join('') !==
-                       r.c.slice(0, i).join('') );
-
-        rnd(r, Big.DP -= 4, Big.RM);
-
-        return r;
-    };
-
-
-    /*
-     * Return a new Big whose value is the value of this Big times the value of
-     * Big y.
-     */
-    P.mul = P.times = function (y) {
-        var c,
-            x = this,
-            Big = x.constructor,
-            xc = x.c,
-            yc = (y = new Big(y)).c,
-            a = xc.length,
-            b = yc.length,
-            i = x.e,
-            j = y.e;
-
-        // Determine sign of result.
-        y.s = x.s == y.s ? 1 : -1;
-
-        // Return signed 0 if either 0.
-        if (!xc[0] || !yc[0]) {
-            return new Big(y.s * 0);
-        }
-
-        // Initialise exponent of result as x.e + y.e.
-        y.e = i + j;
-
-        // If array xc has fewer digits than yc, swap xc and yc, and lengths.
-        if (a < b) {
-            c = xc;
-            xc = yc;
-            yc = c;
-            j = a;
-            a = b;
-            b = j;
-        }
-
-        // Initialise coefficient array of result with zeros.
-        for (c = new Array(j = a + b); j--; c[j] = 0) {
-        }
-
-        // Multiply.
-
-        // i is initially xc.length.
-        for (i = b; i--;) {
-            b = 0;
-
-            // a is yc.length.
-            for (j = a + i; j > i;) {
-
-                // Current sum of products at this digit position, plus carry.
-                b = c[j] + yc[i] * xc[j - i - 1] + b;
-                c[j--] = b % 10;
-
-                // carry
-                b = b / 10 | 0;
-            }
-            c[j] = (c[j] + b) % 10;
-        }
-
-        // Increment result exponent if there is a final carry.
-        if (b) {
-            ++y.e;
-        }
-
-        // Remove any leading zero.
-        if (!c[0]) {
-            c.shift();
-        }
-
-        // Remove trailing zeros.
-        for (i = c.length; !c[--i]; c.pop()) {
-        }
-        y.c = c;
-
-        return y;
-    };
-
-
-    /*
-     * Return a string representing the value of this Big.
-     * Return exponential notation if this Big has a positive exponent equal to
-     * or greater than Big.E_POS, or a negative exponent equal to or less than
-     * Big.E_NEG.
-     */
-    P.toString = P.valueOf = P.toJSON = function () {
-        var x = this,
-            Big = x.constructor,
-            e = x.e,
-            str = x.c.join(''),
-            strL = str.length;
-
-        // Exponential notation?
-        if (e <= Big.E_NEG || e >= Big.E_POS) {
-            str = str.charAt(0) + (strL > 1 ? '.' + str.slice(1) : '') +
-              (e < 0 ? 'e' : 'e+') + e;
-
-        // Negative exponent?
-        } else if (e < 0) {
-
-            // Prepend zeros.
-            for (; ++e; str = '0' + str) {
-            }
-            str = '0.' + str;
-
-        // Positive exponent?
-        } else if (e > 0) {
-
-            if (++e > strL) {
-
-                // Append zeros.
-                for (e -= strL; e-- ; str += '0') {
-                }
-            } else if (e < strL) {
-                str = str.slice(0, e) + '.' + str.slice(e);
-            }
-
-        // Exponent zero.
-        } else if (strL > 1) {
-            str = str.charAt(0) + '.' + str.slice(1);
-        }
-
-        // Avoid '-0'
-        return x.s < 0 && x.c[0] ? '-' + str : str;
-    };
-
-
-    /*
-     ***************************************************************************
-     * If toExponential, toFixed, toPrecision and format are not required they
-     * can safely be commented-out or deleted. No redundant code will be left.
-     * format is used only by toExponential, toFixed and toPrecision.
-     ***************************************************************************
-     */
-
-
-    /*
-     * Return a string representing the value of this Big in exponential
-     * notation to dp fixed decimal places and rounded, if necessary, using
-     * Big.RM.
-     *
-     * [dp] {number} Integer, 0 to MAX_DP inclusive.
-     */
-    P.toExponential = function (dp) {
-
-        if (dp == null) {
-            dp = this.c.length - 1;
-        } else if (dp !== ~~dp || dp < 0 || dp > MAX_DP) {
-            throwErr('!toExp!');
-        }
-
-        return format(this, dp, 1);
-    };
-
-
-    /*
-     * Return a string representing the value of this Big in normal notation
-     * to dp fixed decimal places and rounded, if necessary, using Big.RM.
-     *
-     * [dp] {number} Integer, 0 to MAX_DP inclusive.
-     */
-    P.toFixed = function (dp) {
-        var str,
-            x = this,
-            Big = x.constructor,
-            neg = Big.E_NEG,
-            pos = Big.E_POS;
-
-        // Prevent the possibility of exponential notation.
-        Big.E_NEG = -(Big.E_POS = 1 / 0);
-
-        if (dp == null) {
-            str = x.toString();
-        } else if (dp === ~~dp && dp >= 0 && dp <= MAX_DP) {
-            str = format(x, x.e + dp);
-
-            // (-0).toFixed() is '0', but (-0.1).toFixed() is '-0'.
-            // (-0).toFixed(1) is '0.0', but (-0.01).toFixed(1) is '-0.0'.
-            if (x.s < 0 && x.c[0] && str.indexOf('-') < 0) {
-        //E.g. -0.5 if rounded to -0 will cause toString to omit the minus sign.
-                str = '-' + str;
-            }
-        }
-        Big.E_NEG = neg;
-        Big.E_POS = pos;
-
-        if (!str) {
-            throwErr('!toFix!');
-        }
-
-        return str;
-    };
-
-
-    /*
-     * Return a string representing the value of this Big rounded to sd
-     * significant digits using Big.RM. Use exponential notation if sd is less
-     * than the number of digits necessary to represent the integer part of the
-     * value in normal notation.
-     *
-     * sd {number} Integer, 1 to MAX_DP inclusive.
-     */
-    P.toPrecision = function (sd) {
-
-        if (sd == null) {
-            return this.toString();
-        } else if (sd !== ~~sd || sd < 1 || sd > MAX_DP) {
-            throwErr('!toPre!');
-        }
-
-        return format(this, sd - 1, 2);
-    };
-
-
-    // Export
-
-
-    Big = bigFactory();
-
-    //AMD.
-    if (true) {
-        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-            return Big;
-        }.call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-    // Node and other CommonJS-like environments that support module.exports.
-    } else if (typeof module !== 'undefined' && module.exports) {
-        module.exports = Big;
-
-    //Browser.
-    } else {
-        global.Big = Big;
-    }
-})(this);
-
-
-/***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11152,9 +11220,9 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/* big.js v3.1.3 https://github.com/MikeMcl/bi
 
 
 
-var base64 = __webpack_require__(5)
-var ieee754 = __webpack_require__(10)
-var isArray = __webpack_require__(11)
+var base64 = __webpack_require__(7)
+var ieee754 = __webpack_require__(11)
+var isArray = __webpack_require__(12)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -12932,13 +13000,13 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(9)(undefined);
+exports = module.exports = __webpack_require__(10)(undefined);
 // imports
 
 
@@ -12949,7 +13017,7 @@ exports.push([module.i, "\n#game {\n    padding: 50px;\n}\n.totals,\n.cracker {\
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {/*
@@ -13028,10 +13096,10 @@ function toComment(sourceMap) {
   return '/*# ' + data + ' */';
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8).Buffer))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -13121,7 +13189,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -13132,7 +13200,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 /* globals __VUE_SSR_CONTEXT__ */
@@ -13215,7 +13283,7 @@ module.exports = function normalizeComponent (
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -13363,17 +13431,17 @@ if (false) {
 }
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(8);
+var content = __webpack_require__(9);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(15)("6d484bdb", content, false);
+var update = __webpack_require__(16)("6d484bdb", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -13389,7 +13457,7 @@ if(false) {
 }
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -13408,7 +13476,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(16)
+var listToStyles = __webpack_require__(17)
 
 /*
 type StyleObject = {
@@ -13610,7 +13678,7 @@ function applyToTag (styleElement, obj) {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 /**

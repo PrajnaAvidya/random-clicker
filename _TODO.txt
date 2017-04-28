@@ -10,13 +10,11 @@ other non-standard upgrades
 - toddler forms
 sell buildings
 save data
-better names/flavor texts
-- maybe procedurally generate names/descriptions every game?
-- make everything else loadable/savable
 prettier numbers (million/billion/trillion/etc)
 show upcoming upgrades
 showAt computed property
-
+generated upgrade names
+generated descriptions
 
 1E6 = 1 million
 1E9 = 1 billion
