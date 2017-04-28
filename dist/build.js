@@ -9581,6 +9581,7 @@ exports.default = {
                 this.recalculateCps();
                 this.recalculateClickPower();
                 this.recalculateBuyCosts();
+                this.checkAchievements();
             }
         },
         buildingCost: function buildingCost(building) {
@@ -9655,6 +9656,7 @@ exports.default = {
 
                 this.recalculateCps();
                 this.recalculateClickPower();
+                this.checkAchievements();
             }
         },
         activeUpgrades: function activeUpgrades(buildingType) {

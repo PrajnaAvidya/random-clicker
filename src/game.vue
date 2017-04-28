@@ -276,6 +276,7 @@
                     this.recalculateCps();
                     this.recalculateClickPower();
                     this.recalculateBuyCosts();
+                    this.checkAchievements();
                 }
             },
             buildingCost: function (building) {
@@ -350,6 +351,7 @@
 
                     this.recalculateCps();
                     this.recalculateClickPower();
+                    this.checkAchievements();
                 }
             },
             activeUpgrades: function (buildingType) {
