@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="row totals">
                 <span class="total-crackers"><h1>{{ crackers | crackers }} crackers</h1></span>
                 <span class="crackers-per-second"><h2>Per second: {{ cps | round }}</h2></span>
@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-5">
             <div class="row buildings">
                 <h3>Buildings</h3>
 
@@ -42,7 +42,7 @@
             <div class="row upgrades" v-if="showUpgrades">
                 <h3>Upgrades</h3>
 
-                <div class="row upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && canBuyUpgrade(upgrade)">
+                <div class="row upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
                     <div class="col-xs-12">
                         <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
                         <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | crackers }})</span>
@@ -234,6 +234,7 @@
                 if (upgrade.unlocked == true) {
                     return true;
                 }
+
                 if (upgrade.type == 'Cracker') {
                     if (this.crackers.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
@@ -243,6 +244,31 @@
                     }
                 } else {
                     if (this.buildingCount(upgrade.type) >= upgrade.needed) {
+                        upgrade.unlocked = true;
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            },
+            canSeeUpgrade: function (upgrade) {
+                if (upgrade.unlocked == true) {
+                    return true;
+                }
+
+                if (upgrade.type != 'Cracker' && this.buildingCount(upgrade.type) == 0) {
+                    return false;
+                }
+
+                if (upgrade.type == 'Cracker') {
+                    if (this.crackers.gte(upgrade.needed / 10)) {
+                        upgrade.unlocked = true;
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    if (this.buildingCount(upgrade.type) >= upgrade.needed - 10) {
                         upgrade.unlocked = true;
                         return true;
                     } else {
@@ -299,6 +325,10 @@
                 } else if (upgrade.addition != null) {
                     upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
                 }
+                if (upgrade.type != 'Cracker' && this.buildingCount(upgrade.type) < upgrade.needed) {
+                    upgradeText += '<br/>Requires ' + upgrade.needed + ' ' + upgrade.type;
+                }
+
                 return upgradeText;
             },
 
@@ -508,6 +538,7 @@
                 this.generateBuildings();
                 this.generateUpgrades();
                 this.generateAchievements();
+                this.saveGame();
             }
 
             setInterval(function () {

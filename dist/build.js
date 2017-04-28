@@ -10852,6 +10852,7 @@ exports.default = {
             if (upgrade.unlocked == true) {
                 return true;
             }
+
             if (upgrade.type == 'Cracker') {
                 if (this.crackers.gte(upgrade.needed)) {
                     upgrade.unlocked = true;
@@ -10861,6 +10862,31 @@ exports.default = {
                 }
             } else {
                 if (this.buildingCount(upgrade.type) >= upgrade.needed) {
+                    upgrade.unlocked = true;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        },
+        canSeeUpgrade: function canSeeUpgrade(upgrade) {
+            if (upgrade.unlocked == true) {
+                return true;
+            }
+
+            if (upgrade.type != 'Cracker' && this.buildingCount(upgrade.type) == 0) {
+                return false;
+            }
+
+            if (upgrade.type == 'Cracker') {
+                if (this.crackers.gte(upgrade.needed / 10)) {
+                    upgrade.unlocked = true;
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                if (this.buildingCount(upgrade.type) >= upgrade.needed - 10) {
                     upgrade.unlocked = true;
                     return true;
                 } else {
@@ -10917,6 +10943,10 @@ exports.default = {
             } else if (upgrade.addition != null) {
                 upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
             }
+            if (upgrade.type != 'Cracker' && this.buildingCount(upgrade.type) < upgrade.needed) {
+                upgradeText += '<br/>Requires ' + upgrade.needed + ' ' + upgrade.type;
+            }
+
             return upgradeText;
         },
 
@@ -11126,6 +11156,7 @@ exports.default = {
             this.generateBuildings();
             this.generateUpgrades();
             this.generateAchievements();
+            this.saveGame();
         }
 
         setInterval(function () {
@@ -11160,7 +11191,7 @@ var _big2 = _interopRequireDefault(_big);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
-    buildingNames: ["Abbey", "A-frame", "Aircraft Hangar", "Airport Terminal", "Amphitheater", "Apartment Building", "Aqueduct", "Arch", "Arena", "Armory", "Assembly Hall", "Barn", "Barracks", "Beach House", "Boathouse", "Boarding House", "Bowling Alley", "Bridge", "Brownstone", "Bungalow", "Bunkhouse", "Bunker", "Cabana", "Cabin", "Capitol", "Carport", "Castle", "Catacomb", "Cathedral", "Chalet", "Chapel", "Chateau", "Church", "Cinema", "City Hall", "Clubhouse", "College", "Compound", "Concert Hall", "Condominium", "Conservatory", "Cottage", "Courthouse", "Crypt", "Depot", "Detached House", "Dock", "Dome", "Dormitory", "Double Wide", "Duplex", "Dwelling", "Earth-sheltered House", "Embassy", "Exposition Hall", "Factory", "Farm", "Farmhouse", "Ferry Slip", "Ferry Terminal", "Firehouse", "Fire Station", "Folly", "Forge", "Fort", "Fortress", "Foundry", "Gallery", "Garage", "Gas Station", "Gazebo", "Geodesic Dome", "Granary", "Greenhouse", "Gym", "Gymnasium", "Hall", "Hangar", "Haunted House", "Headquarters", "High-rise", "Home", "Hospital", "Hostel", "Hotel", "Hot House", "House", "Houseboat", "Housing Project", "Hunting Lodge", "Hut", "Igloo", "Jail", "Kiosk", "Laboratory", "Lean-to", "Library", "Lighthouse", "Lodge", "Log Cabin", "Longhouse", "Mall", "Manor", "Manse", "Mansion", "Marina", "Market", "Mausoleum", "Meeting Hall", "Mill", "Minaret", "Mobile Home", "Monastery", "Monument", "Mosque", "Motel", "Museum", "Nuclear Power Plant", "Nursing Home", "Observatory", "Office Building", "Opera House", "Outbuilding", "Outhouse", "Pagoda", "Palace", "Parking Garage", "Parliament", "Pavilion", "Plant", "Playhouse", "Police Station", "Pool House", "Post Office", "Power Plant", "Prefab Building", "Prison", "Pump House", "Pyramid", "Quonset Hut", "Railway Station", "Ranch", "Rectory", "Refinery", "Residence", "Restaurant", "Roller Rink", "Roundhouse", "Rowhouse", "School", "Shack", "Shed", "Shelter", "Shopping Center", "Shopping Mall", "Shrine", "Silo", "Skating Rink", "Skyscraper", "Skyway", "Smokestack", "Spire", "Split-level House", "Stable", "Stadium", "State House", "Station", "Steeple", "Store", "Storehouse", "Strip Mall", "Structure", "Studio", "Supermarket", "Symphony", "Synagogue", "Temple", "Tenement", "Tent", "Terminal", "Theater", "Tipi", "Toll House", "Tomb", "Tower", "Townhouse", "Treehouse", "Triplex", "Tudor House", "University", "Vault", "Vicarage", "Villa", "Warehouse", "Watermill", "Workshop", "Yurt"],
+    buildingNames: ["Abbey", "A-frame", "Aircraft Hangar", "Airport Terminal", "Amphitheater", "Apartment Building", "Aqueduct", "Arch", "Arena", "Armory", "Assembly Hall", "Barn", "Barracks", "Beach House", "Boathouse", "Boarding House", "Bowling Alley", "Bridge", "Brownstone", "Bungalow", "Bunkhouse", "Bunker", "Cabana", "Cabin", "Capitol", "Carport", "Castle", "Catacomb", "Cathedral", "Chalet", "Chapel", "Chateau", "Church", "Cinema", "City Hall", "Clubhouse", "College", "Compound", "Concert Hall", "Condominium", "Conservatory", "Cottage", "Courthouse", "Crypt", "Depot", "Detached House", "Dock", "Dome", "Dormitory", "Double Wide", "Duplex", "Dwelling", "Embassy", "Exposition Hall", "Factory", "Farm", "Farmhouse", "Ferry Slip", "Ferry Terminal", "Firehouse", "Fire Station", "Folly", "Forge", "Fort", "Fortress", "Foundry", "Gallery", "Garage", "Gas Station", "Gazebo", "Geodesic Dome", "Granary", "Greenhouse", "Gym", "Gymnasium", "Hall", "Hangar", "Haunted House", "Headquarters", "High-rise", "Home", "Hospital", "Hostel", "Hotel", "Hot House", "House", "Houseboat", "Housing Project", "Hunting Lodge", "Hut", "Igloo", "Jail", "Kiosk", "Laboratory", "Lean-to", "Library", "Lighthouse", "Lodge", "Log Cabin", "Longhouse", "Mall", "Manor", "Manse", "Mansion", "Marina", "Market", "Mausoleum", "Meeting Hall", "Mill", "Minaret", "Mobile Home", "Monastery", "Monument", "Mosque", "Motel", "Museum", "Nuclear Power Plant", "Nursing Home", "Observatory", "Office Building", "Opera House", "Outbuilding", "Outhouse", "Pagoda", "Palace", "Parking Garage", "Parliament", "Pavilion", "Plant", "Playhouse", "Police Station", "Pool House", "Post Office", "Power Plant", "Prefab Building", "Prison", "Pump House", "Pyramid", "Quonset Hut", "Railway Station", "Ranch", "Rectory", "Refinery", "Residence", "Restaurant", "Roller Rink", "Roundhouse", "Rowhouse", "School", "Shack", "Shed", "Shelter", "Shopping Center", "Shopping Mall", "Shrine", "Silo", "Skating Rink", "Skyscraper", "Skyway", "Smokestack", "Spire", "Split-level House", "Stable", "Stadium", "State House", "Station", "Steeple", "Store", "Storehouse", "Strip Mall", "Structure", "Studio", "Supermarket", "Symphony", "Synagogue", "Temple", "Tenement", "Tent", "Terminal", "Theater", "Tipi", "Toll House", "Tomb", "Tower", "Townhouse", "Treehouse", "Triplex", "Tudor House", "University", "Vault", "Vicarage", "Villa", "Warehouse", "Watermill", "Workshop", "Yurt"],
 
     buildings: [{ name: 0, baseCost: (0, _big2.default)(15), buyCost: (0, _big2.default)(15), baseCps: (0, _big2.default)(0.1), currentCps: (0, _big2.default)(0.1), description: "", unlocked: false, showAt: 0, owned: 0 }, { name: 1, baseCost: (0, _big2.default)(100), buyCost: (0, _big2.default)(100), baseCps: (0, _big2.default)(1), currentCps: (0, _big2.default)(1), description: "", unlocked: false, showAt: (0, _big2.default)(0), owned: 0 }, { name: 2, baseCost: (0, _big2.default)(1100), buyCost: (0, _big2.default)(1100), baseCps: (0, _big2.default)(8), currentCps: (0, _big2.default)(8), description: "", unlocked: false, showAt: (0, _big2.default)(15), owned: 0 }, { name: 3, baseCost: (0, _big2.default)(12000), buyCost: (0, _big2.default)(12000), baseCps: (0, _big2.default)(47), currentCps: (0, _big2.default)(47), description: "", unlocked: false, showAt: (0, _big2.default)(100), owned: 0 }, { name: 4, baseCost: (0, _big2.default)(130000), buyCost: (0, _big2.default)(130000), baseCps: (0, _big2.default)(260), currentCps: (0, _big2.default)(260), description: "", unlocked: false, showAt: (0, _big2.default)(1100), owned: 0 }, { name: 5, baseCost: (0, _big2.default)(1.4E6), buyCost: (0, _big2.default)(1.4E6), baseCps: (0, _big2.default)(1400), currentCps: (0, _big2.default)(1400), description: "", unlocked: false, showAt: (0, _big2.default)(12000), owned: 0 }, { name: 6, baseCost: (0, _big2.default)(20E6), buyCost: (0, _big2.default)(20E6), baseCps: (0, _big2.default)(7800), currentCps: (0, _big2.default)(7800), description: "", unlocked: false, showAt: (0, _big2.default)(130000), owned: 0 }, { name: 7, baseCost: (0, _big2.default)(330E6), buyCost: (0, _big2.default)(330E6), baseCps: (0, _big2.default)(44000), currentCps: (0, _big2.default)(44000), description: "", unlocked: false, showAt: (0, _big2.default)(1.4E6), owned: 0 }, { name: 8, baseCost: (0, _big2.default)(5.1E9), buyCost: (0, _big2.default)(5.1E9), baseCps: (0, _big2.default)(260000), currentCps: (0, _big2.default)(260000), description: "", unlocked: false, showAt: (0, _big2.default)(20E6), owned: 0 }, { name: 9, baseCost: (0, _big2.default)(75E9), buyCost: (0, _big2.default)(75E9), baseCps: (0, _big2.default)(1.6E6), currentCps: (0, _big2.default)(1.6E6), description: "", unlocked: false, showAt: (0, _big2.default)(330E6), owned: 0 }, { name: 10, baseCost: (0, _big2.default)(1E12), buyCost: (0, _big2.default)(1E12), baseCps: (0, _big2.default)(10E6), currentCps: (0, _big2.default)(10E6), description: "", unlocked: false, showAt: (0, _big2.default)(5.1E9), owned: 0 }, { name: 11, baseCost: (0, _big2.default)(14E12), buyCost: (0, _big2.default)(14E12), baseCps: (0, _big2.default)(65E6), currentCps: (0, _big2.default)(65E6), description: "", unlocked: false, showAt: (0, _big2.default)(75E9), owned: 0 }, { name: 12, baseCost: (0, _big2.default)(170E12), buyCost: (0, _big2.default)(170E12), baseCps: (0, _big2.default)(430E6), currentCps: (0, _big2.default)(430E6), description: "", unlocked: false, showAt: (0, _big2.default)(1E12), owned: 0 }, { name: 13, baseCost: (0, _big2.default)(2.1E15), buyCost: (0, _big2.default)(2.1E15), baseCps: (0, _big2.default)(2.9E12), currentCps: (0, _big2.default)(2.9E12), description: "", unlocked: false, showAt: (0, _big2.default)(14E12), owned: 0 }],
 
@@ -13420,7 +13451,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   return _c('div', {
     staticClass: "row"
   }, [_c('div', {
-    staticClass: "col-md-3"
+    staticClass: "col-md-4"
   }, [_c('div', {
     staticClass: "row totals"
   }, [_c('span', {
@@ -13439,7 +13470,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "click": _vm.crackerClick
     }
   })])]), _vm._v(" "), _c('div', {
-    staticClass: "col-md-6"
+    staticClass: "col-md-5"
   }, [_c('div', {
     staticClass: "row buildings"
   }, [_c('h3', [_vm._v("Buildings")]), _vm._v(" "), _c('div', {
@@ -13512,7 +13543,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [(_vm.showUpgrades) ? _c('div', {
     staticClass: "row upgrades"
   }, [_c('h3', [_vm._v("Upgrades")]), _vm._v(" "), _vm._l((_vm.sortedUpgrades), function(upgrade) {
-    return (!upgrade.active && _vm.canBuyUpgrade(upgrade)) ? _c('div', {
+    return (!upgrade.active && (_vm.canBuyUpgrade(upgrade) || _vm.canSeeUpgrade(upgrade))) ? _c('div', {
       staticClass: "row upgrade"
     }, [_c('div', {
       staticClass: "col-xs-12"

@@ -10,10 +10,12 @@ other non-standard upgrades
 - toddler forms
 sell buildings
 prettier numbers (million/billion/trillion/etc)
-show upcoming upgrades
-showAt computed property
+showAt computed property?
+golden crackers
 generated upgrade names
 generated descriptions
+sounds
+hard reset button
 
 1E6 = 1 million
 1E9 = 1 billion
