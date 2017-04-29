@@ -24,3 +24,6 @@ also the dismissable achievements
 1E15 = 1 quadrillion
 1E18 = 1 quintillion
 1E21 = 1 sextillion
+1E24 = 1 septillion
+1E27 = 1 octillion
+1E30 = 1 nonillion

@@ -70,11 +70,11 @@
     export default {
         data: function () {
             return {
-                enableLoad: true,
+                enableLoad: false,
 
                 lastFrame: 0,
 
-                crackers: Big(0),
+                crackers: Big(1E30),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -88,6 +88,8 @@
                 buildings: [],
 
                 upgrades: [
+                    // TODO generated
+
                     // production
                     { type: 'Cracker', name: 'Store Brand Crackers', needed: Big(50000), cost: Big(999999), multiplier: 1.01, description: 'Meh', unlocked: false, active: false },
                     { type: 'Cracker', name: 'Fancy Store Crackers', needed: Big(250000), cost: Big(5E6), multiplier: 1.01, description: 'Ok I guess', unlocked: false, active: false },
@@ -105,6 +107,8 @@
                 _sortedUpgrades: null,
 
                 achievements: [
+                    // TODO generated
+
                     // total crackers
                     { type: 'Cracker', name: 'Cracker', total: Big(1), unlocked: false },
                     { type: 'Cracker', name: 'Crackers', total: Big(1000), unlocked: false },
@@ -273,7 +277,6 @@
                 if (upgrade.type != 'Cracker' && this.buildingCount(upgrade.type) == 0) {
                     return false;
                 }
-
                 if (upgrade.type == 'Cracker') {
                     if (this.crackers.gte(upgrade.needed / 10)) {
                         upgrade.unlocked = true;
@@ -423,13 +426,43 @@
             },
             generateUpgrades: function () {
                 let vm = this;
-                GameData.buildingUpgrades.forEach(function (upgrade) {
-                    let buildingIndex = upgrade.type;
-                    upgrade.type = vm.buildingNames[buildingIndex];
+                let adjectives = this.shuffleArray(GameData.adjectives);
+                GameData.buildingUpgradeCosts.forEach(function (upgradeParams) {
+                    let upgradeIndex = upgradeParams.type;
+                    upgradeParams.type = vm.buildingNames[upgradeIndex];
 
-                    upgrade.name = upgrade.name.replace(/{TYPE}/, upgrade.type);
+                    let upgradeCosts = upgradeParams.costs;
 
-                    vm.upgrades.push(upgrade);
+                    let upgradeNeeds = GameData.buildingUpgradeNeeds[1];
+                    if (upgradeIndex == 0) {
+                        let upgradeNeeds = GameData.buildingUpgradeNeeds[0];
+                    }
+
+                    let upgradeAmounts = GameData.buildingUpgradeAmounts[1];
+                    if (upgradeAmounts == 0) {
+                        let upgradeAmounts = GameData.buildingUpgradeAmounts[0];
+                    }
+
+                    for (let i = 0; i < upgradeNeeds.length; i++) {
+                        let upgrade = {
+                            type: upgradeParams.type,
+                            name: adjectives[i] + ' ' + upgradeParams.type,
+                            needed: upgradeNeeds[i],
+                            cost: Big(upgradeCosts[i]),
+                            description: 'Need Description',
+                            unlocked: false,
+                            active: false,
+                        };
+
+                        // TODO parse amount
+                        if (upgradeAmounts[i].substr(0, 1) == 'm') {
+                            upgrade.multiplier = parseInt(upgradeAmounts[i].substr(1));
+                        } else if (upgradeAmounts[i].substr(0, 1) == 'a') {
+                            upgrade.addition = parseInt(upgradeAmounts[i].substr(1));
+                        }
+
+                        vm.upgrades.push(upgrade)
+                    }
                 });
             },
             generateAchievements: function () {
@@ -565,6 +598,7 @@
             if (this.enableLoad && localStorage.getItem('SaveGame') != null) {
                 this.loadGame(localStorage.getItem('SaveGame'));
             } else {
+
                 this.generateBuildings();
                 this.generateUpgrades();
                 this.generateAchievements();
