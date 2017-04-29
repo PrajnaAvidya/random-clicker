@@ -8,7 +8,7 @@
             </div>
 
             <div class="row cracker">
-                <img src="/images/cracker.png" v-on:click="crackerClick" />
+                <img src="./assets/cracker.png" v-on:click="crackerClick" />
             </div>
         </div>
 
@@ -74,7 +74,7 @@
 
                 lastFrame: 0,
 
-                crackers: Big(10000000),
+                crackers: Big(0),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -341,6 +341,9 @@
                     }
                 } else if (upgrade.addition != null) {
                     upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
+                    if (upgrade.type == this.buildingNames[0]) {
+                        upgradeText += '<br/>Also adds to clicks';
+                    }
                 }
                 if (upgrade.type != 'Cracker' && this.buildingCount(upgrade.type) < upgrade.needed) {
                     upgradeText += '<br/>Requires ' + upgrade.needed + ' ' + upgrade.type;
@@ -413,6 +416,7 @@
                     let buildingName = buildingNames.pop();
                     let building = GameData.buildings[i];
                     building.name = buildingName;
+
                     this.buildings.push(building);
                     this.buildingNames.push(buildingName);
                 }
@@ -422,6 +426,9 @@
                 GameData.buildingUpgrades.forEach(function (upgrade) {
                     let buildingIndex = upgrade.type;
                     upgrade.type = vm.buildingNames[buildingIndex];
+
+                    upgrade.name = upgrade.name.replace(/{TYPE}/, upgrade.type);
+
                     vm.upgrades.push(upgrade);
                 });
             },

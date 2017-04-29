@@ -21,9 +21,9 @@ export default {
     ],
 
     buildingUpgrades: [
-        { type: 0, name: 'Double Tap', needed: 1, cost: Big(100), multiplier: 2, description: 'Tap faster', unlocked: false, active: false },
-        { type: 0, name: 'Quattro Tap', needed: 1, cost: Big(500), multiplier: 2, description: 'Tap faster!', unlocked: false, active: false },
-        { type: 0, name: 'Mega Tap', needed: 10, cost: Big(10000), multiplier: 2, description: 'Tap even faster!!', unlocked: false, active: false },
+        { type: 0, name: 'Double {TYPE}', needed: 1, cost: Big(100), multiplier: 2, description: 'Tap faster', unlocked: false, active: false },
+        { type: 0, name: 'Quattro {TYPE}', needed: 1, cost: Big(500), multiplier: 2, description: 'Tap faster!', unlocked: false, active: false },
+        { type: 0, name: 'Mega {TYPE}', needed: 10, cost: Big(10000), multiplier: 2, description: 'Tap even faster!!', unlocked: false, active: false },
         { type: 0, name: 'Middle Finger', needed: 20, cost: Big(100000), addition: 0.1, description: 'Put that thing away.', unlocked: false, active: false },
         { type: 0, name: 'Double Middle Finger', needed: 40, cost: Big(10E6), addition: 0.5, description: 'Put those away.', unlocked: false, active: false },
         { type: 0, name: 'Extra Middle Fingers', needed: 80, cost: Big(100E6), addition: 5, description: "Now that's just rude.", unlocked: false, active: false },
