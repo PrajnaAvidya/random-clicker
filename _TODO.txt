@@ -24,24 +24,3 @@ also the dismissable achievements
 1E15 = 1 quadrillion
 1E18 = 1 quintillion
 1E21 = 1 sextillion
-
-adjectives:
-
-sweet
-angry
-bright
-calm
-cold
-cool
-curly
-early
-rich
-lovely
-smart
-simple
-famous
-immense
-long
-perfect
-quick
-thin

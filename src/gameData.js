@@ -105,4 +105,6 @@ export default {
         { type: 1, name: 'Grandma basics', total: Big(1), unlocked: false },
         { type: 1, name: 'Grandma proficiency', total: Big(50), unlocked: false }
     ],
+
+    adjectives: ['Adorable', 'Ancient', 'Angry', 'Beautiful', 'Better', 'Big', 'Brave', 'Bright', 'Calm', 'Clean', 'Clever', 'Cold', 'Colossal', 'Cool', 'Curly', 'Delicious', 'Delightful', 'Eager', 'Early', 'Elegant', 'Fancy', 'Fast', 'Famous', 'Full', 'Fresh', 'Gentle', 'Gifted', 'Gigantic', 'Glamorous', 'Great', 'Handsome', 'Happy', 'Heavy', 'Hot', 'Huge', 'Immense', 'Jolly', 'Kind', 'Large', 'Long', 'Lively', 'Lovely', 'Magnificent', 'Mammouth', 'Massive', 'Modern', 'Nice', 'Perfect', 'Powerful', 'Proud', 'Quick', 'Rapid', 'Rich', 'Smart', 'Silly', 'Simple', 'Sparkling', 'Strong', 'Sweet', 'Swift', 'Tall', 'Thin', 'Thundering', 'Victorious', 'Witty', 'Young', 'Zealous'],
 }
