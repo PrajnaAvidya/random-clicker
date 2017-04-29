@@ -87,23 +87,7 @@
                 buildingNames: [],
                 buildings: [],
 
-                upgrades: [
-                    // TODO generated
-
-                    // production
-                    { type: 'Cracker', name: 'Store Brand Crackers', needed: Big(50000), cost: Big(999999), multiplier: 1.01, description: 'Meh', unlocked: false, active: false },
-                    { type: 'Cracker', name: 'Fancy Store Crackers', needed: Big(250000), cost: Big(5E6), multiplier: 1.01, description: 'Ok I guess', unlocked: false, active: false },
-                    { type: 'Cracker', name: 'Rye Crackers', needed: Big(500000), cost: Big(10E6), multiplier: 1.01, description: 'Better than cardboard', unlocked: false, active: false },
-                    { type: 'Cracker', name: 'Sugared Crackers', needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01, description: 'Gross?', unlocked: false, active: false },
-                    { type: 'Cracker', name: 'Saltine Crackers', needed: Big(5E6), cost: Big(100E6), multiplier: 1.01, description: 'That seems reasonable', unlocked: false, active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(25E6), cost: Big(500E6), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(50E6), cost: Big(1E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(250E6), cost: Big(5E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(500E6), cost: Big(10E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
-                    { type: 'Cracker', name: 'Need Name', needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02, description: 'Need Description', unlocked: false, active: false },
-                    // 4% etc
-                ],
-
+                upgrades: [],
                 _sortedUpgrades: null,
 
                 achievements: [
@@ -427,6 +411,23 @@
             generateUpgrades: function () {
                 let vm = this;
                 let adjectives = this.shuffleArray(GameData.adjectives);
+
+                GameData.productionUpgrades.forEach(function (productionUpgrade) {
+                    adjectives = vm.shuffleArray(GameData.adjectives);
+
+                    let upgrade = {
+                        type: 'Cracker',
+                        name: adjectives[0] + ' Crackers',
+                        needed: Big(productionUpgrade.needed),
+                        cost: Big(productionUpgrade.cost),
+                        multiplier: productionUpgrade.multiplier,
+                        description: '',
+                        unlocked: false, active: false
+                    };
+
+                    vm.upgrades.push(upgrade)
+                });
+
                 GameData.buildingUpgradeCosts.forEach(function (upgradeParams) {
                     let upgradeIndex = upgradeParams.type;
                     upgradeParams.type = vm.buildingNames[upgradeIndex];
@@ -467,6 +468,7 @@
             },
             generateAchievements: function () {
                 let vm = this;
+
                 GameData.buildingAchivements.forEach(function (achievement) {
                     let buildingIndex = achievement.type;
                     achievement.type = vm.buildingNames[buildingIndex];

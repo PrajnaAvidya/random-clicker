@@ -72,5 +72,33 @@ export default {
         { type: 1, name: 'Grandma proficiency', total: Big(50), unlocked: false }
     ],
 
-    adjectives: ['Adorable', 'Ancient', 'Angry', 'Beautiful', 'Better', 'Big', 'Brave', 'Bright', 'Calm', 'Clean', 'Clever', 'Cold', 'Colossal', 'Cool', 'Curly', 'Delicious', 'Delightful', 'Eager', 'Early', 'Elegant', 'Fancy', 'Fast', 'Famous', 'Full', 'Fresh', 'Gentle', 'Gifted', 'Gigantic', 'Glamorous', 'Great', 'Handsome', 'Happy', 'Heavy', 'Hot', 'Huge', 'Immense', 'Jolly', 'Kind', 'Large', 'Long', 'Lively', 'Lovely', 'Magnificent', 'Mammouth', 'Massive', 'Modern', 'Nice', 'Perfect', 'Powerful', 'Proud', 'Quick', 'Rapid', 'Rich', 'Smart', 'Silly', 'Simple', 'Sparkling', 'Strong', 'Sweet', 'Swift', 'Tall', 'Thin', 'Thundering', 'Victorious', 'Witty', 'Young', 'Zealous'],
+    productionUpgrades: [
+        { needed: Big(50000), cost: Big(999999), multiplier: 1.01, description: '' },
+        { needed: Big(250000), cost: Big(5E6), multiplier: 1.01, description: '' },
+        { needed: Big(500000), cost: Big(10E6), multiplier: 1.01, description: '' },
+        { needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01, description: '' },
+        { needed: Big(5E6), cost: Big(100E6), multiplier: 1.01, description: '' },
+        { needed: Big(25E6), cost: Big(500E6), multiplier: 1.02, description: '' },
+        { needed: Big(50E6), cost: Big(1E9), multiplier: 1.02, description: '' },
+        { needed: Big(250E6), cost: Big(5E9), multiplier: 1.02, description: '' },
+        { needed: Big(500E6), cost: Big(10E9), multiplier: 1.02, description: '' },
+        { needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02, description: '' },
+        // 4% etc
+    ],
+
+    productionAchievements: [
+        // total
+        { total: Big(1) },
+        { total: Big(1000) },
+
+        // cps
+        { cps: Big(1) },
+        { cps: Big(10) },
+
+        // clicking
+        { clicks: Big(10000) },
+        { clicks: Big(100000) },
+    ],
+
+    adjectives: ['Adorable', 'Ancient', 'Angry', 'Awesome', 'Beautiful', 'Better', 'Big', 'Brave', 'Bright', 'Calm', 'Clean', 'Clever', 'Cold', 'Colossal', 'Cool', 'Curly', 'Delicious', 'Delightful', 'Eager', 'Early', 'Elegant', 'Fancy', 'Fast', 'Famous', 'Full', 'Fresh', 'Gentle', 'Gifted', 'Gigantic', 'Glamorous', 'Great', 'Handsome', 'Happy', 'Heavy', 'Hot', 'Huge', 'Immense', 'Jolly', 'Kind', 'Large', 'Long', 'Lively', 'Lovely', 'Magnificent', 'Mammouth', 'Massive', 'Modern', 'Nice', 'Perfect', 'Powerful', 'Proud', 'Quick', 'Rapid', 'Rich', 'Smart', 'Silly', 'Simple', 'Sparkling', 'Strong', 'Sweet', 'Swift', 'Tall', 'Thin', 'Thundering', 'Victorious', 'Witty', 'Young', 'Zealous'],
 }
