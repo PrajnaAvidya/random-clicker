@@ -487,6 +487,19 @@
                     vm.achievements.push(achievement);
                 });
             },
+            newGame: function () {
+                // get currency name & adjectives
+                this.currencyName = this.shuffleArray(GameData.currencies).pop();
+                this.adjectives = this.shuffleArray(GameData.adjectives);
+
+                // generate stuff
+                this.generateBuildings();
+                this.generateUpgrades();
+                this.generateAchievements();
+
+                // save fresh game
+                this.saveGame();
+            },
             saveGame: function () {
                 let saveData = {
                     currency: this.currency,
@@ -612,11 +625,7 @@
             if (this.enableLoad && localStorage.getItem('SaveGame') != null) {
                 this.loadGame(localStorage.getItem('SaveGame'));
             } else {
-                this.adjectives = this.shuffleArray(GameData.adjectives);
-                this.generateBuildings();
-                this.generateUpgrades();
-                this.generateAchievements();
-                this.saveGame();
+                this.newGame();
             }
 
             // check achievements every couple seconds
