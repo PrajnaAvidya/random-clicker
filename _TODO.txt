@@ -16,7 +16,7 @@ more achivements
 - also the dismissable achievements
 
 juice
-- click amount popup when clicking
+- click amount popup when clicking (particle effect)
 - ui overhaul
 - generated graphics
 - currency images
