@@ -755,7 +755,7 @@
                 if (value < 10) {
                     return Number((value).toFixed(1));
                 } else if (value <= 999999) {
-                    return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
                     // display pretty formatted number
                     let displayedValue = new Big(value);
@@ -776,7 +776,7 @@
                     return 0;
                 }
                 if (value <= 999999) {
-                    return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
                     // display pretty formatted number
                     let displayedValue = new Big(value);
