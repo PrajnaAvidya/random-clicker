@@ -1,21 +1,30 @@
-achivements
+sell buildings
+just show next locked building upgrade instead of the -10 method
+generated descriptions
+golden crackers
+upgrade/achievement costs based on formula instead of static?
+
+ui overhaul
+- prettier numbers (million/billion/trillion/etc)
+- currency images
+- add juice/animations/etc
+- sound
+
+more achivements
 - building achievements
 - sell achivements
 - click achievements
 - tea (milk) + upgrades
-non-standard upgrades
+- also the dismissable achievements
+
+more upgrades
+- rest of production upgrades
 - toddler forms
-sell buildings
-prettier numbers (million/billion/trillion/etc)
-showAt computed property?
-golden crackers
-sounds
-hard reset button
-just show next locked building upgrade instead of the -10 method
-also the dismissable achievements
-generated descriptions
-more data entry for achievements/upgrades
-currency images
+- anything else?
+
+menu
+-preferences
+-hard reset button
 
 
 1E6 = 1 million

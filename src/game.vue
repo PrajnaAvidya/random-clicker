@@ -393,7 +393,16 @@
                 for (let i = 0; i < GameData.buildings.length; i++) {
                     let buildingName = buildingNames.pop();
                     let building = GameData.buildings[i];
+                    building.buyCost = Big(building.baseCost);
+                    building.currentCps = Big(building.baseCps);
+                    building.unlocked = false;
                     building.name = buildingName;
+                    building.owned = 0;
+                    if (i >= 2) {
+                        building.showAt = Big(GameData.buildings[(i - 2)].buyCost);
+                    } else {
+                        building.showAt = Big(0);
+                    }
 
                     this.buildings.push(building);
                     this.buildingNames.push(buildingName);

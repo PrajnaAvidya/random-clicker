@@ -2,33 +2,33 @@ import Big from 'big.js';
 
 export default {
     buildings: [
-        { name: 0, baseCost: Big(15), buyCost: Big(15), baseCps: Big(0.1), currentCps: Big(0.1), description: "", unlocked: false, showAt: 0, owned: 0 },
+        { name: 0, baseCost: Big(15), baseCps: Big(0.1), description: "" },
 
-        { name: 1, baseCost: Big(100), buyCost: Big(100), baseCps: Big(1), currentCps: Big(1), description: "", unlocked: false, showAt: Big(0), owned: 0 },
+        { name: 1, baseCost: Big(100), baseCps: Big(1), description: "" },
 
-        { name: 2, baseCost: Big(1100), buyCost: Big(1100), baseCps: Big(8), currentCps: Big(8), description: "", unlocked: false, showAt: Big(15), owned: 0 },
+        { name: 2, baseCost: Big(1100), baseCps: Big(8), description: "" },
 
-        { name: 3, baseCost: Big(12000), buyCost: Big(12000), baseCps: Big(47), currentCps: Big(47), description: "", unlocked: false, showAt: Big(100), owned: 0 },
+        { name: 3, baseCost: Big(12000), baseCps: Big(47), description: "" },
 
-        { name: 4, baseCost: Big(130000), buyCost: Big(130000), baseCps: Big(260), currentCps: Big(260), description: "", unlocked: false, showAt: Big(1100), owned: 0 },
+        { name: 4, baseCost: Big(130000), baseCps: Big(260), description: "" },
 
-        { name: 5, baseCost: Big(1.4E6), buyCost: Big(1.4E6), baseCps: Big(1400), currentCps: Big(1400), description: "", unlocked: false, showAt: Big(12000), owned: 0 },
+        { name: 5, baseCost: Big(1.4E6), baseCps: Big(1400), description: "" },
 
-        { name: 6, baseCost: Big(20E6), buyCost: Big(20E6), baseCps: Big(7800), currentCps: Big(7800), description: "", unlocked: false, showAt: Big(130000), owned: 0 },
+        { name: 6, baseCost: Big(20E6), baseCps: Big(7800), description: "" },
 
-        { name: 7, baseCost: Big(330E6), buyCost: Big(330E6), baseCps: Big(44000), currentCps: Big(44000), description: "", unlocked: false, showAt: Big(1.4E6), owned: 0 },
+        { name: 7, baseCost: Big(330E6), baseCps: Big(44000), description: "" },
 
-        { name: 8, baseCost: Big(5.1E9), buyCost: Big(5.1E9), baseCps: Big(260000), currentCps: Big(260000), description: "", unlocked: false, showAt: Big(20E6), owned: 0 },
+        { name: 8, baseCost: Big(5.1E9), baseCps: Big(260000), description: "" },
 
-        { name: 9, baseCost: Big(75E9), buyCost: Big(75E9), baseCps: Big(1.6E6), currentCps: Big(1.6E6), description: "", unlocked: false, showAt: Big(330E6), owned: 0 },
+        { name: 9, baseCost: Big(75E9), baseCps: Big(1.6E6), description: "" },
 
-        { name: 10, baseCost: Big(1E12), buyCost: Big(1E12), baseCps: Big(10E6), currentCps: Big(10E6), description: "", unlocked: false, showAt: Big(5.1E9), owned: 0 },
+        { name: 10, baseCost: Big(1E12), baseCps: Big(10E6), description: "" },
 
-        { name: 11, baseCost: Big(14E12), buyCost: Big(14E12), baseCps: Big(65E6), currentCps: Big(65E6), description: "", unlocked: false, showAt: Big(75E9), owned: 0 },
+        { name: 11, baseCost: Big(14E12), baseCps: Big(65E6), description: "" },
 
-        { name: 12, baseCost: Big(170E12), buyCost: Big(170E12), baseCps: Big(430E6), currentCps: Big(430E6), description: "", unlocked: false, showAt: Big(1E12), owned: 0 },
+        { name: 12, baseCost: Big(170E12), baseCps: Big(430E6), description: "" },
 
-        { name: 13, baseCost: Big(2.1E15), buyCost: Big(2.1E15), baseCps: Big(2.9E12), currentCps: Big(2.9E12), description: "", unlocked: false, showAt: Big(14E12), owned: 0 },
+        { name: 13, baseCost: Big(2.1E15), baseCps: Big(2.9E12), description: "" },
     ],
 
     buildingUpgradeNeeds: [
