@@ -71,13 +71,13 @@
         data: function () {
             return {
                 // disable for debug
-                enableLoad: false,
+                enableLoad: true,
 
                 // for fps calculations
                 lastFrame: 0,
 
                 currencyName: null,
-                currency: Big(1E30),
+                currency: Big(0),
                 totalCurrency: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -502,6 +502,7 @@
             },
             saveGame: function () {
                 let saveData = {
+                    currencyName: this.currencyName,
                     currency: this.currency,
                     totalCurrency: this.totalCurrency,
                     clicks: this.clicks,
@@ -523,6 +524,7 @@
                 let saveData = JSON.parse(saveJson);
                 let vm = this;
 
+                this.currencyName = saveData.currencyName;
                 this.currency = Big(saveData.currency);
                 this.totalCurrency = Big(saveData.totalCurrency);
                 this.clicks = Big(saveData.clicks);

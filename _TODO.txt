@@ -1,11 +1,9 @@
 achivements
-- ui
 - building achievements
 - sell achivements
 - click achievements
-- check for total crackers/cps every second?
 - tea (milk) + upgrades
-other non-standard upgrades
+non-standard upgrades
 - toddler forms
 sell buildings
 prettier numbers (million/billion/trillion/etc)
