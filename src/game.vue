@@ -2,13 +2,13 @@
     <div class="row">
         <div class="col-md-4">
             <div class="row totals">
-                <span class="total-crackers"><h1>{{ crackers | crackers }} crackers</h1></span>
-                <span class="crackers-per-second"><h2>Per second: {{ cps | round }}</h2></span>
-                <span class="crackers-per-click"><h3>Per click: {{ clickPower | crackers }}</h3></span>
+                <span class="total-currency"><h1>{{ currency | currency }} crackers</h1></span>
+                <span class="currency-per-second"><h2>Per second: {{ cps | round }}</h2></span>
+                <span class="currency-per-click"><h3>Per click: {{ clickPower | currency }}</h3></span>
             </div>
 
-            <div class="row cracker">
-                <img src="./assets/cracker.png" v-on:click="crackerClick" />
+            <div class="row currency">
+                <img src="./assets/cracker.png" v-on:click="click" />
             </div>
         </div>
 
@@ -32,7 +32,7 @@
                         <br /> ({{ building.owned }} owned)
                     </div>
                     <div class="col-xs-2">
-                        <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | crackers }})</button>
+                        <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</button>
                     </div>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                 <div class="row upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
                     <div class="col-xs-12">
                         <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
-                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | crackers }})</span>
+                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                     </div>
                 </div>
             </div>
@@ -70,12 +70,15 @@
     export default {
         data: function () {
             return {
-                enableLoad: true,
+                // disable for debug
+                enableLoad: false,
 
+                // for fps calculations
                 lastFrame: 0,
 
-                crackers: Big(0),
-                totalCrackers: Big(0),
+                currencyName: null,
+                currency: Big(1E30),
+                totalCurrency: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
                 clickPower: Big(1),
@@ -113,7 +116,7 @@
 
         methods: {
             // clicking/cps
-            crackerClick: function () {
+            click: function () {
                 let vm = this;
                 let loopAmount = Big(10);
                 if (this.clickPower < 10) {
@@ -123,8 +126,8 @@
                 for (let i = 0; i < loopAmount; i++) {
                     setTimeout(function timer() {
                         vm.clicks = vm.clicks.plus(clickAmount);
-                        vm.crackers = vm.crackers.plus(clickAmount);
-                        vm.totalCrackers = vm.totalCrackers.plus(clickAmount);
+                        vm.currency = vm.currency.plus(clickAmount);
+                        vm.totalCurrency = vm.totalCurrency.plus(clickAmount);
                     }, i * 250 / loopAmount);
                 }
             },
@@ -151,17 +154,17 @@
 
             // buildings
             showBuilding: function (building) {
-                if (building.unlocked == false && this.totalCrackers.gte(building.baseCost)) {
+                if (building.unlocked == false && this.totalCurrency.gte(building.baseCost)) {
                     building.unlocked = true;
                 }
-                return this.totalCrackers.gte(building.showAt);
+                return this.totalCurrency.gte(building.showAt);
             },
             canBuyBuilding: function (building) {
-                return this.crackers.gte(this.buildingCost(building, this.buyAmount));
+                return this.currency.gte(this.buildingCost(building, this.buyAmount));
             },
             buyBuilding: function (building) {
                 if (this.canBuyBuilding(building, this.buyAmount)) {
-                    this.crackers = this.crackers.minus(this.buildingCost(building));
+                    this.currency = this.currency.minus(this.buildingCost(building));
                     building.owned += this.buyAmount;
                     building.unlocked = true; // just in case
 
@@ -226,7 +229,7 @@
                 }
 
                 if (upgrade.type == 'Cracker') {
-                    if (this.crackers.gte(upgrade.needed)) {
+                    if (this.currency.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
                     } else {
@@ -250,7 +253,7 @@
                     return false;
                 }
                 if (upgrade.type == 'Cracker') {
-                    if (this.crackers.gte(upgrade.needed / 10)) {
+                    if (this.currency.gte(upgrade.needed / 10)) {
                         upgrade.unlocked = true;
                         return true;
                     } else {
@@ -266,8 +269,8 @@
                 }
             },
             buyUpgrade: function (upgrade) {
-                if (this.canBuyUpgrade(upgrade) && this.crackers.gte(upgrade.cost)) {
-                    this.crackers = this.crackers.minus(upgrade.cost);
+                if (this.canBuyUpgrade(upgrade) && this.currency.gte(upgrade.cost)) {
+                    this.currency = this.currency.minus(upgrade.cost);
                     upgrade.active = true;
 
                     this.recalculateCps();
@@ -340,7 +343,7 @@
                             vm.unlockAchievement(achievement);
                         }
                     } else if (achievement.type == 'Cracker') {
-                        if (vm.totalCrackers.gte(achievement.total)) {
+                        if (vm.totalCurrency.gte(achievement.total)) {
                             vm.unlockAchievement(achievement);
                         }
                     } else {
@@ -378,8 +381,8 @@
                 this.lastFrame = timestamp;
 
                 let division = 1000 / progress;
-                this.crackers = this.crackers.plus(this.cps.div(division));
-                this.totalCrackers = this.totalCrackers.plus(this.cps.div(division))
+                this.currency = this.currency.plus(this.cps.div(division));
+                this.totalCurrency = this.totalCurrency.plus(this.cps.div(division))
 
                 window.requestAnimationFrame(this.tick);
             },
@@ -486,8 +489,8 @@
             },
             saveGame: function () {
                 let saveData = {
-                    crackers: this.crackers,
-                    totalCrackers: this.totalCrackers,
+                    currency: this.currency,
+                    totalCurrency: this.totalCurrency,
                     clicks: this.clicks,
                     cps: this.cps,
                     clickPower: this.clickPower,
@@ -507,8 +510,8 @@
                 let saveData = JSON.parse(saveJson);
                 let vm = this;
 
-                this.crackers = Big(saveData.crackers);
-                this.totalCrackers = Big(saveData.totalCrackers);
+                this.currency = Big(saveData.currency);
+                this.totalCurrency = Big(saveData.totalCurrency);
                 this.clicks = Big(saveData.clicks);
                 this.cps = Big(saveData.cps);
                 this.clickPower = Big(saveData.clickPower);
@@ -597,7 +600,7 @@
                     return value.toExponential(3);
                 }
             },
-            crackers: function (value) {
+            currency: function (value) {
                 if (value <= 9999999999) {
                     return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
@@ -639,7 +642,7 @@
     }
     
     .totals,
-    .cracker {
+    .currency {
         text-align: center;
     }
     
