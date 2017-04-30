@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="row totals">
-                <span class="total-currency"><h1>{{ currency | currency }} crackers</h1></span>
+                <span class="total-currency"><h1>{{ currency | currency }} {{ currencyName}}s</h1></span>
                 <span class="currency-per-second"><h2>Per second: {{ cps | round }}</h2></span>
                 <span class="currency-per-click"><h3>Per click: {{ clickPower | currency }}</h3></span>
             </div>
@@ -206,8 +206,8 @@
                 let buildingCps = building.currentCps * building.owned;
                 let buildingCpsPercent = 100 * buildingCps / this.cps;
                 let buildingText = building.description;
-                buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " crackers per second";
-                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " crackers per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
+                buildingText += "<br />Each " + building.name + " produces " + building.currentCps + " " + this.currencyName + "s per second";
+                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " " + this.currencyName + "s per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
                 return buildingText;
             },
             setBuyAmount: function (amount) {
@@ -228,7 +228,7 @@
                     return true;
                 }
 
-                if (upgrade.type == 'Cracker') {
+                if (upgrade.type == this.currencyName) {
                     if (this.currency.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
@@ -249,10 +249,10 @@
                     return true;
                 }
 
-                if (upgrade.type != 'Cracker' && this.buildingCount(upgrade.type) == 0) {
+                if (upgrade.type != this.currencyName && this.buildingCount(upgrade.type) == 0) {
                     return false;
                 }
-                if (upgrade.type == 'Cracker') {
+                if (upgrade.type == this.currencyName) {
                     if (this.currency.gte(upgrade.needed / 10)) {
                         upgrade.unlocked = true;
                         return true;
@@ -303,7 +303,7 @@
             },
             upgradeProduction: function () {
                 let production = 1;
-                this.activeUpgrades('Cracker').forEach(function (upgrade) {
+                this.activeUpgrades(this.currencyName).forEach(function (upgrade) {
                     if (upgrade.multiplier != null) {
                         production *= upgrade.multiplier;
                     }
@@ -318,12 +318,12 @@
                         upgradeText += '<br/>Also multiplies clicks';
                     }
                 } else if (upgrade.addition != null) {
-                    upgradeText += '<br/>Adds ' + upgrade.addition + ' cracker production for every non-' + upgrade.type + ' building owned';
+                    upgradeText += '<br/>Adds ' + upgrade.addition + ' ' + this.currencyName + ' production for every non-' + upgrade.type + ' building owned';
                     if (upgrade.type == this.buildingNames[0]) {
                         upgradeText += '<br/>Also adds to clicks';
                     }
                 }
-                if (upgrade.type != 'Cracker' && this.buildingCount(upgrade.type) < upgrade.needed) {
+                if (upgrade.type != this.currencyName && this.buildingCount(upgrade.type) < upgrade.needed) {
                     upgradeText += '<br/>Requires ' + upgrade.needed + ' ' + upgrade.type;
                 }
 
@@ -342,7 +342,7 @@
                         if (vm.clicks.gte(achievement.clicks)) {
                             vm.unlockAchievement(achievement);
                         }
-                    } else if (achievement.type == 'Cracker') {
+                    } else if (achievement.type == vm.currencyName) {
                         if (vm.totalCurrency.gte(achievement.total)) {
                             vm.unlockAchievement(achievement);
                         }
@@ -365,11 +365,11 @@
             },
             achievementText: function (achievement) {
                 if (achievement.cps != null) {
-                    return 'Reached a total of ' + achievement.cps + ' cps';
+                    return 'Reached a total of ' + achievement.cps + ' ' + this.currencyName + '/sec';
                 } else if (achievement.clicks != null) {
-                    return 'Generated a total of ' + achievement.clicks + ' crackers using clicks';
-                } else if (achievement.type == 'Cracker') {
-                    return 'Generated a total of ' + achievement.total + ' crackers';
+                    return 'Generated a total of ' + achievement.clicks + ' ' + this.currencyName + 's using clicks';
+                } else if (achievement.type == this.currencyName) {
+                    return 'Generated a total of ' + achievement.total + ' ' + this.currencyName + 's';
                 } else {
                     return 'Built a total of ' + achievement.total + ' ' + achievement.type;
                 }
@@ -403,8 +403,8 @@
                 let vm = this;
                 GameData.productionUpgrades.forEach(function (productionUpgrade) {
                     let upgrade = {
-                        type: 'Cracker',
-                        name: vm.adjectives.pop() + ' Crackers',
+                        type: vm.currencyName,
+                        name: vm.adjectives.pop() + ' ' + vm.currencyName + 's',
                         needed: Big(productionUpgrade.needed),
                         cost: Big(productionUpgrade.cost),
                         multiplier: productionUpgrade.multiplier,
@@ -458,8 +458,8 @@
 
                 GameData.productionAchievements.forEach(function (productionAchievement) {
                     let achievement = {
-                        type: 'Cracker',
-                        name: vm.adjectives.pop() + ' Crackers',
+                        type: vm.currencyName,
+                        name: vm.adjectives.pop() + ' ' + vm.currencyName + 's',
                         unlocked: false,
                     };
 
