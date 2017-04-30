@@ -90,21 +90,9 @@
                 upgrades: [],
                 _sortedUpgrades: null,
 
-                achievements: [
-                    // TODO generated
+                adjectives: [],
 
-                    // total crackers
-                    { type: 'Cracker', name: 'Cracker', total: Big(1), unlocked: false },
-                    { type: 'Cracker', name: 'Crackers', total: Big(1000), unlocked: false },
-
-                    // cps
-                    { type: 'Cracker', name: 'Casual baking', cps: Big(1), unlocked: false },
-                    { type: 'Cracker', name: 'Hardcore baking', cps: Big(10), unlocked: false },
-
-                    // clicking
-                    { type: 'Cracker', name: 'Clicktastic', clicks: Big(10000), unlocked: false },
-                    { type: 'Cracker', name: 'Clickathon', clicks: Big(100000), unlocked: false },
-                ],
+                achievements: [],
             }
         },
 
@@ -410,14 +398,10 @@
             },
             generateUpgrades: function () {
                 let vm = this;
-                let adjectives = this.shuffleArray(GameData.adjectives);
-
                 GameData.productionUpgrades.forEach(function (productionUpgrade) {
-                    adjectives = vm.shuffleArray(GameData.adjectives);
-
                     let upgrade = {
                         type: 'Cracker',
-                        name: adjectives[0] + ' Crackers',
+                        name: vm.adjectives.pop() + ' Crackers',
                         needed: Big(productionUpgrade.needed),
                         cost: Big(productionUpgrade.cost),
                         multiplier: productionUpgrade.multiplier,
@@ -447,7 +431,7 @@
                     for (let i = 0; i < upgradeNeeds.length; i++) {
                         let upgrade = {
                             type: upgradeParams.type,
-                            name: adjectives[i] + ' ' + upgradeParams.type + 's',
+                            name: vm.adjectives.pop() + ' ' + upgradeParams.type + 's',
                             needed: upgradeNeeds[i],
                             cost: Big(upgradeCosts[i]),
                             description: 'Need Description',
@@ -469,9 +453,34 @@
             generateAchievements: function () {
                 let vm = this;
 
-                GameData.buildingAchivements.forEach(function (achievement) {
-                    let buildingIndex = achievement.type;
-                    achievement.type = vm.buildingNames[buildingIndex];
+                GameData.productionAchievements.forEach(function (productionAchievement) {
+                    let achievement = {
+                        type: 'Cracker',
+                        name: vm.adjectives.pop() + ' Crackers',
+                        unlocked: false,
+                    };
+
+                    if (productionAchievement.total != null) {
+                        achievement.total = Big(productionAchievement.total);
+                    } else if (productionAchievement.cps != null) {
+                        achievement.cps = Big(productionAchievement.cps);
+                    } else if (productionAchievement.clicks != null) {
+                        achievement.clicks = Big(productionAchievement.clicks);
+                    }
+
+                    vm.achievements.push(achievement);
+                });
+
+                GameData.buildingAchivements.forEach(function (buildingAchivement) {
+                    let upgradeIndex = buildingAchivement.type;
+
+                    let achievement = {
+                        type: vm.buildingNames[upgradeIndex],
+                        name: vm.adjectives.pop() + ' ' + vm.buildingNames[upgradeIndex],
+                        total: Big(buildingAchivement.total),
+                        unlocked: false,
+                    };
+
                     vm.achievements.push(achievement);
                 });
             },
@@ -600,7 +609,7 @@
             if (this.enableLoad && localStorage.getItem('SaveGame') != null) {
                 this.loadGame(localStorage.getItem('SaveGame'));
             } else {
-
+                this.adjectives = this.shuffleArray(GameData.adjectives);
                 this.generateBuildings();
                 this.generateUpgrades();
                 this.generateAchievements();
