@@ -3,9 +3,15 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="row totals">
-                    <span class="total-currency"><h1>{{ currency | currency }} {{ currencyName}}s</h1></span>
-                    <span class="currency-per-second"><h2>Per second: {{ cps | round }}</h2></span>
-                    <span class="currency-per-click"><h3>Per click: {{ clickPower | currency }}</h3></span>
+                    <div class="total-currency">
+                        <h1>{{ currency | currency }} {{ currencyName}}s</h1>
+                    </div>
+                    <div class="currency-per-second">
+                        <h2>Per second: {{ cps | round }}</h2>
+                    </div>
+                    <div class="currency-per-click">
+                        <h3>Per click: {{ clickPower | currency }}</h3>
+                    </div>
                 </div>
 
                 <div class="row currency" id="currency" v-on:click="click"></div>
@@ -13,10 +19,12 @@
 
             <div class="col-md-5">
                 <div class="row buildings">
-                    <h3>Buildings</h3>
+                    <div class="row">
+                        <h3>Buildings</h3>
+                    </div>
 
                     <div class="row buy-sell-buttons">
-                        <div class="col-12">
+                        <div class="col-xs-12">
                             <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 1 }" @click="setBuyAmount(1)">Buy 1</button>
                             <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 10 }" @click="setBuyAmount(10)">Buy 10</button>
                             <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 100 }" @click="setBuyAmount(100)">Buy 100</button>
@@ -24,13 +32,12 @@
                     </div>
 
                     <div class="row building" v-for="building in buildings" v-if="building.owned > 0 || showBuilding(building)">
-                        <div class="col-3">
-
+                        <div class="col-xs-3">
                             <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="buildingText(building)"></span></span>
                             <span v-bind:class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
                             <br /> ({{ building.owned }} owned)
                         </div>
-                        <div class="col-2">
+                        <div class="col-xs-2">
                             <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</button>
                         </div>
                     </div>
@@ -42,7 +49,7 @@
                     <h3>Upgrades</h3>
 
                     <div class="row upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                        <div class="col-12">
+                        <div class="col-xs-12">
                             <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
                             <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                         </div>
@@ -51,7 +58,7 @@
 
                 <div class="row achievements" v-if="showAchievements">
                     <h3>Achievements</h3>
-                    <div class="col-12">
+                    <div class="col-xs-12">
                         <div class="row achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
                             <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="achievementText(achievement)"></span></span>
                             {{ achievement.name }}
@@ -61,12 +68,12 @@
             </div>
         </div>
 
-        <!--div class="row menu">
-            <div class="col-md-6 offset-md-1">
+        <div class="row menu">
+            <div class="col-md-3 col-md-offset-9">
                 <button class="btn btn-default" @click="saveGame()">Save Game</button>
                 <button class="btn btn-danger" @click="hardReset()">Hard Reset</button>
             </div>
-        </div-->
+        </div>
     </div>
 </template>
 
@@ -706,7 +713,7 @@
                     };
                     draw(ctx) {
                         if (this.alive) {
-                            ctx.font = "bold 18px Helvetica Neue";
+                            ctx.font = "bold 22px Helvetica Neue";
                             ctx.fillStyle = "rgba(0, 0, 0, " + this.life + ")";
                             ctx.fillText("+" + this.clickPower, this.x, this.y);
                         }
@@ -881,6 +888,10 @@
     
     .upgrade {
         margin-bottom: 5px;
+    }
+    
+    .menu {
+        margin-top: 50px;
     }
     /* "spoiler" effect */
     
