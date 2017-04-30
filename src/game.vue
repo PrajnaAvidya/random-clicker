@@ -71,7 +71,7 @@
         data: function () {
             return {
                 // disable for debug
-                enableLoad: false,
+                enableLoad: true,
 
                 // for fps calculations
                 lastFrame: 0,
@@ -619,10 +619,21 @@
             round: function (value) {
                 if (value < 10) {
                     return Number((value).toFixed(1));
-                } else if (value <= 9999999999) {
+                } else if (value <= 999999) {
                     return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
-                    return value.toExponential(3);
+                    // display pretty formatted number
+                    let suffixes = ["", "", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"];
+                    let index = Math.floor((value.e) / 3);
+                    if (index >= suffixes.length) {
+                        // outside of range
+                        return value.toExponential(3);
+                    }
+                    let suffix = suffixes[Math.floor((value.e) / 3)];
+                    let displayedValue = new Big(value);
+                    let sigFig = (displayedValue.e % 3);
+                    displayedValue.e = 3 + sigFig;
+                    return displayedValue.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
                 }
             },
             currency: function (value) {
