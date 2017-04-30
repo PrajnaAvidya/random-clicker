@@ -71,7 +71,7 @@
         data: function () {
             return {
                 // disable for debug
-                enableLoad: true,
+                enableLoad: false,
 
                 // for fps calculations
                 lastFrame: 0,
@@ -433,12 +433,12 @@
 
                     let upgradeNeeds = GameData.buildingUpgradeNeeds[1];
                     if (upgradeIndex == 0) {
-                        let upgradeNeeds = GameData.buildingUpgradeNeeds[0];
+                        upgradeNeeds = GameData.buildingUpgradeNeeds[0];
                     }
 
                     let upgradeAmounts = GameData.buildingUpgradeAmounts[1];
-                    if (upgradeAmounts == 0) {
-                        let upgradeAmounts = GameData.buildingUpgradeAmounts[0];
+                    if (upgradeIndex == 0) {
+                        upgradeAmounts = GameData.buildingUpgradeAmounts[0];
                     }
 
                     for (let i = 0; i < upgradeNeeds.length; i++) {

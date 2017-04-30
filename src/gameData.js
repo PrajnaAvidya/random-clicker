@@ -32,7 +32,7 @@ export default {
     ],
 
     buildingUpgradeNeeds: [
-        // cursor type
+        // currency type
         [1, 1, 10, 20, 40, 80, 120, 160, 200, 240, 280, 320],
 
         // everything else
@@ -40,7 +40,7 @@ export default {
     ],
 
     buildingUpgradeAmounts: [
-        // cursor type
+        // currency type
         ["m2", "m2", "m2", "a0.1", "a0.5", "a5", "a50", "a500", "a5000", "a50000", "a500000", "a5000000"],
 
         // everything else
