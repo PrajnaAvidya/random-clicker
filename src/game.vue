@@ -70,11 +70,11 @@
     export default {
         data: function () {
             return {
-                enableLoad: true,
+                enableLoad: false,
 
                 lastFrame: 0,
 
-                crackers: Big(0),
+                crackers: Big(10000000000000000000),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
@@ -421,7 +421,7 @@
                         needed: Big(productionUpgrade.needed),
                         cost: Big(productionUpgrade.cost),
                         multiplier: productionUpgrade.multiplier,
-                        description: '',
+                        description: 'Need Description',
                         unlocked: false, active: false
                     };
 
@@ -447,7 +447,7 @@
                     for (let i = 0; i < upgradeNeeds.length; i++) {
                         let upgrade = {
                             type: upgradeParams.type,
-                            name: adjectives[i] + ' ' + upgradeParams.type,
+                            name: adjectives[i] + ' ' + upgradeParams.type + 's',
                             needed: upgradeNeeds[i],
                             cost: Big(upgradeCosts[i]),
                             description: 'Need Description',
@@ -576,7 +576,7 @@
                     array[j] = temp;
                 }
                 return array;
-            }
+            },
         },
         filters: {
             round: function (value) {
