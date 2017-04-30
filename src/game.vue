@@ -70,11 +70,11 @@
     export default {
         data: function () {
             return {
-                enableLoad: false,
+                enableLoad: true,
 
                 lastFrame: 0,
 
-                crackers: Big(10000000000000000000),
+                crackers: Big(0),
                 totalCrackers: Big(0),
                 clicks: Big(0),
                 cps: Big(0),
