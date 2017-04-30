@@ -12,11 +12,14 @@ more achivements
 - building achievements
 - sell achivements
 - click achievements
+- click speed
 - tea (milk) + upgrades
 - also the dismissable achievements
 
 juice
 - ui overhaul
+-- clean up bootstrap grid
+-- nicer tooltips
 - generated graphics
 - currency images
 - falling cracker effect
@@ -25,7 +28,6 @@ juice
 
 menu
 -preferences
--hard reset button
 
 
 6E = million
