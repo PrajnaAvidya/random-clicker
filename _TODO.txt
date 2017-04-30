@@ -20,7 +20,6 @@ juice
 - click amount popup when clicking
 - ui overhaul
 - generated graphics
-- prettier numbers (million/billion/trillion/etc)
 - currency images
 - add juice/animations/etc
 - sound
@@ -31,12 +30,12 @@ menu
 -hard reset button
 
 
-1E6 = 1 million
-1E9 = 1 billion
-1E12 = 1 trillion
-1E15 = 1 quadrillion
-1E18 = 1 quintillion
-1E21 = 1 sextillion
-1E24 = 1 septillion
-1E27 = 1 octillion
-1E30 = 1 nonillion
+6E = million
+9E = billion
+12E = trillion
+15E = quadrillion
+18E = quintillion
+21E = sextillion
+24E = septillion
+27E = octillion
+30E = nonillion
