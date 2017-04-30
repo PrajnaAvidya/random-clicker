@@ -1,5 +1,4 @@
 sell buildings
-just show next locked building upgrade instead of the -10 method
 generated descriptions
 golden crackers
 upgrade/achievement costs based on formula instead of static?

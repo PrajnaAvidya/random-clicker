@@ -261,7 +261,7 @@
                         return false;
                     }
                 } else {
-                    if (this.buildingCount(upgrade.type) >= upgrade.needed - 10) {
+                    if (upgrade.cost == this.nextUpgrade(upgrade.type).cost) {
                         upgrade.unlocked = true;
                         return true;
                     } else {
@@ -282,6 +282,12 @@
             activeUpgrades: function (buildingType) {
                 return this.upgrades.filter(function (upgrade) {
                     return upgrade.active && upgrade.type == buildingType;
+                });
+            },
+            nextUpgrade: function (buildingType) {
+                let vm = this;
+                return this.upgrades.find(function (upgrade) {
+                    return !upgrade.active && upgrade.type == buildingType && upgrade.needed > vm.buildingCount(buildingType);
                 });
             },
             upgradeMultiplier: function (buildingType) {
@@ -432,12 +438,9 @@
                     let upgradeCosts = upgradeParams.costs;
 
                     let upgradeNeeds = GameData.buildingUpgradeNeeds[1];
-                    if (upgradeIndex == 0) {
-                        upgradeNeeds = GameData.buildingUpgradeNeeds[0];
-                    }
-
                     let upgradeAmounts = GameData.buildingUpgradeAmounts[1];
                     if (upgradeIndex == 0) {
+                        upgradeNeeds = GameData.buildingUpgradeNeeds[0];
                         upgradeAmounts = GameData.buildingUpgradeAmounts[0];
                     }
 
@@ -452,7 +455,7 @@
                             active: false,
                         };
 
-                        // TODO parse amount
+                        // parse amount
                         if (upgradeAmounts[i].substr(0, 1) == "m") {
                             upgrade.multiplier = parseInt(upgradeAmounts[i].substr(1));
                         } else if (upgradeAmounts[i].substr(0, 1) == "a") {
