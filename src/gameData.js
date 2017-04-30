@@ -1,4 +1,4 @@
-import Big from 'big.js';
+import Big from "big.js";
 
 export default {
     buildings: [
@@ -41,10 +41,10 @@ export default {
 
     buildingUpgradeAmounts: [
         // cursor type
-        ['m2', 'm2', 'm2', 'a0.1', 'a0.5', 'a5', 'a50', 'a500', 'a5000', 'a50000', 'a500000', 'a5000000'],
+        ["m2", "m2", "m2", "a0.1", "a0.5", "a5", "a50", "a500", "a5000", "a50000", "a500000", "a5000000"],
 
         // everything else
-        ['m2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2'],
+        ["m2", "m2", "m2", "m2", "m2", "m2", "m2", "m2"],
     ],
 
     buildingUpgradeCosts: [
@@ -88,16 +88,16 @@ export default {
     ],
 
     productionUpgrades: [
-        { needed: Big(50000), cost: Big(999999), multiplier: 1.01, description: '' },
-        { needed: Big(250000), cost: Big(5E6), multiplier: 1.01, description: '' },
-        { needed: Big(500000), cost: Big(10E6), multiplier: 1.01, description: '' },
-        { needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01, description: '' },
-        { needed: Big(5E6), cost: Big(100E6), multiplier: 1.01, description: '' },
-        { needed: Big(25E6), cost: Big(500E6), multiplier: 1.02, description: '' },
-        { needed: Big(50E6), cost: Big(1E9), multiplier: 1.02, description: '' },
-        { needed: Big(250E6), cost: Big(5E9), multiplier: 1.02, description: '' },
-        { needed: Big(500E6), cost: Big(10E9), multiplier: 1.02, description: '' },
-        { needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02, description: '' },
+        { needed: Big(50000), cost: Big(999999), multiplier: 1.01, description: "" },
+        { needed: Big(250000), cost: Big(5E6), multiplier: 1.01, description: "" },
+        { needed: Big(500000), cost: Big(10E6), multiplier: 1.01, description: "" },
+        { needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01, description: "" },
+        { needed: Big(5E6), cost: Big(100E6), multiplier: 1.01, description: "" },
+        { needed: Big(25E6), cost: Big(500E6), multiplier: 1.02, description: "" },
+        { needed: Big(50E6), cost: Big(1E9), multiplier: 1.02, description: "" },
+        { needed: Big(250E6), cost: Big(5E9), multiplier: 1.02, description: "" },
+        { needed: Big(500E6), cost: Big(10E9), multiplier: 1.02, description: "" },
+        { needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02, description: "" },
         // TODO 4% etc
     ],
 
