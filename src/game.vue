@@ -633,7 +633,7 @@
                         this.wander = 0.15;
                         this.theta = random(TWO_PI);
                         this.drag = 0.92;
-                        this.color = '#fff';
+                        //this.color = '#fff';
 
                         this.x = x || 0.0;
                         this.y = y || 0.0;
@@ -643,7 +643,6 @@
                     },
 
                     move: function () {
-
                         this.x += this.vx;
                         this.y += this.vy;
 
@@ -651,8 +650,9 @@
                         this.vy *= this.drag;
 
                         this.theta += random(-0.5, 0.5) * this.wander;
-                        this.vx += sin(this.theta) * 0.1;
-                        this.vy += cos(this.theta) * 0.1;
+                        this.vx += sin(this.theta) * 0.05;
+                        //this.vy += cos(this.theta) * 0.1;
+                        this.vy += 0.5;
 
                         this.radius *= 0.96;
                         this.alive = this.radius > 0.5;
@@ -660,15 +660,18 @@
 
                     draw: function (ctx) {
 
-                        ctx.beginPath();
+                        /*ctx.beginPath();
                         ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
                         ctx.fillStyle = this.color;
-                        ctx.fill();
+                        ctx.fill();*/
+                        let img = new Image();
+                        img.src = '/static/cracker.png';
+                        ctx.drawImage(img, this.x, this.y, 30, 30);
                     }
                 };
 
-                var MAX_PARTICLES = 280;
-                var COLOURS = ['#69D2E7', '#A7DBD8', '#E0E4CC', '#F38630', '#FA6900', '#FF4E50', '#F9D423'];
+                var MAX_PARTICLES = 100;
+                //var COLOURS = ['#69D2E7', '#A7DBD8', '#E0E4CC', '#F38630', '#FA6900', '#FF4E50', '#F9D423'];
                 var particles = [];
                 var pool = [];
 
@@ -688,19 +691,19 @@
                             pool.push(particles.shift());
                         }
 
-
                         particle = pool.length ? pool.pop() : new Particle();
                         particle.init(x, y, random(5, 40));
 
                         particle.wander = random(0.5, 2.0);
-                        particle.color = random(COLOURS);
+                        //particle.color = random(COLOURS);
                         particle.drag = random(0.9, 0.99);
 
                         theta = random(TWO_PI);
                         force = random(2, 8);
 
                         particle.vx = sin(theta) * force;
-                        particle.vy = cos(theta) * force;
+                        //particle.vy = cos(theta) * force;
+                        particle.vy = random(-10, -2);
 
                         particles.push(particle);
                     },
@@ -712,13 +715,17 @@
 
                             particle = particles[i];
 
-                            if (particle.alive) particle.move();
-                            else pool.push(particles.splice(i, 1)[0]);
+                            if (particle.alive) {
+                                particle.move();
+                            }
+                            else {
+                                pool.push(particles.splice(i, 1)[0]);
+                            }
                         }
                     },
 
                     draw() {
-                        this.globalCompositeOperation = 'lighter';
+                        //this.globalCompositeOperation = 'lighter';
 
                         for (var i = particles.length - 1; i >= 0; i--) {
                             particles[i].draw(this);
@@ -811,7 +818,7 @@
     
     .currency {
         height: 350px;
-        background-image: url("./assets/cracker.png");
+        background-image: url("/static/cracker.png");
         background-position: center;
         background-repeat: no-repeat;
     }
