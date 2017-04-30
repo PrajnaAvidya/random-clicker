@@ -64,8 +64,8 @@
 </template>
 
 <script>
-    import GameData from './gameData.js';
-    import Big from 'big.js';
+    import GameData from "./gameData.js";
+    import Big from "big.js";
 
     export default {
         data: function () {
@@ -313,18 +313,18 @@
             upgradeText: function (upgrade) {
                 let upgradeText = upgrade.description;
                 if (upgrade.multiplier != null) {
-                    upgradeText += '<br/>Multiplies ' + upgrade.type + ' production by ' + upgrade.multiplier + 'x';
+                    upgradeText += "<br/>Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
                     if (upgrade.type == this.buildingNames[0]) {
-                        upgradeText += '<br/>Also multiplies clicks';
+                        upgradeText += "<br/>Also multiplies clicks";
                     }
                 } else if (upgrade.addition != null) {
-                    upgradeText += '<br/>Adds ' + upgrade.addition + ' ' + this.currencyName + ' production for every non-' + upgrade.type + ' building owned';
+                    upgradeText += "<br/>Adds " + upgrade.addition + " " + this.currencyName + " production for every non-" + upgrade.type + " building owned";
                     if (upgrade.type == this.buildingNames[0]) {
-                        upgradeText += '<br/>Also adds to clicks';
+                        upgradeText += "<br/>Also adds to clicks";
                     }
                 }
                 if (upgrade.type != this.currencyName && this.buildingCount(upgrade.type) < upgrade.needed) {
-                    upgradeText += '<br/>Requires ' + upgrade.needed + ' ' + upgrade.type;
+                    upgradeText += "<br/>Requires " + upgrade.needed + " " + upgrade.type;
                 }
 
                 return upgradeText;
@@ -365,13 +365,13 @@
             },
             achievementText: function (achievement) {
                 if (achievement.cps != null) {
-                    return 'Reached a total of ' + achievement.cps + ' ' + this.currencyName + '/sec';
+                    return "Reached a total of " + achievement.cps + " " + this.currencyName + "/sec";
                 } else if (achievement.clicks != null) {
-                    return 'Generated a total of ' + achievement.clicks + ' ' + this.currencyName + 's using clicks';
+                    return "Generated a total of " + achievement.clicks + " " + this.currencyName + "s using clicks";
                 } else if (achievement.type == this.currencyName) {
-                    return 'Generated a total of ' + achievement.total + ' ' + this.currencyName + 's';
+                    return "Generated a total of " + achievement.total + " " + this.currencyName + "s";
                 } else {
-                    return 'Built a total of ' + achievement.total + ' ' + achievement.type;
+                    return "Built a total of " + achievement.total + " " + achievement.type;
                 }
             },
 
@@ -413,11 +413,11 @@
                 GameData.productionUpgrades.forEach(function (productionUpgrade) {
                     let upgrade = {
                         type: vm.currencyName,
-                        name: vm.adjectives.pop() + ' ' + vm.currencyName + 's',
+                        name: vm.adjectives.pop() + " " + vm.currencyName + "s",
                         needed: Big(productionUpgrade.needed),
                         cost: Big(productionUpgrade.cost),
                         multiplier: productionUpgrade.multiplier,
-                        description: 'Need Description',
+                        description: "Need Description",
                         unlocked: false, active: false
                     };
 
@@ -443,18 +443,18 @@
                     for (let i = 0; i < upgradeNeeds.length; i++) {
                         let upgrade = {
                             type: upgradeParams.type,
-                            name: vm.adjectives.pop() + ' ' + upgradeParams.type + 's',
+                            name: vm.adjectives.pop() + " " + upgradeParams.type + "s",
                             needed: upgradeNeeds[i],
                             cost: Big(upgradeCosts[i]),
-                            description: 'Need Description',
+                            description: "Need Description",
                             unlocked: false,
                             active: false,
                         };
 
                         // TODO parse amount
-                        if (upgradeAmounts[i].substr(0, 1) == 'm') {
+                        if (upgradeAmounts[i].substr(0, 1) == "m") {
                             upgrade.multiplier = parseInt(upgradeAmounts[i].substr(1));
-                        } else if (upgradeAmounts[i].substr(0, 1) == 'a') {
+                        } else if (upgradeAmounts[i].substr(0, 1) == "a") {
                             upgrade.addition = parseInt(upgradeAmounts[i].substr(1));
                         }
 
@@ -468,7 +468,7 @@
                 GameData.productionAchievements.forEach(function (productionAchievement) {
                     let achievement = {
                         type: vm.currencyName,
-                        name: vm.adjectives.pop() + ' ' + vm.currencyName + 's',
+                        name: vm.adjectives.pop() + " " + vm.currencyName + "s",
                         unlocked: false,
                     };
 
@@ -488,7 +488,7 @@
 
                     let achievement = {
                         type: vm.buildingNames[upgradeIndex],
-                        name: vm.adjectives.pop() + ' ' + vm.buildingNames[upgradeIndex],
+                        name: vm.adjectives.pop() + " " + vm.buildingNames[upgradeIndex],
                         total: Big(buildingAchivement.total),
                         unlocked: false,
                     };
@@ -527,7 +527,7 @@
                     achievements: this.achievements,
                 };
 
-                localStorage.setItem('SaveGame', JSON.stringify(saveData));
+                localStorage.setItem("SaveGame", JSON.stringify(saveData));
             },
             loadGame: function (saveJson) {
                 let saveData = JSON.parse(saveJson);
@@ -633,8 +633,8 @@
             }
         },
         mounted: function () {
-            if (this.enableLoad && localStorage.getItem('SaveGame') != null) {
-                this.loadGame(localStorage.getItem('SaveGame'));
+            if (this.enableLoad && localStorage.getItem("SaveGame") != null) {
+                this.loadGame(localStorage.getItem("SaveGame"));
             } else {
                 this.newGame();
             }
@@ -709,7 +709,7 @@
     }
     
     .tooltips span:after {
-        content: '';
+        content: "";
         position: absolute;
         top: 100%;
         left: 50%;
