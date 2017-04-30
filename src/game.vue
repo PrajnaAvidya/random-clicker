@@ -70,7 +70,7 @@
         data: function () {
             return {
                 // disable for debug
-                enableLoad: false,
+                enableLoad: true,
 
                 // for fps calculations
                 lastFrame: 0,
@@ -618,117 +618,130 @@
             },
 
             // particles/effects
-            particleTest: function () {
-                function Particle(x, y, radius) {
-                    this.init(x, y, radius);
-                }
+            setupParticles: function () {
+                let vm = this;
 
-                Particle.prototype = {
+                let particleImage = new Image();
+                particleImage.src = '/static/cracker.png';
 
-                    init: function (x, y, radius) {
-
+                class CurrencyParticle {
+                    constructor(x, y) {
+                        this.init(x, y);
+                    };
+                    init(x, y) {
                         this.alive = true;
-
-                        this.radius = radius || 10;
-                        this.wander = 0.15;
-                        this.theta = random(TWO_PI);
-                        this.drag = 0.92;
-                        //this.color = '#fff';
+                        this.life = 1;
 
                         this.x = x || 0.0;
                         this.y = y || 0.0;
 
-                        this.vx = 0.0;
-                        this.vy = 0.0;
-                    },
+                        this.wander = random(0.5, 2.0);
+                        this.drag = random(0.9, 0.99);
 
-                    move: function () {
-                        this.x += this.vx;
-                        this.y += this.vy;
+                        this.vx = random(-5, 5);
+                        this.vy = random(-5, -2);
+                    };
+                    move() {
+                        if (this.alive) {
+                            this.x += this.vx;
+                            this.y += this.vy;
 
-                        this.vx *= this.drag;
-                        this.vy *= this.drag;
+                            this.vx *= this.drag;
+                            this.vy += 0.5;
 
-                        this.theta += random(-0.5, 0.5) * this.wander;
-                        this.vx += sin(this.theta) * 0.05;
-                        //this.vy += cos(this.theta) * 0.1;
-                        this.vy += 0.5;
+                            this.life *= 0.98;
+                            this.alive = this.life > 0.05;
+                        }
+                    };
+                    draw(ctx) {
+                        if (this.alive) {
+                            ctx.drawImage(particleImage, this.x, this.y, 40, 40);
+                        }
+                    };
+                }
 
-                        this.radius *= 0.96;
-                        this.alive = this.radius > 0.5;
-                    },
+                class NumberParticle {
+                    constructor(x, y) {
+                        this.init(x, y);
+                    };
+                    init(x, y, clickPower = 1) {
+                        this.alive = true;
+                        this.life = 1;
 
-                    draw: function (ctx) {
+                        this.x = x || 0.0;
+                        this.y = y || 0.0;
 
-                        /*ctx.beginPath();
-                        ctx.arc(this.x, this.y, this.radius, 0, TWO_PI);
-                        ctx.fillStyle = this.color;
-                        ctx.fill();*/
-                        let img = new Image();
-                        img.src = '/static/cracker.png';
-                        ctx.drawImage(img, this.x, this.y, 30, 30);
-                    }
-                };
+                        this.clickPower = clickPower;
+                    };
+                    move() {
+                        if (this.alive) {
+                            this.y -= 0.75;
+                            this.life -= 0.015;
+                            this.alive = this.life > 0.05;
+                        }
+                    };
+                    draw(ctx) {
+                        if (this.alive) {
+                            ctx.font = "bold 18px Helvetica Neue";
+                            ctx.fillStyle = "rgba(0, 0, 0, " + this.life + ")";
+                            ctx.fillText("+" + this.clickPower, this.x, this.y);
+                        }
+                    };
+                }
 
-                var MAX_PARTICLES = 100;
-                //var COLOURS = ['#69D2E7', '#A7DBD8', '#E0E4CC', '#F38630', '#FA6900', '#FF4E50', '#F9D423'];
-                var particles = [];
-                var pool = [];
+                let currencyParticles = [];
+                let currencyPool = [];
+                let numberParticles = [];
+                let numberPool = [];
+                let maxParticles = 50;
 
-                let demo = Sketch.create({
+                Sketch.create({
                     container: document.getElementById('currency'),
                     fullscreen: false,
                     width: 350,
                     height: 350,
                     click() {
-                        this.spawn(this.mouse.x, this.mouse.y);
+                        this.spawnCurrencyParticle(this.mouse.x, this.mouse.y);
+                        this.spawnNumberParticle(this.mouse.x, this.mouse.y);
                     },
 
-                    spawn(x, y) {
-                        var particle, theta, force;
-
-                        if (particles.length >= MAX_PARTICLES) {
-                            pool.push(particles.shift());
+                    spawnCurrencyParticle(x, y) {
+                        if (currencyParticles.length >= maxParticles) {
+                            currencyPool.push(currencyParticles.shift());
                         }
 
-                        particle = pool.length ? pool.pop() : new Particle();
-                        particle.init(x, y, random(5, 40));
+                        let particle = new CurrencyParticle();
+                        particle.init(x, y);
+                        currencyParticles.push(particle);
+                    },
 
-                        particle.wander = random(0.5, 2.0);
-                        //particle.color = random(COLOURS);
-                        particle.drag = random(0.9, 0.99);
+                    spawnNumberParticle(x, y) {
+                        if (numberParticles.length >= maxParticles) {
+                            numberPool.push(numberParticles.shift());
+                        }
 
-                        theta = random(TWO_PI);
-                        force = random(2, 8);
-
-                        particle.vx = sin(theta) * force;
-                        //particle.vy = cos(theta) * force;
-                        particle.vy = random(-10, -2);
-
-                        particles.push(particle);
+                        let particle = new NumberParticle();
+                        let clickPower = vm.$options.filters.round(vm.clickPower);
+                        particle.init(x, y, clickPower);
+                        numberParticles.push(particle);
                     },
 
                     update() {
-                        var i, particle;
-
-                        for (i = particles.length - 1; i >= 0; i--) {
-
-                            particle = particles[i];
-
-                            if (particle.alive) {
-                                particle.move();
-                            }
-                            else {
-                                pool.push(particles.splice(i, 1)[0]);
-                            }
+                        let i, particle;
+                        for (i = currencyParticles.length - 1; i >= 0; i--) {
+                            currencyParticles[i].move();
+                        }
+                        for (i = numberParticles.length - 1; i >= 0; i--) {
+                            numberParticles[i].move();
                         }
                     },
 
                     draw() {
-                        //this.globalCompositeOperation = 'lighter';
-
-                        for (var i = particles.length - 1; i >= 0; i--) {
-                            particles[i].draw(this);
+                        for (let i = currencyParticles.length - 1; i >= 0; i--) {
+                            currencyParticles[i].draw(this);
+                        }
+                        for (let i = numberParticles.length - 1; i >= 0; i--) {
+                            numberParticles[i].draw(this);
                         }
                     }
                 });
@@ -800,7 +813,8 @@
             // start tick loop (dynamic fps)
             window.requestAnimationFrame(this.tick);
 
-            this.particleTest();
+            // start particle effects
+            this.setupParticles();
         }
     }
 

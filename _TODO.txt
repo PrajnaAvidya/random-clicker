@@ -16,11 +16,10 @@ more achivements
 - also the dismissable achievements
 
 juice
-- click amount popup when clicking (particle effect)
 - ui overhaul
 - generated graphics
 - currency images
-- add juice/animations/etc
+- falling cracker effect
 - sound
 - themes per currency (ambitious)
 
