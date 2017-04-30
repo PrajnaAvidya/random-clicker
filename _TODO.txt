@@ -4,11 +4,10 @@ generated descriptions
 golden crackers
 upgrade/achievement costs based on formula instead of static?
 
-ui overhaul
-- prettier numbers (million/billion/trillion/etc)
-- currency images
-- add juice/animations/etc
-- sound
+more upgrades
+- rest of production upgrades
+- toddler forms
+- anything else?
 
 more achivements
 - building achievements
@@ -17,10 +16,15 @@ more achivements
 - tea (milk) + upgrades
 - also the dismissable achievements
 
-more upgrades
-- rest of production upgrades
-- toddler forms
-- anything else?
+juice
+- click amount popup when clicking
+- ui overhaul
+- generated graphics
+- prettier numbers (million/billion/trillion/etc)
+- currency images
+- add juice/animations/etc
+- sound
+- themes per currency (ambitious)
 
 menu
 -preferences

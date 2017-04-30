@@ -128,7 +128,7 @@
                         vm.clicks = vm.clicks.plus(clickAmount);
                         vm.currency = vm.currency.plus(clickAmount);
                         vm.totalCurrency = vm.totalCurrency.plus(clickAmount);
-                    }, i * 250 / loopAmount);
+                    }, i * 333 / loopAmount);
                 }
             },
             recalculateClickPower: function () {
