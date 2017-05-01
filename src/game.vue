@@ -664,12 +664,12 @@
                     constructor(x, y) {
                         this.init(x, y);
                     };
-                    init(x, y) {
+                    init(x = 0.0, y = 0.0) {
                         this.alive = true;
                         this.life = 1;
 
-                        this.x = x || 0.0;
-                        this.y = y || 0.0;
+                        this.x = x;
+                        this.y = y;
 
                         this.wander = random(0.5, 2.0);
                         this.drag = random(0.9, 0.99);
@@ -700,12 +700,12 @@
                     constructor(x, y) {
                         this.init(x, y);
                     };
-                    init(x, y, clickPower = 1) {
+                    init(x = 0.0, y = 0.0, clickPower = 1) {
                         this.alive = true;
                         this.life = 1;
 
-                        this.x = x || 0.0;
-                        this.y = y || 0.0;
+                        this.x = x + random(-10.0, 10.0);
+                        this.y = y;
 
                         this.clickPower = clickPower;
                     };
