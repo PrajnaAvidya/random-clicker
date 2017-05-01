@@ -525,6 +525,7 @@
             newGame: function () {
                 // get currency name & adjectives
                 this.currencyName = this.shuffleArray(GameData.currencies).pop();
+                document.title = this.currencyName + ' Clicker';
                 this.adjectives = this.shuffleArray(GameData.adjectives);
 
                 // generate stuff
@@ -566,6 +567,7 @@
                 let vm = this;
 
                 this.currencyName = saveData.currencyName;
+                document.title = this.currencyName + ' Clicker';
                 this.currency = Big(saveData.currency);
                 this.totalCurrency = Big(saveData.totalCurrency);
                 this.clicks = Big(saveData.clicks);
