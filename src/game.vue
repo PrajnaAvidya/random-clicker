@@ -124,6 +124,7 @@
                     showAchievements: false,
                     achievementCount: 0,
 
+                    buildingCostMultiplier: 0.15,
                     buildingNames: [],
                     buildings: [],
 
@@ -199,7 +200,7 @@
             },
             buildingCost: function (building) {
                 Big.RM = 3;
-                return building.baseCost.times(Big(1.15).pow(building.owned + this.buyAmount).minus(Big(1.15).pow(building.owned))).div(0.15).round();
+                return building.baseCost.times(Big(1 + this.buildingCostMultiplier).pow(building.owned + this.buyAmount).minus(Big(1 + this.buildingCostMultiplier).pow(building.owned))).div(this.buildingCostMultiplier).round();
             },
             buildingCount: function (buildingName) {
                 return this.buildings.find(function (building) {
@@ -554,6 +555,7 @@
                     showUpgrades: this.showUpgrades,
                     showAchievements: this.showAchievements,
                     achievementCount: this.achievementCount,
+                    buildingCostMultiplier: this.buildingCostMultiplier,
                     buildingNames: this.buildingNames,
                     buildings: this.buildings,
                     upgrades: this.upgrades,
@@ -578,6 +580,7 @@
                 this.showAchievements = saveData.showAchievements;
                 this.achievementCount = saveData.achievementCount;
                 this.buildingNames = saveData.buildingNames;
+                this.buildingCostMultiplier = saveData.buildingCostMultiplier;
 
                 // parse buildings/upgrades/achievements (cast numbers to big.js)
                 this.buildings = [];

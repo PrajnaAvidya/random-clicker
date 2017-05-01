@@ -1,5 +1,6 @@
 sell buildings
 generated descriptions
+- what if i sourced them from reddit thread titles or something?
 golden crackers
 upgrade/achievement costs based on formula instead of static?
 
@@ -18,9 +19,11 @@ more achivements
 
 juice
 - ui overhaul
--- clean up bootstrap grid
+-- replace left panel with canvas
+-- move cracker to canvas background
+--- cracker pulsating effect
 -- nicer tooltips
-- generated graphics
+- generated icons for buildings/upgrades
 - currency images
 - falling cracker effect
 - sound
