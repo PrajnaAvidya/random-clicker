@@ -525,7 +525,8 @@
             // setup/save
             newGame: function () {
                 // get currency name & adjectives
-                this.currencyName = this.shuffleArray(GameData.currencies).pop();
+                //this.currencyName = this.shuffleArray(GameData.currencies).pop();
+                this.currencyName = 'Cracker';
                 document.title = this.currencyName + ' Clicker';
                 this.adjectives = this.shuffleArray(GameData.adjectives);
 
