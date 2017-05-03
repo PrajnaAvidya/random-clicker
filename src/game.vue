@@ -480,7 +480,7 @@
                         if (upgradeAmounts[i].substr(0, 1) == "m") {
                             upgrade.multiplier = parseInt(upgradeAmounts[i].substr(1));
                         } else if (upgradeAmounts[i].substr(0, 1) == "a") {
-                            upgrade.addition = parseInt(upgradeAmounts[i].substr(1));
+                            upgrade.addition = parseFloat(upgradeAmounts[i].substr(1));
                         }
 
                         vm.upgrades.push(upgrade)
