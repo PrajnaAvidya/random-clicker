@@ -658,7 +658,7 @@
                 let vm = this;
 
                 let particleImage = new Image();
-                particleImage.src = '/static/cracker.png';
+                particleImage.src = '/static/cracker-small.png';
 
                 class CurrencyParticle {
                     constructor(x, y) {
