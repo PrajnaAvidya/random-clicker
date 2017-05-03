@@ -71,7 +71,7 @@
         <div class="row menu">
             <div class="col-md-3 col-md-offset-9">
                 <button class="btn btn-default" @click="saveGame()">Save Game</button>
-                <button class="btn btn-danger" @click="hardReset()">Hard Reset</button>
+                <!--button class="btn btn-danger" @click="hardReset()">Hard Reset</button-->
             </div>
         </div>
     </div>
@@ -525,7 +525,8 @@
             // setup/save
             newGame: function () {
                 // get currency name & adjectives
-                this.currencyName = this.shuffleArray(GameData.currencies).pop();
+                //this.currencyName = this.shuffleArray(GameData.currencies).pop();
+                this.currencyName = 'Cracker';
                 document.title = this.currencyName + ' Clicker';
                 this.adjectives = this.shuffleArray(GameData.adjectives);
 
