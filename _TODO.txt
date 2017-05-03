@@ -32,6 +32,8 @@ juice
 menu
 -preferences
 
+bugs:
+- cursor additive not working (showing as 0)
 
 6E = million
 9E = billion

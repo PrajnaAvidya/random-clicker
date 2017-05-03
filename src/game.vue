@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="row building" v-for="building in buildings" v-if="building.owned > 0 || showBuilding(building)">
-                        <div class="col-xs-3">
+                        <div class="col-xs-5">
                             <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="buildingText(building)"></span></span>
                             <span v-bind:class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
                             <br /> ({{ building.owned }} owned)
