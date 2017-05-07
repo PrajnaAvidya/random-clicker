@@ -3,18 +3,32 @@ generated descriptions
 - what if i sourced them from reddit thread titles or something?
 golden crackers
 upgrade/achievement costs based on formula instead of static?
+show purchase efficiency
+fractional clicks?
 
-more upgrades
-- rest of production upgrades
-- toddler forms
-- anything else?
+performance optimization
+- account for clickers and limit particle generation
+- learn about js performance profiling to find bottlenecks
+
+upgrade checklist
+DONE:
+- building 0 production
+- base production
+- clicking upgrades
+NOT DONE:
+- rest of the income multipler upgrades (dark chocolate-coated cookies+)
+- building 1 forms (grandma types)
+- synergies (heavenly upgrade)
+- kitten upgrades
+- golden cracker upgrades
+- heavenly chip upgrades
 
 more achivements
 - building achievements
 - sell achivements
 - click achievements
 - click speed
-- tea (milk) + upgrades
+- tea (milk)
 - also the dismissable achievements
 
 juice

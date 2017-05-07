@@ -71,7 +71,7 @@
         <div class="row menu">
             <div class="col-md-3 col-md-offset-9">
                 <button class="btn btn-default" @click="saveGame()">Save Game</button>
-                <!--button class="btn btn-danger" @click="hardReset()">Hard Reset</button-->
+                <button class="btn btn-danger" @click="hardReset()">Hard Reset</button>
             </div>
         </div>
     </div>
@@ -113,7 +113,7 @@
                     lastFrame: 0,
 
                     currencyName: null,
-                    currency: Big(0),
+                    currency: Big(1E21),
                     totalCurrency: Big(0),
                     currencySuffix: '',
                     clicks: Big(0),
@@ -139,10 +139,18 @@
 
             // clicking/cps
             click: function () {
+                // skip loop if cps is too high
+                if (this.cps.gte(this.clickPower.times(10))) {
+                    this.clicks = this.clicks.plus(this.clickPower);
+                    this.currency = this.currency.plus(this.clickPower);
+                    this.totalCurrency = this.totalCurrency.plus(this.clickPower);
+                    return;
+                }
+
                 let vm = this;
-                let loopAmount = Big(10);
+                let loopAmount = 10;
                 if (this.clickPower < 10) {
-                    loopAmount = Big(this.clickPower);
+                    loopAmount = this.clickPower;
                 }
                 let clickAmount = this.clickPower.div(loopAmount);
                 for (let i = 0; i < loopAmount; i++) {
@@ -154,7 +162,9 @@
                 }
             },
             recalculateClickPower: function () {
-                this.clickPower = this.upgradeMultiplier(this.buildingNames[0]).plus(this.upgradeAddition());
+                let clickPower = this.upgradeMultiplier(this.buildingNames[0]).plus(this.upgradeAddition());
+                let cpsMultiplierBonus = this.upgradeMultiplier('Clicking').minus(1).times(this.cps);
+                this.clickPower = clickPower.plus(cpsMultiplierBonus);
             },
             recalculateCps: function () {
                 let cps = Big(0);
@@ -254,16 +264,21 @@
                     if (this.currency.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
-                    } else {
-                        return false;
                     }
+
+                    return false;
                 } else {
-                    if (this.buildingCount(upgrade.type) >= upgrade.needed) {
+                    if (upgrade.type == 'Clicking') {
+                        if (this.clicks.gte(upgrade.cost)) {
+                            upgrade.unlocked = true;
+                            return true;
+                        }
+                    } else if (this.buildingCount(upgrade.type) >= upgrade.needed) {
                         upgrade.unlocked = true;
                         return true;
-                    } else {
-                        return false;
                     }
+
+                    return false;
                 }
             },
             canSeeUpgrade: function (upgrade) {
@@ -271,23 +286,28 @@
                     return true;
                 }
 
-                if (upgrade.type != this.currencyName && this.buildingCount(upgrade.type) == 0) {
+                if (upgrade.type != 'Clicking' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) == 0) {
                     return false;
                 }
                 if (upgrade.type == this.currencyName) {
                     if (this.currency.gte(upgrade.needed / 10)) {
                         upgrade.unlocked = true;
                         return true;
-                    } else {
-                        return false;
                     }
+
+                    return false;
                 } else {
-                    if (upgrade.cost == this.nextUpgrade(upgrade.type).cost) {
+                    if (upgrade.type == 'Clicking') {
+                        if (this.clicks.gte(upgrade.needed)) {
+                            upgrade.unlocked = true;
+                            return true;
+                        }
+                    } else if (upgrade.cost == this.nextUpgrade(upgrade.type).cost) {
                         upgrade.unlocked = true;
                         return true;
-                    } else {
-                        return false;
                     }
+
+                    return false;
                 }
             },
             buyUpgrade: function (upgrade) {
@@ -312,6 +332,7 @@
                 });
             },
             upgradeMultiplier: function (buildingType) {
+
                 let multiplier = Big(1);
                 this.activeUpgrades(buildingType).forEach(function (upgrade) {
                     if (upgrade.multiplier != null) {
@@ -340,7 +361,9 @@
             },
             upgradeText: function (upgrade) {
                 let upgradeText = '';// upgrade.description;
-                if (upgrade.multiplier != null) {
+                if (upgrade.type == 'Clicking') {
+                    upgradeText += 'Clicking gains 1% of your ' + this.currencyName + ' per second';
+                } else if (upgrade.multiplier != null) {
                     upgradeText += "Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
                     if (upgrade.type == this.buildingNames[0]) {
                         upgradeText += "<br/>Also multiplies clicks";
@@ -351,7 +374,7 @@
                         upgradeText += "<br/>Also adds to clicks";
                     }
                 }
-                if (upgrade.type != this.currencyName && this.buildingCount(upgrade.type) < upgrade.needed) {
+                if (upgrade.type != 'Clicking' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) < upgrade.needed) {
                     upgradeText += "Requires " + upgrade.needed + " " + upgrade.type;
                 }
 
@@ -438,6 +461,8 @@
             },
             generateUpgrades: function () {
                 let vm = this;
+
+                // cps upgrades
                 GameData.productionUpgrades.forEach(function (productionUpgrade) {
                     let upgrade = {
                         type: vm.currencyName,
@@ -452,6 +477,7 @@
                     vm.upgrades.push(upgrade)
                 });
 
+                // building upgrades
                 GameData.buildingUpgradeCosts.forEach(function (upgradeParams) {
                     let upgradeIndex = upgradeParams.type;
                     upgradeParams.type = vm.buildingNames[upgradeIndex];
@@ -485,6 +511,22 @@
 
                         vm.upgrades.push(upgrade)
                     }
+                });
+
+                // clicking upgrades
+                GameData.clickingUpgrades.forEach(function (upgradeParams) {
+                    let upgrade = {
+                        type: 'Clicking',
+                        name: vm.adjectives.pop() + " Mouse",
+                        multiplier: upgradeParams.multiplier,
+                        needed: Big(upgradeParams.needed),
+                        cost: Big(upgradeParams.cost),
+                        description: "Need Description",
+                        unlocked: false,
+                        active: false,
+                    };
+
+                    vm.upgrades.push(upgrade)
                 });
             },
             generateAchievements: function () {
@@ -861,46 +903,46 @@
     #game {
         padding: 50px;
     }
-    
+
     .totals,
     .currency {
         text-align: center;
     }
-    
+
     .currency {
         height: 350px;
         background-image: url("/static/cracker.png");
         background-position: center;
         background-repeat: no-repeat;
     }
-    
+
     .buy-sell-buttons {
         margin-bottom: 20px;
     }
-    
+
     .upgrade-link {
         text-decoration: underline;
     }
-    
+
     .buildings,
     .upgrades,
     .achievements {
         margin-top: 50px;
     }
-    
+
     .building {
         margin-bottom: 10px;
     }
-    
+
     .upgrade {
         margin-bottom: 5px;
     }
-    
+
     .menu {
         margin-top: 50px;
     }
     /* "spoiler" effect */
-    
+
     .redacted {
         color: black;
         background-color: black;
@@ -911,12 +953,12 @@
         background: -moz-linear-gradient(180deg, #000, #222);
     }
     /* tooltips */
-    
+
     .tooltips {
         position: relative;
         display: inline;
     }
-    
+
     .tooltips span {
         position: absolute;
         width: 300px;
@@ -931,7 +973,7 @@
         padding-right: 5px;
         padding-left: 5px;
     }
-    
+
     .tooltips span:after {
         content: "";
         position: absolute;
@@ -944,7 +986,7 @@
         border-right: 8px solid transparent;
         border-left: 8px solid transparent;
     }
-    
+
      :hover.tooltips span {
         visibility: visible;
         opacity: 0.8;

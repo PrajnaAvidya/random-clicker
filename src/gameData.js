@@ -2,33 +2,47 @@ import Big from "big.js";
 
 export default {
     buildings: [
-        { name: 0, baseCost: Big(15), baseCps: Big(0.1), description: "" },
+        // cursor
+        { name: 0, baseCost: Big(15), baseCps: Big(0.1) },
 
-        { name: 1, baseCost: Big(100), baseCps: Big(1), description: "" },
+        // grandma
+        { name: 1, baseCost: Big(100), baseCps: Big(1) },
 
-        { name: 2, baseCost: Big(1100), baseCps: Big(8), description: "" },
+        // farm
+        { name: 2, baseCost: Big(1100), baseCps: Big(8) },
 
-        { name: 3, baseCost: Big(12000), baseCps: Big(47), description: "" },
+        // mine
+        { name: 3, baseCost: Big(12000), baseCps: Big(47) },
 
-        { name: 4, baseCost: Big(130000), baseCps: Big(260), description: "" },
+        // factory
+        { name: 4, baseCost: Big(130000), baseCps: Big(260) },
 
-        { name: 5, baseCost: Big(1.4E6), baseCps: Big(1400), description: "" },
+        // bank
+        { name: 5, baseCost: Big(1.4E6), baseCps: Big(1400) },
 
-        { name: 6, baseCost: Big(20E6), baseCps: Big(7800), description: "" },
+        // temple
+        { name: 6, baseCost: Big(20E6), baseCps: Big(7800) },
 
-        { name: 7, baseCost: Big(330E6), baseCps: Big(44000), description: "" },
+        // wizard tower
+        { name: 7, baseCost: Big(330E6), baseCps: Big(44000) },
 
-        { name: 8, baseCost: Big(5.1E9), baseCps: Big(260000), description: "" },
+        // shipment
+        { name: 8, baseCost: Big(5.1E9), baseCps: Big(260000) },
 
-        { name: 9, baseCost: Big(75E9), baseCps: Big(1.6E6), description: "" },
+        // alchemy lab
+        { name: 9, baseCost: Big(75E9), baseCps: Big(1.6E6) },
 
-        { name: 10, baseCost: Big(1E12), baseCps: Big(10E6), description: "" },
+        // portal
+        { name: 10, baseCost: Big(1E12), baseCps: Big(10E6) },
 
-        { name: 11, baseCost: Big(14E12), baseCps: Big(65E6), description: "" },
+        // time machine
+        { name: 11, baseCost: Big(14E12), baseCps: Big(65E6) },
 
-        { name: 12, baseCost: Big(170E12), baseCps: Big(430E6), description: "" },
+        // antimatter condenser
+        { name: 12, baseCost: Big(170E12), baseCps: Big(430E6) },
 
-        { name: 13, baseCost: Big(2.1E15), baseCps: Big(2.9E12), description: "" },
+        // prism
+        { name: 13, baseCost: Big(2.1E15), baseCps: Big(2.9E12) },
     ],
 
     buildingUpgradeNeeds: [
@@ -45,6 +59,22 @@ export default {
 
         // everything else
         ["m2", "m2", "m2", "m2", "m2", "m2", "m2", "m2"],
+    ],
+
+    clickingUpgrades: [
+        { needed: Big(1000), cost: Big(50000), multiplier: 1.01 },
+        { needed: Big(100000), cost: Big(5E6), multiplier: 1.01 },
+        { needed: Big(10E6), cost: Big(500E6), multiplier: 1.01 },
+        { needed: Big(1E9), cost: Big(50E9), multiplier: 1.01 },
+        { needed: Big(100E9), cost: Big(5E12), multiplier: 1.01 },
+        { needed: Big(10E12), cost: Big(500E12), multiplier: 1.01 },
+        { needed: Big(1E15), cost: Big(50E15), multiplier: 1.01 },
+        { needed: Big(100E15), cost: Big(5E18), multiplier: 1.01 },
+        { needed: Big(10E18), cost: Big(500E18), multiplier: 1.01 },
+    ],
+
+    tierTwoTypes: [
+
     ],
 
     buildingUpgradeCosts: [
@@ -88,16 +118,16 @@ export default {
     ],
 
     productionUpgrades: [
-        { needed: Big(50000), cost: Big(999999), multiplier: 1.01, description: "" },
-        { needed: Big(250000), cost: Big(5E6), multiplier: 1.01, description: "" },
-        { needed: Big(500000), cost: Big(10E6), multiplier: 1.01, description: "" },
-        { needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01, description: "" },
-        { needed: Big(5E6), cost: Big(100E6), multiplier: 1.01, description: "" },
-        { needed: Big(25E6), cost: Big(500E6), multiplier: 1.02, description: "" },
-        { needed: Big(50E6), cost: Big(1E9), multiplier: 1.02, description: "" },
-        { needed: Big(250E6), cost: Big(5E9), multiplier: 1.02, description: "" },
-        { needed: Big(500E6), cost: Big(10E9), multiplier: 1.02, description: "" },
-        { needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02, description: "" },
+        { needed: Big(50000), cost: Big(999999), multiplier: 1.01 },
+        { needed: Big(250000), cost: Big(5E6), multiplier: 1.01 },
+        { needed: Big(500000), cost: Big(10E6), multiplier: 1.01 },
+        { needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01 },
+        { needed: Big(5E6), cost: Big(100E6), multiplier: 1.01 },
+        { needed: Big(25E6), cost: Big(500E6), multiplier: 1.02 },
+        { needed: Big(50E6), cost: Big(1E9), multiplier: 1.02 },
+        { needed: Big(250E6), cost: Big(5E9), multiplier: 1.02 },
+        { needed: Big(500E6), cost: Big(10E9), multiplier: 1.02 },
+        { needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02 },
         // TODO 4% etc
     ],
 
