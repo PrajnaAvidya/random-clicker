@@ -1,12 +1,12 @@
-sell buildings
-generated descriptions
-- what if i sourced them from reddit thread titles or something?
-golden crackers
-upgrade/achievement costs based on formula instead of static?
-show purchase efficiency
-fractional clicks?
+features
+- sell buildings
+- generated descriptions
+-- what if i sourced them from reddit thread titles or something?
+- golden crackers
+- upgrade/achievement costs based on formula instead of static?
+- show purchase efficiency
 
-performance optimization
+performance
 - account for clickers and limit particle generation
 - learn about js performance profiling to find bottlenecks
 

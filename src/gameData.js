@@ -73,8 +73,10 @@ export default {
         { needed: Big(10E18), cost: Big(500E18), multiplier: 1.01 },
     ],
 
-    tierTwoTypes: [
-
+    tierOneUpgradeTypes: [
+        // TODO requires 15 buildingType & 1 tier1 building.
+        // makes tier1 twice as efficient and +1% CpS per n/tier1 where n is upgrade #
+        { 'buildingType': 2, cost: Big(55000) }
     ],
 
     buildingUpgradeCosts: [

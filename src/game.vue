@@ -70,9 +70,13 @@
 
         <div class="row menu">
             <div class="col-md-3 col-md-offset-9">
-                <button class="btn btn-default" @click="saveGame()">Save Game</button>
-                <button class="btn btn-danger" @click="hardReset()">Hard Reset</button>
+                <button class="btn btn-default" @click="saveGame">Save Game</button>
+                <button class="btn btn-danger" @click="hardReset">Hard Reset</button>
             </div>
+        </div>
+
+        <div class="golden" @click="clickGolden">
+            <img src="/static/cracker-golden.png">
         </div>
     </div>
 </template>
@@ -88,7 +92,7 @@
         },
 
         computed: {
-            sortedUpgrades: function () {
+            sortedUpgrades() {
                 if (!this._sortedUpgrades) {
                     // sort upgrades by cost (1 time)
                     let sortedUpgrades = this.upgrades;
@@ -104,7 +108,7 @@
 
         methods: {
             // default data
-            defaultData: function () {
+            defaultData() {
                 return {
                     // disable for debug
                     enableLoad: true,
@@ -113,7 +117,7 @@
                     lastFrame: 0,
 
                     currencyName: null,
-                    currency: Big(1E21),
+                    currency: Big(0),
                     totalCurrency: Big(0),
                     currencySuffix: '',
                     clicks: Big(0),
@@ -138,7 +142,7 @@
             },
 
             // clicking/cps
-            click: function () {
+            click() {
                 // skip loop if cps is too high
                 if (this.cps.gte(this.clickPower.times(10))) {
                     this.clicks = this.clicks.plus(this.clickPower);
@@ -161,12 +165,12 @@
                     }, i * 333 / loopAmount);
                 }
             },
-            recalculateClickPower: function () {
+            recalculateClickPower() {
                 let clickPower = this.upgradeMultiplier(this.buildingNames[0]).plus(this.upgradeAddition());
                 let cpsMultiplierBonus = this.upgradeMultiplier('Clicking').minus(1).times(this.cps);
                 this.clickPower = clickPower.plus(cpsMultiplierBonus);
             },
-            recalculateCps: function () {
+            recalculateCps() {
                 let cps = Big(0);
                 let vm = this;
                 this.ownedBuildings().forEach(function (building) {
@@ -185,16 +189,16 @@
             },
 
             // buildings
-            showBuilding: function (building) {
+            showBuilding(building) {
                 if (building.unlocked == false && this.totalCurrency.gte(building.baseCost)) {
                     building.unlocked = true;
                 }
                 return this.totalCurrency.gte(building.showAt);
             },
-            canBuyBuilding: function (building) {
+            canBuyBuilding(building) {
                 return this.currency.gte(this.buildingCost(building, this.buyAmount));
             },
-            buyBuilding: function (building) {
+            buyBuilding(building) {
                 if (this.canBuyBuilding(building, this.buyAmount)) {
                     this.currency = this.currency.minus(this.buildingCost(building));
                     building.owned += this.buyAmount;
@@ -208,16 +212,16 @@
                     this.checkAchievements();
                 }
             },
-            buildingCost: function (building) {
+            buildingCost(building) {
                 Big.RM = 3;
                 return building.baseCost.times(Big(1 + this.buildingCostMultiplier).pow(building.owned + this.buyAmount).minus(Big(1 + this.buildingCostMultiplier).pow(building.owned))).div(this.buildingCostMultiplier).round();
             },
-            buildingCount: function (buildingName) {
+            buildingCount(buildingName) {
                 return this.buildings.find(function (building) {
                     return building.name == buildingName;
                 }).owned;
             },
-            otherBuildingCount: function (buildingName) {
+            otherBuildingCount(buildingName) {
                 let buildingCount = 0;
                 this.buildings.find(function (building) {
                     if (building.name != buildingName) {
@@ -226,12 +230,12 @@
                 });
                 return buildingCount;
             },
-            ownedBuildings: function () {
+            ownedBuildings() {
                 return this.buildings.filter(function (building) {
                     return building.owned > 0;
                 });
             },
-            buildingText: function (building) {
+            buildingText(building) {
                 if (building.unlocked == false) {
                     return null;
                 }
@@ -242,12 +246,12 @@
                 buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " " + this.currencyName + "s per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
                 return buildingText;
             },
-            setBuyAmount: function (amount) {
+            setBuyAmount(amount) {
                 this.buyAmount = amount;
 
                 this.recalculateBuyCosts();
             },
-            recalculateBuyCosts: function () {
+            recalculateBuyCosts() {
                 let vm = this;
                 this.buildings.forEach(function (building) {
                     building.buyCost = vm.buildingCost(building);
@@ -255,7 +259,7 @@
             },
 
             // upgrades
-            canBuyUpgrade: function (upgrade) {
+            canBuyUpgrade(upgrade) {
                 if (upgrade.unlocked == true) {
                     return true;
                 }
@@ -281,7 +285,7 @@
                     return false;
                 }
             },
-            canSeeUpgrade: function (upgrade) {
+            canSeeUpgrade(upgrade) {
                 if (upgrade.unlocked == true) {
                     return true;
                 }
@@ -310,7 +314,7 @@
                     return false;
                 }
             },
-            buyUpgrade: function (upgrade) {
+            buyUpgrade(upgrade) {
                 if (this.canBuyUpgrade(upgrade) && this.currency.gte(upgrade.cost)) {
                     this.currency = this.currency.minus(upgrade.cost);
                     upgrade.active = true;
@@ -320,18 +324,18 @@
                     this.checkAchievements();
                 }
             },
-            activeUpgrades: function (buildingType) {
+            activeUpgrades(buildingType) {
                 return this.upgrades.filter(function (upgrade) {
                     return upgrade.active && upgrade.type == buildingType;
                 });
             },
-            nextUpgrade: function (buildingType) {
+            nextUpgrade(buildingType) {
                 let vm = this;
                 return this.upgrades.find(function (upgrade) {
                     return !upgrade.active && upgrade.type == buildingType && upgrade.needed > vm.buildingCount(buildingType);
                 });
             },
-            upgradeMultiplier: function (buildingType) {
+            upgradeMultiplier(buildingType) {
 
                 let multiplier = Big(1);
                 this.activeUpgrades(buildingType).forEach(function (upgrade) {
@@ -341,7 +345,7 @@
                 });
                 return multiplier;
             },
-            upgradeAddition: function () {
+            upgradeAddition() {
                 let addition = Big(0);
                 this.activeUpgrades(this.buildingNames[0]).forEach(function (upgrade) {
                     if (upgrade.addition != null) {
@@ -350,7 +354,7 @@
                 });
                 return addition * this.otherBuildingCount(this.buildingNames[0]);
             },
-            upgradeProduction: function () {
+            upgradeProduction() {
                 let production = 1;
                 this.activeUpgrades(this.currencyName).forEach(function (upgrade) {
                     if (upgrade.multiplier != null) {
@@ -359,7 +363,7 @@
                 });
                 return production;
             },
-            upgradeText: function (upgrade) {
+            upgradeText(upgrade) {
                 let upgradeText = '';// upgrade.description;
                 if (upgrade.type == 'Clicking') {
                     upgradeText += 'Clicking gains 1% of your ' + this.currencyName + ' per second';
@@ -375,14 +379,19 @@
                     }
                 }
                 if (upgrade.type != 'Clicking' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) < upgrade.needed) {
-                    upgradeText += "Requires " + upgrade.needed + " " + upgrade.type;
+                    upgradeText += "<br/>Requires " + upgrade.needed + " " + upgrade.type;
                 }
 
                 return upgradeText;
             },
 
+            // golden
+            clickGolden() {
+                console.log("Golden!");
+            },
+
             // achievements
-            checkAchievements: function () {
+            checkAchievements() {
                 let vm = this;
                 this.lockedAchievements().forEach(function (achievement) {
                     if (achievement.cps != null) {
@@ -404,17 +413,17 @@
                     }
                 });
             },
-            lockedAchievements: function () {
+            lockedAchievements() {
                 return this.achievements.filter(function (achievement) {
                     return achievement.unlocked == false;
                 });
             },
-            unlockAchievement: function (achievement) {
+            unlockAchievement(achievement) {
                 achievement.unlocked = true;
                 this.achievementCount++;
                 this.showAchievements = true;
             },
-            achievementText: function (achievement) {
+            achievementText(achievement) {
                 if (achievement.cps != null) {
                     return "Reached a total of " + achievement.cps + " " + this.currencyName + "/sec";
                 } else if (achievement.clicks != null) {
@@ -427,7 +436,7 @@
             },
 
             // tick function
-            tick: function (timestamp) {
+            tick(timestamp) {
                 let progress = timestamp - this.lastFrame;
                 this.lastFrame = timestamp;
 
@@ -439,7 +448,7 @@
             },
 
             // generate stuff
-            generateBuildings: function () {
+            generateBuildings() {
                 let buildingNames = this.shuffleArray(GameData.buildingNames);
                 for (let i = 0; i < GameData.buildings.length; i++) {
                     let buildingName = buildingNames.pop();
@@ -459,7 +468,7 @@
                     this.buildingNames.push(buildingName);
                 }
             },
-            generateUpgrades: function () {
+            generateUpgrades() {
                 let vm = this;
 
                 // cps upgrades
@@ -529,7 +538,7 @@
                     vm.upgrades.push(upgrade)
                 });
             },
-            generateAchievements: function () {
+            generateAchievements() {
                 let vm = this;
 
                 GameData.productionAchievements.forEach(function (productionAchievement) {
@@ -565,7 +574,7 @@
             },
 
             // setup/save
-            newGame: function () {
+            newGame() {
                 // get currency name & adjectives
                 //this.currencyName = this.shuffleArray(GameData.currencies).pop();
                 this.currencyName = 'Cracker';
@@ -580,13 +589,13 @@
                 // save fresh game
                 this.saveGame();
             },
-            hardReset: function () {
+            hardReset() {
                 if (confirm("Are you sure?")) {
                     Object.assign(this.$data, this.defaultData())
                     this.newGame();
                 }
             },
-            saveGame: function () {
+            saveGame() {
                 let saveData = {
                     currencyName: this.currencyName,
                     currency: this.currency,
@@ -607,7 +616,7 @@
 
                 localStorage.setItem("SaveGame", JSON.stringify(saveData));
             },
-            loadGame: function (saveJson) {
+            loadGame(saveJson) {
                 let saveData = JSON.parse(saveJson);
                 let vm = this;
 
@@ -686,7 +695,7 @@
             },
 
             // randomize array
-            shuffleArray: function (array) {
+            shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     let j = Math.floor(Math.random() * (i + 1));
                     let temp = array[i];
@@ -697,7 +706,7 @@
             },
 
             // particles/canvas effects
-            setupParticles: function () {
+            setupParticles() {
                 let vm = this;
 
                 let particleImage = new Image();
@@ -827,7 +836,7 @@
             },
         },
         filters: {
-            round: function (value) {
+            round(value) {
                 if (isNaN(value)) {
                     return 0;
                 }
@@ -850,7 +859,7 @@
                     return displayedValue.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
                 }
             },
-            currency: function (value) {
+            currency(value) {
                 if (isNaN(value)) {
                     return 0;
                 }
@@ -872,7 +881,7 @@
                 }
             }
         },
-        mounted: function () {
+        mounted() {
             if (this.enableLoad && localStorage.getItem("SaveGame") != null) {
                 this.loadGame(localStorage.getItem("SaveGame"));
             } else {
@@ -936,6 +945,13 @@
 
     .upgrade {
         margin-bottom: 5px;
+    }
+
+    .golden {
+        position: absolute;
+        opacity: 0.75;
+        top: 250px;
+        right: 650px;
     }
 
     .menu {
