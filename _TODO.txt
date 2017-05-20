@@ -1,5 +1,5 @@
 bugs:
-- something in the sortedUpgrades v-for is broken
+- GameData needs to be reloaded from scratch every time you hard reset
 - inconsistent vertical spacing in unlocked buildings
 
 core features
