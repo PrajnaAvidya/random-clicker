@@ -20,19 +20,19 @@
                     <h3>Buildings</h3>
 
                     <div class="buy-sell-buttons">
-                        <v-btn light default v-bind:class="{ active:this.buyAmount == 1 }" @click="setBuyAmount(1)">Buy 1</v-btn>
-                        <v-btn light default class="btn btn-default" v-bind:class="{ active:this.buyAmount == 10 }" @click="setBuyAmount(10)">Buy 10</v-btn>
-                        <v-btn light default class="btn btn-default" v-bind:class="{ active:this.buyAmount == 100 }" @click="setBuyAmount(100)">Buy 100</v-btn>
+                        <v-btn light default :class="{ active:this.buyAmount == 1 }" @click.native="setBuyAmount(1)">Buy 1</v-btn>
+                        <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 10 }" @click.native="setBuyAmount(10)">Buy 10</v-btn>
+                        <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
                     </div>
 
-                    <v-row class="building" v-for="building in buildings" v-bind:data="buildings" v-bind:key="building" v-if="building.owned > 0 || showBuilding(building)">
+                    <v-row class="building" v-for="building in buildings" :data="buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
                         <v-col xs5>
                             <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
-                            <span v-bind:class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
+                            <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
                             <br /> ({{ building.owned }} owned)
                         </v-col>
                         <v-col xs7>
-                            <v-btn light default class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
+                            <v-btn light default class="btn btn-default" @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
                         </v-col>
                     </v-row>
                 </v-row>
@@ -42,7 +42,7 @@
                 <v-row class="upgrades" v-if="showUpgrades">
                     <h3>Upgrades</h3>
 
-                    <div class="upgrade" v-for="upgrade in sortedUpgrades" v-bind:data="sortedUpgrades" v-bind:key="upgrade" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
+                    <div class="upgrade" v-for="upgrade in sortedUpgrades" :data="sortedUpgrades" :key="upgrade" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
                         <span v-tooltip:top="{ html: upgradeText(upgrade) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
                         <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                     </div>
@@ -51,14 +51,14 @@
                 <v-row class="achievements" v-if="showAchievements">
                     <h3>Achievements</h3>
 
-                    <div v-for="achievement in achievements" v-bind:data="achievements" v-bind:key="achievement" v-if="achievement.unlocked">
+                    <div v-for="achievement in achievements" :data="achievements" :key="achievement" v-if="achievement.unlocked">
                         <span v-tooltip:top="{ html: achievementText(achievement) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>                        {{ achievement.name }}
                     </div>
                 </v-row>
 
                 <div class="game-utils">
-                    <v-btn light default class="btn btn-default" @click="saveGame">Save Game</v-btn>
-                    <v-btn light error default class="btn btn-danger" @click="hardReset">Hard Reset</v-btn>
+                    <v-btn light default class="btn btn-default" @click.native="saveGame">Save Game</v-btn>
+                    <v-btn light error default class="btn btn-danger" @click.native="hardReset">Hard Reset</v-btn>
                 </div>
             </v-col>
         </v-row>
@@ -106,7 +106,7 @@
 
                     currencyName: null,
                     currency: Big(0),
-                    startingCurrency: Big(1E12),
+                    startingCurrency: Big(0),
                     totalCurrency: Big(0),
                     currencySuffix: '',
                     clicks: Big(0),
@@ -247,6 +247,7 @@
             },
             setBuyAmount(amount) {
                 this.buyAmount = amount;
+                console.log(this.buyAmount);
 
                 this.recalculateBuyCosts();
             },
@@ -1003,6 +1004,10 @@
         opacity: 0.75;
         top: 250px;
         right: 650px;
+    }
+
+    .active {
+        filter: brightness(85%);
     }
 
     .redacted {
