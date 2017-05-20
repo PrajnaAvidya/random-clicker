@@ -1,72 +1,91 @@
 <template>
-    <v-container fluid="fluid">
-        <v-row>
-            <v-col md5>
-                <v-row class="totals">
+    <v-app>
+        <v-container fluid="fluid">
+            <v-row>
+                <v-col md5>
+                    <v-row class="totals">
 
-                    <h2>{{ currency | currency }} {{ currencyName}}s</h2>
+                        <h2>{{ currency | currency }} {{ currencyName}}s</h2>
 
-                    <h3>Per second: {{ displayedCps | round }}</h3>
+                        <h3>Per second: {{ displayedCps | round }}</h3>
 
-                    <h4>Per click: {{ displayedClickPower | currency }}</h4>
+                        <h4>Per click: {{ displayedClickPower | currency }}</h4>
 
-                </v-row>
-
-                <div class="row currency" id="currency" @click="click"></div>
-            </v-col>
-
-            <v-col md4>
-                <v-row class="buildings">
-                    <h3>Buildings</h3>
-
-                    <div class="buy-sell-buttons">
-                        <v-btn light default :class="{ active:this.buyAmount == 1 }" @click.native="setBuyAmount(1)">Buy 1</v-btn>
-                        <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 10 }" @click.native="setBuyAmount(10)">Buy 10</v-btn>
-                        <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
-                    </div>
-
-                    <v-row class="building" v-for="building in buildings" :data="buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
-                        <v-col xs5>
-                            <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
-                            <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
-                            <br /> ({{ building.owned }} owned)
-                        </v-col>
-                        <v-col xs7>
-                            <v-btn light default class="btn btn-default" @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
-                        </v-col>
                     </v-row>
-                </v-row>
-            </v-col>
 
-            <v-col md3>
-                <v-row class="upgrades" v-if="showUpgrades">
-                    <h3>Upgrades</h3>
+                    <div class="row currency" id="currency" @click="click"></div>
+                </v-col>
 
-                    <div class="upgrade" v-for="upgrade in sortedUpgrades" :data="sortedUpgrades" :key="upgrade" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                        <span v-tooltip:top="{ html: upgradeText(upgrade) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
-                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
+                <v-col md4>
+                    <v-row class="buildings">
+                        <h3>Buildings</h3>
+
+                        <div class="buy-sell-buttons">
+                            <v-btn light default :class="{ active:this.buyAmount == 1 }" @click.native="setBuyAmount(1)">Buy 1</v-btn>
+                            <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 10 }" @click.native="setBuyAmount(10)">Buy 10</v-btn>
+                            <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
+                        </div>
+
+                        <v-row class="building" v-for="building in buildings" :data="buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
+                            <v-col xs5>
+                                <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
+                                <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
+                                <br /> ({{ building.owned }} owned)
+                            </v-col>
+                            <v-col xs7>
+                                <v-btn light default class="btn btn-default" @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-row>
+                </v-col>
+
+                <v-col md3>
+                    <v-row class="upgrades" v-if="showUpgrades">
+                        <h3>Upgrades</h3>
+
+                        <div class="upgrade" v-for="upgrade in sortedUpgrades" :data="sortedUpgrades" :key="upgrade" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
+                            <span v-tooltip:top="{ html: upgradeText(upgrade) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
+                            <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
+                        </div>
+                    </v-row>
+
+                    <v-row class="achievements" v-if="showAchievements">
+                        <h3>Achievements</h3>
+
+                        <div v-for="achievement in achievements" :data="achievements" :key="achievement" v-if="achievement.unlocked">
+                            <span v-tooltip:top="{ html: achievementText(achievement) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>                            {{ achievement.name }}
+                        </div>
+                    </v-row>
+
+                    <div class="game-utils">
+                        <v-btn light default class="btn btn-default" @click.native="saveGame">Save Game</v-btn>
+                        <v-btn light error default class="btn btn-danger" @click.native="hardReset">Hard Reset</v-btn>
                     </div>
-                </v-row>
+                </v-col>
+            </v-row>
 
-                <v-row class="achievements" v-if="showAchievements">
-                    <h3>Achievements</h3>
-
-                    <div v-for="achievement in achievements" :data="achievements" :key="achievement" v-if="achievement.unlocked">
-                        <span v-tooltip:top="{ html: achievementText(achievement) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>                        {{ achievement.name }}
-                    </div>
-                </v-row>
-
-                <div class="game-utils">
-                    <v-btn light default class="btn btn-default" @click.native="saveGame">Save Game</v-btn>
-                    <v-btn light error default class="btn btn-danger" @click.native="hardReset">Hard Reset</v-btn>
-                </div>
-            </v-col>
-        </v-row>
-
-        <!--div class="golden" @click="clickGolden">
+            <!--div class="golden" @click="clickGolden">
             <img src="/static/cracker-golden.png">
         </div-->
-    </v-container>
+
+            <v-dialog v-model="bonusDialog">
+                <v-card>
+                    <v-card-row>
+                        <v-card-title>Bonus {{ currencyName }}s</v-card-title>
+                    </v-card-row>
+                    <v-card-row>
+                        <v-card-text>
+                            While you were away, you earned {{ bonusCurrency | currency }} bonus {{ currencyName }}s!
+                        </v-card-text>
+                    </v-card-row>
+                    <v-card-row actions>
+                        <v-btn light default @click.native="bonusDialog = false">Cool!</v-btn>
+                    </v-card-row>
+                </v-card>
+            </v-dialog>
+
+        </v-container>
+    </v-app>
 </template>
 
 <script>
@@ -106,8 +125,10 @@
 
                     currencyName: null,
                     currency: Big(0),
-                    startingCurrency: Big(0),
+                    startingCurrency: Big(1E12),
                     totalCurrency: Big(0),
+                    bonusCurrency: Big(0),
+                    bonusDialog: false,
                     currencySuffix: '',
                     clicks: Big(0),
                     cps: Big(0),
@@ -724,13 +745,17 @@
                     vm.achievements.push(achievement);
                 });
 
-                // calculate idle bonus currency
+                // calculate bonus currency
                 let timeDifference = Math.round((new Date()).getTime() / 1000) - saveData.timestamp;
-                let bonusCurrency = this.cps.div(2).times(timeDifference).round();
-                console.log("Bonus Currency: " + bonusCurrency.toString());
+                this.bonusCurrency = this.cps.div(2).times(timeDifference).round();
+
+                // show dialog if earned over 5% saved currency
+                if (this.bonusCurrency.gt(0) && this.bonusCurrency.gte(Big(saveData.currency).div(20))) {
+                    this.bonusDialog = true;
+                }
 
                 // loop in currency
-                let startingCurrency = Big(saveData.currency).plus(bonusCurrency);
+                let startingCurrency = Big(saveData.currency).plus(this.bonusCurrency);
                 if (startingCurrency.gt(0)) {
                     this.loopCurrency(startingCurrency, 500);
                 }
