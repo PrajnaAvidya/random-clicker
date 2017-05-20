@@ -20,9 +20,9 @@
                     <h3>Buildings</h3>
 
                     <div class="buy-sell-buttons">
-                        <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 1 }" @click="setBuyAmount(1)">Buy 1</button>
-                        <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 10 }" @click="setBuyAmount(10)">Buy 10</button>
-                        <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 100 }" @click="setBuyAmount(100)">Buy 100</button>
+                        <v-btn light default v-bind:class="{ active:this.buyAmount == 1 }" @click="setBuyAmount(1)">Buy 1</v-btn>
+                        <v-btn light default class="btn btn-default" v-bind:class="{ active:this.buyAmount == 10 }" @click="setBuyAmount(10)">Buy 10</v-btn>
+                        <v-btn light default class="btn btn-default" v-bind:class="{ active:this.buyAmount == 100 }" @click="setBuyAmount(100)">Buy 100</v-btn>
                     </div>
 
                     <v-row class="building" v-for="building in buildings" v-bind:data="buildings" v-bind:key="building" v-if="building.owned > 0 || showBuilding(building)">
@@ -32,7 +32,7 @@
                             <br /> ({{ building.owned }} owned)
                         </v-col>
                         <v-col xs7>
-                            <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</button>
+                            <v-btn light default class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
                         </v-col>
                     </v-row>
                 </v-row>
@@ -57,8 +57,8 @@
                 </v-row>
 
                 <div class="game-utils">
-                    <button class="btn btn-default" @click="saveGame">Save Game</button>
-                    <button class="btn btn-danger" @click="hardReset">Hard Reset</button>
+                    <v-btn light default class="btn btn-default" @click="saveGame">Save Game</v-btn>
+                    <v-btn light error default class="btn btn-danger" @click="hardReset">Hard Reset</v-btn>
                 </div>
             </v-col>
         </v-row>
