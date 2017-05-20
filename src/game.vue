@@ -1,84 +1,73 @@
 <template>
-    <div class="game container">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="row totals">
-                    <div class="total-currency">
-                        <h1>{{ currency | currency }} {{ currencyName}}s</h1>
-                    </div>
-                    <div class="currency-per-second">
-                        <h2>Per second: {{ displayedCps | round }}</h2>
-                    </div>
-                    <div class="currency-per-click">
-                        <h3>Per click: {{ displayedClickPower | currency }}</h3>
-                    </div>
-                </div>
+    <v-container fluid="fluid">
+        <v-row>
+            <v-col md5>
+                <v-row class="totals">
 
-                <div class="row currency" id="currency" v-on:click="click"></div>
-            </div>
+                    <h2>{{ currency | currency }} {{ currencyName}}s</h2>
 
-            <div class="col-md-5">
-                <div class="row buildings">
-                    <div class="row">
-                        <h3>Buildings</h3>
-                    </div>
+                    <h3>Per second: {{ displayedCps | round }}</h3>
 
-                    <div class="row buy-sell-buttons">
-                        <div class="col-xs-12">
-                            <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 1 }" @click="setBuyAmount(1)">Buy 1</button>
-                            <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 10 }" @click="setBuyAmount(10)">Buy 10</button>
-                            <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 100 }" @click="setBuyAmount(100)">Buy 100</button>
-                        </div>
+                    <h4>Per click: {{ displayedClickPower | currency }}</h4>
+
+                </v-row>
+
+                <div class="row currency" id="currency" @click="click"></div>
+            </v-col>
+
+            <v-col md4>
+                <v-row class="buildings">
+                    <h3>Buildings</h3>
+
+                    <div class="buy-sell-buttons">
+                        <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 1 }" @click="setBuyAmount(1)">Buy 1</button>
+                        <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 10 }" @click="setBuyAmount(10)">Buy 10</button>
+                        <button class="btn btn-default" v-bind:class="{ active:this.buyAmount == 100 }" @click="setBuyAmount(100)">Buy 100</button>
                     </div>
 
-                    <div class="row building" v-for="building in buildings" v-if="building.owned > 0 || showBuilding(building)">
-                        <div class="col-xs-5">
+                    <v-row class="building" v-for="building in buildings" v-bind:data="buildings" v-bind:key="building" v-if="building.owned > 0 || showBuilding(building)">
+                        <v-col xs5>
                             <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="buildingText(building)"></span></span>
                             <span v-bind:class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
                             <br /> ({{ building.owned }} owned)
-                        </div>
-                        <div class="col-xs-2">
+                        </v-col>
+                        <v-col xs7>
                             <button class="btn btn-default" @click="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        </v-col>
+                    </v-row>
+                </v-row>
+            </v-col>
 
-            <div class="col-md-3">
-                <div class="row upgrades" v-if="showUpgrades">
+            <v-col md3>
+                <v-row class="upgrades" v-if="showUpgrades">
                     <h3>Upgrades</h3>
 
-                    <div class="row upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                        <div class="col-xs-12">
-                            <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
-                            <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
-                        </div>
+                    <div class="upgrade" v-for="upgrade in sortedUpgrades" v-bind:data="sortedUpgrades" v-bind:key="upgrade" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
+                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
+                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                     </div>
-                </div>
+                </v-row>
 
-                <div class="row achievements" v-if="showAchievements">
+                <v-row class="achievements" v-if="showAchievements">
                     <h3>Achievements</h3>
-                    <div class="col-xs-12">
-                        <div class="row achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
-                            <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="achievementText(achievement)"></span></span>
-                            {{ achievement.name }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="row menu">
-            <div class="col-md-3 col-md-offset-9">
-                <button class="btn btn-default" @click="saveGame">Save Game</button>
-                <button class="btn btn-danger" @click="hardReset">Hard Reset</button>
-            </div>
-        </div>
+                    <div v-for="achievement in achievements" v-bind:data="achievements" v-bind:key="achievement" v-if="achievement.unlocked">
+                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="achievementText(achievement)"></span></span>
+                        {{ achievement.name }}
+                    </div>
+                </v-row>
+
+                <div class="game-utils">
+                    <button class="btn btn-default" @click="saveGame">Save Game</button>
+                    <button class="btn btn-danger" @click="hardReset">Hard Reset</button>
+                </div>
+            </v-col>
+        </v-row>
 
         <!--div class="golden" @click="clickGolden">
             <img src="/static/cracker-golden.png">
         </div-->
-    </div>
+    </v-container>
 </template>
 
 <script>
@@ -968,9 +957,23 @@
         padding: 50px;
     }
 
+    .left-panel {
+        margin-right: 20px;
+    }
+
+    .totals,
+    .currency,
+    .buildings,
+    .upgrades,
+    .achievements,
+    .game-utils {
+        margin-top: 30px;
+        flex-direction: column;
+    }
+
     .totals,
     .currency {
-        text-align: center;
+        align-items: center;
     }
 
     .currency {
@@ -988,12 +991,6 @@
         text-decoration: underline;
     }
 
-    .buildings,
-    .upgrades,
-    .achievements {
-        margin-top: 50px;
-    }
-
     .building {
         margin-bottom: 10px;
     }
@@ -1009,12 +1006,8 @@
         right: 650px;
     }
 
-    .menu {
-        margin-top: 50px;
-    }
-    /* "spoiler" effect */
-
     .redacted {
+        /* "spoiler" effect */
         color: black;
         background-color: black;
         white-space: nowrap;
