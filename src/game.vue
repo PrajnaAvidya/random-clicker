@@ -30,7 +30,7 @@
                             <v-col xs5>
                                 <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
                                 <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
-                                <br /> ({{ building.owned }} owned)
+                                <span>({{ building.owned }} owned)</span>
                             </v-col>
                             <v-col xs7>
                                 <v-btn light default class="btn btn-default" @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>

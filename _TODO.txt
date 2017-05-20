@@ -1,6 +1,3 @@
-bugs:
-- inconsistent vertical spacing in unlocked buildings
-
 core features
 - golden crackers
 - show purchase efficiency
