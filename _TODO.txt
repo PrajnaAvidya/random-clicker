@@ -1,10 +1,7 @@
-features
-- sell buildings
-- generated descriptions
--- what if i sourced them from reddit thread titles or something?
+core features
 - golden crackers
-- upgrade/achievement costs based on formula instead of static?
 - show purchase efficiency
+- offline earnings
 
 performance
 - account for clickers and limit particle generation
@@ -31,23 +28,20 @@ more achivements
 - tea (milk)
 - also the dismissable achievements
 
-juice
+juice/improvements
+- generated descriptions
+-- what if i sourced them from reddit thread titles or something?
+- menu/preferences
+-- import/export save
 - ui overhaul
 -- replace left panel with canvas
 -- move cracker to canvas background
 --- cracker pulsating effect
 -- nicer tooltips
-- generated icons for buildings/upgrades
-- currency images
+- generated/random icons for buildings/upgrades
 - falling cracker effect
 - sound
-- themes per currency (ambitious)
-
-menu
--preferences
-
-bugs:
-- cursor additive not working (showing as 0)
+- upgrade/achievement costs based on formula instead of static?
 
 6E = million
 9E = billion

@@ -7,10 +7,10 @@
                         <h1>{{ currency | currency }} {{ currencyName}}s</h1>
                     </div>
                     <div class="currency-per-second">
-                        <h2>Per second: {{ cps | round }}</h2>
+                        <h2>Per second: {{ displayedCps | round }}</h2>
                     </div>
                     <div class="currency-per-click">
-                        <h3>Per click: {{ clickPower | currency }}</h3>
+                        <h3>Per click: {{ displayedClickPower | currency }}</h3>
                     </div>
                 </div>
 
@@ -75,9 +75,9 @@
             </div>
         </div>
 
-        <div class="golden" @click="clickGolden">
+        <!--div class="golden" @click="clickGolden">
             <img src="/static/cracker-golden.png">
-        </div>
+        </div-->
     </div>
 </template>
 
@@ -118,11 +118,18 @@
 
                     currencyName: null,
                     currency: Big(0),
+                    startingCurrency: Big(0),
                     totalCurrency: Big(0),
                     currencySuffix: '',
                     clicks: Big(0),
                     cps: Big(0),
+                    lastCps: Big(0),
+                    displayedCps: Big(0),
+                    cpsTick: Big(0),
                     clickPower: Big(1),
+                    lastClickPower: Big(1),
+                    displayedClickPower: Big(1),
+                    clickPowerTick: Big(0),
                     buyAmount: 1,
                     showUpgrades: false,
                     showAchievements: false,
@@ -143,26 +150,30 @@
 
             // clicking/cps
             click() {
-                // skip loop if cps is too high
-                if (this.cps.gte(this.clickPower.times(10))) {
-                    this.clicks = this.clicks.plus(this.clickPower);
+                // add to overall stats
+                this.clicks = this.clicks.plus(this.clickPower);
+                this.totalCurrency = this.totalCurrency.plus(this.clickPower);
+
+                // skip loop if cps is too high or clickPower = 1
+                if (this.clickPower == 1 || this.cps.gte(this.clickPower.times(10))) {
                     this.currency = this.currency.plus(this.clickPower);
-                    this.totalCurrency = this.totalCurrency.plus(this.clickPower);
                     return;
                 }
 
+                this.loopCurrency(this.clickPower);
+            },
+            // show currency ticking up effect (when clicking & loading)
+            loopCurrency(amount, ms = 333) {
                 let vm = this;
                 let loopAmount = 10;
-                if (this.clickPower < 10) {
-                    loopAmount = this.clickPower;
+                if (amount < 10) {
+                    loopAmount = amount;
                 }
-                let clickAmount = this.clickPower.div(loopAmount);
+                let clickAmount = amount.div(loopAmount);
                 for (let i = 0; i < loopAmount; i++) {
                     setTimeout(function timer() {
-                        vm.clicks = vm.clicks.plus(clickAmount);
                         vm.currency = vm.currency.plus(clickAmount);
-                        vm.totalCurrency = vm.totalCurrency.plus(clickAmount);
-                    }, i * 333 / loopAmount);
+                    }, i * ms / loopAmount);
                 }
             },
             recalculateClickPower() {
@@ -442,7 +453,29 @@
 
                 let division = 1000 / progress;
                 this.currency = this.currency.plus(this.cps.div(division));
-                this.totalCurrency = this.totalCurrency.plus(this.cps.div(division))
+                this.totalCurrency = this.totalCurrency.plus(this.cps.div(division));
+
+                if (!this.lastCps.eq(this.cps)) {
+                    this.lastCps = this.cps;
+                    this.cpsTick = this.cps.minus(this.displayedCps).div(division / 2);
+                }
+                if (!this.displayedCps.eq(this.cps)) {
+                    this.displayedCps = this.displayedCps.plus(this.cpsTick);
+                    if (this.displayedCps.gt(this.cps)) {
+                        this.displayedCps = this.cps;
+                    }
+                }
+
+                if (!this.lastClickPower.eq(this.clickPower)) {
+                    this.lastClickPower = this.clickPower;
+                    this.clickPowerTick = this.clickPower.minus(this.displayedClickPower).div(division / 2);
+                }
+                if (!this.displayedClickPower.eq(this.clickPower)) {
+                    this.displayedClickPower = this.displayedClickPower.plus(this.clickPowerTick);
+                    if (this.displayedClickPower.gt(this.clickPower)) {
+                        this.displayedClickPower = this.clickPower;
+                    }
+                }
 
                 window.requestAnimationFrame(this.tick);
             },
@@ -586,12 +619,16 @@
                 this.generateUpgrades();
                 this.generateAchievements();
 
-                // save fresh game
-                this.saveGame();
+                // loop in starting currency (if any)
+                if (this.startingCurrency.gt(0)) {
+                    this.loopCurrency(this.startingCurrency, 500);
+                }
+
+                console.log("New Game");
             },
             hardReset() {
                 if (confirm("Are you sure?")) {
-                    Object.assign(this.$data, this.defaultData())
+                    Object.assign(this.$data, this.defaultData());
                     this.newGame();
                 }
             },
@@ -615,6 +652,8 @@
                 };
 
                 localStorage.setItem("SaveGame", JSON.stringify(saveData));
+
+                console.log("Game Saved");
             },
             loadGame(saveJson) {
                 let saveData = JSON.parse(saveJson);
@@ -622,11 +661,13 @@
 
                 this.currencyName = saveData.currencyName;
                 document.title = this.currencyName + ' Clicker';
-                this.currency = Big(saveData.currency);
+                this.currency = Big(0); // this will be looped in
                 this.totalCurrency = Big(saveData.totalCurrency);
                 this.clicks = Big(saveData.clicks);
                 this.cps = Big(saveData.cps);
+                this.displayedCps = Big(0);
                 this.clickPower = Big(saveData.clickPower);
+                this.displayedClickPower = Big(1);
                 this.buyAmount = saveData.buyAmount;
                 this.showUpgrades = saveData.showUpgrades;
                 this.showAchievements = saveData.showAchievements;
@@ -692,6 +733,14 @@
 
                     vm.achievements.push(achievement);
                 });
+
+                // loop in currency
+                let saveCurrency = Big(saveData.currency);
+                if (saveCurrency.gt(0)) {
+                    this.loopCurrency(saveCurrency, 500);
+                }
+
+                console.log("Game Loaded");
             },
 
             // randomize array
@@ -781,7 +830,7 @@
                 let currencyPool = [];
                 let numberParticles = [];
                 let numberPool = [];
-                let maxParticles = 50;
+                let maxParticles = 33;
 
                 Sketch.create({
                     container: document.getElementById('currency'),
