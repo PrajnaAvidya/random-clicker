@@ -1,5 +1,4 @@
 bugs:
-- GameData needs to be reloaded from scratch every time you hard reset
 - inconsistent vertical spacing in unlocked buildings
 
 core features

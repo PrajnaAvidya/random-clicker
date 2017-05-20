@@ -1,46 +1,4 @@
 export default {
-    defaultData: {
-        // disable for debug
-        enableLoad: true,
-
-        // for fps calculations
-        lastFrame: 0,
-
-        currencyName: null,
-        currency: 0,
-        startingCurrency: 1E12,
-        totalCurrency: 0,
-        bonusCurrency: 0,
-        bonusDialog: false,
-        currencySuffix: '',
-        clicks: 0,
-        cps: 0,
-        lastCps: 0,
-        displayedCps: 0,
-        cpsTick: 0,
-        clickPower: 1,
-        lastClickPower: 1,
-        displayedClickPower: 1,
-        clickPowerTick: 0,
-        buyAmount: 1,
-        showUpgrades: false,
-        showAchievements: false,
-        achievementCount: 0,
-
-        buildingCostMultiplier: 0.15,
-        buildingNames: [],
-        buildings: [],
-
-        upgrades: [],
-        _sortedUpgrades: null,
-
-        adjectives: [],
-
-        achievements: [],
-
-        words: null,
-    },
-
     buildings: [
         // cursor
         { name: 0, baseCost: 15, baseCps: 0.1 },
@@ -102,15 +60,15 @@ export default {
     ],
 
     clickingUpgrades: [
-        /*{ needed: Big(1000), cost: Big(50000), multiplier: 1.01 },
-        { needed: Big(100000), cost: Big(5E6), multiplier: 1.01 },
-        { needed: Big(10E6), cost: Big(500E6), multiplier: 1.01 },
-        { needed: Big(1E9), cost: Big(50E9), multiplier: 1.01 },
-        { needed: Big(100E9), cost: Big(5E12), multiplier: 1.01 },
-        { needed: Big(10E12), cost: Big(500E12), multiplier: 1.01 },
-        { needed: Big(1E15), cost: Big(50E15), multiplier: 1.01 },
-        { needed: Big(100E15), cost: Big(5E18), multiplier: 1.01 },
-        { needed: Big(10E18), cost: Big(500E18), multiplier: 1.01 },*/
+        { needed: 1000, cost: 50000, multiplier: 1.01 },
+        { needed: 100000, cost: 5E6, multiplier: 1.01 },
+        { needed: 10E6, cost: 500E6, multiplier: 1.01 },
+        { needed: 1E9, cost: 50E9, multiplier: 1.01 },
+        { needed: 100E9, cost: 5E12, multiplier: 1.01 },
+        { needed: 10E12, cost: 500E12, multiplier: 1.01 },
+        { needed: 1E15, cost: 50E15, multiplier: 1.01 },
+        { needed: 100E15, cost: 5E18, multiplier: 1.01 },
+        { needed: 10E18, cost: 500E18, multiplier: 1.01 },
     ],
 
     tierOneUpgradeTypes: [
@@ -150,28 +108,26 @@ export default {
     ],
 
     buildingAchivements: [
-        /*
-        { type: 0, total: Big(1) },
-        { type: 0, total: Big(2) },
+        { type: 0, total: 1 },
+        { type: 0, total: 2 },
 
-        { type: 1, total: Big(1) },
-        { type: 1, total: Big(50) }
-        */
+        { type: 1, total: 1 },
+        { type: 1, total: 50 }
 
         // TODO more
     ],
 
     productionUpgrades: [
-        /*{ needed: Big(50000), cost: Big(999999), multiplier: 1.01 },
-        { needed: Big(250000), cost: Big(5E6), multiplier: 1.01 },
-        { needed: Big(500000), cost: Big(10E6), multiplier: 1.01 },
-        { needed: Big(2.5E6), cost: Big(50E6), multiplier: 1.01 },
-        { needed: Big(5E6), cost: Big(100E6), multiplier: 1.01 },
-        { needed: Big(25E6), cost: Big(500E6), multiplier: 1.02 },
-        { needed: Big(50E6), cost: Big(1E9), multiplier: 1.02 },
-        { needed: Big(250E6), cost: Big(5E9), multiplier: 1.02 },
-        { needed: Big(500E6), cost: Big(10E9), multiplier: 1.02 },
-        { needed: Big(2.5E9), cost: Big(50E9), multiplier: 1.02 },*/
+        { needed: 50000, cost: 999999, multiplier: 1.01 },
+        { needed: 250000, cost: 5E6, multiplier: 1.01 },
+        { needed: 500000, cost: 10E6, multiplier: 1.01 },
+        { needed: 2.5E6, cost: 50E6, multiplier: 1.01 },
+        { needed: 5E6, cost: 100E6, multiplier: 1.01 },
+        { needed: 25E6, cost: 500E6, multiplier: 1.02 },
+        { needed: 50E6, cost: 1E9, multiplier: 1.02 },
+        { needed: 250E6, cost: 5E9, multiplier: 1.02 },
+        { needed: 500E6, cost: 10E9, multiplier: 1.02 },
+        { needed: 2.5E9, cost: 50E9, multiplier: 1.02 },
         // TODO 4% etc
     ],
 

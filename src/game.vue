@@ -96,47 +96,7 @@
 
     export default {
         data: function () {
-            return {
-                // disable for debug
-                enableLoad: true,
-
-                // for fps calculations
-                lastFrame: 0,
-
-                currencyName: null,
-                currency: Big(0),
-                startingCurrency: Big(0),
-                totalCurrency: Big(0),
-                bonusCurrency: Big(0),
-                bonusDialog: false,
-                currencySuffix: '',
-                clicks: Big(0),
-                cps: Big(0),
-                lastCps: Big(0),
-                displayedCps: Big(0),
-                cpsTick: Big(0),
-                clickPower: Big(1),
-                lastClickPower: Big(1),
-                displayedClickPower: Big(1),
-                clickPowerTick: Big(0),
-                buyAmount: 1,
-                showUpgrades: false,
-                showAchievements: false,
-                achievementCount: 0,
-
-                buildingCostMultiplier: 0.15,
-                buildingNames: [],
-                buildings: [],
-
-                upgrades: [],
-                _sortedUpgrades: null,
-
-                adjectives: [],
-
-                achievements: [],
-
-                words: null,
-            };
+            return this.defaultData();
         },
 
         computed: {
@@ -155,6 +115,50 @@
         },
 
         methods: {
+            defaultData() {
+                return {
+                    // disable for debug
+                    enableLoad: true,
+
+                    // for fps calculations
+                    lastFrame: 0,
+
+                    currencyName: null,
+                    currency: Big(0),
+                    startingCurrency: Big(0),
+                    totalCurrency: Big(0),
+                    bonusCurrency: Big(0),
+                    bonusDialog: false,
+                    currencySuffix: '',
+                    clicks: Big(0),
+                    cps: Big(0),
+                    lastCps: Big(0),
+                    displayedCps: Big(0),
+                    cpsTick: Big(0),
+                    clickPower: Big(1),
+                    lastClickPower: Big(1),
+                    displayedClickPower: Big(1),
+                    clickPowerTick: Big(0),
+                    buyAmount: 1,
+                    showUpgrades: false,
+                    showAchievements: false,
+                    achievementCount: 0,
+
+                    buildingCostMultiplier: 0.15,
+                    buildingNames: [],
+                    buildings: [],
+
+                    upgrades: [],
+                    _sortedUpgrades: null,
+
+                    adjectives: [],
+
+                    achievements: [],
+
+                    words: null,
+                }
+            },
+
             // clicking/cps
             click() {
                 // add to overall stats
@@ -295,11 +299,10 @@
                             upgrade.unlocked = true;
                             return true;
                         }
-                    } /*else if (this.buildingCount(upgrade.type) >= upgrade.needed) {
+                    } else if (this.buildingCount(upgrade.type) >= upgrade.needed) {
                         upgrade.unlocked = true;
                         return true;
-                    }*/
-                    console.log(upgrade.type);
+                    }
 
                     return false;
                 }
@@ -309,9 +312,9 @@
                     return true;
                 }
 
-                /*if (upgrade.type != 'Clicking' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) == 0) {
+                if (upgrade.type != 'Clicking' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) == 0) {
                     return false;
-                }*/
+                }
                 if (upgrade.type == this.currencyName) {
                     if (this.currency.gte(upgrade.needed / 10)) {
                         upgrade.unlocked = true;
@@ -325,10 +328,10 @@
                             upgrade.unlocked = true;
                             return true;
                         }
-                    } /*else if (upgrade.cost == this.nextUpgrade(upgrade.type).cost) {
+                    } else if (upgrade.cost == this.nextUpgrade(upgrade.type).cost) {
                         upgrade.unlocked = true;
                         return true;
-                    }*/
+                    }
 
                     return false;
                 }
@@ -543,7 +546,7 @@
                     for (let i = 0; i < upgradeNeeds.length; i++) {
                         let upgrade = {
                             type: vm.buildingNames[upgradeIndex],
-                            name: vm.adjectives.pop() + " " + upgradeParams.type + "s",
+                            name: vm.adjectives.pop() + " " + vm.buildingNames[upgradeIndex] + "s",
                             needed: upgradeNeeds[i],
                             cost: Big(upgradeCosts[i]),
                             description: "Need Description",
@@ -618,7 +621,8 @@
             // setup/save
             newGame() {
                 // load default data
-                Object.assign(this.$data, JSON.parse(JSON.stringify(GameData.defaultData)));
+                Object.assign(this.$data, this.defaultData());
+                this._sortedUpgrades = null;
 
                 // load word lists
                 this.words = JSON.parse(JSON.stringify(Words));
@@ -652,8 +656,6 @@
                 if (this.startingCurrency.gt(0)) {
                     this.loopCurrency(this.startingCurrency, 500);
                 }
-
-                console.log(this.buildingNames);
             },
             hardReset() {
                 if (confirm("Are you sure?")) {
