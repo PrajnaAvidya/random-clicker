@@ -118,7 +118,7 @@
 
                     currencyName: null,
                     currency: Big(0),
-                    startingCurrency: Big(0),
+                    startingCurrency: Big(1E12),
                     totalCurrency: Big(0),
                     currencySuffix: '',
                     clicks: Big(0),
@@ -649,6 +649,7 @@
                     buildings: this.buildings,
                     upgrades: this.upgrades,
                     achievements: this.achievements,
+                    timestamp: Math.round((new Date()).getTime() / 1000)
                 };
 
                 localStorage.setItem("SaveGame", JSON.stringify(saveData));
@@ -734,10 +735,15 @@
                     vm.achievements.push(achievement);
                 });
 
+                // calculate idle bonus currency
+                let timeDifference = Math.round((new Date()).getTime() / 1000) - saveData.timestamp;
+                let bonusCurrency = this.cps.div(2).times(timeDifference).round();
+                console.log("Bonus Currency: " + bonusCurrency.toString());
+
                 // loop in currency
-                let saveCurrency = Big(saveData.currency);
-                if (saveCurrency.gt(0)) {
-                    this.loopCurrency(saveCurrency, 500);
+                let startingCurrency = Big(saveData.currency).plus(bonusCurrency);
+                if (startingCurrency.gt(0)) {
+                    this.loopCurrency(startingCurrency, 500);
                 }
 
                 console.log("Game Loaded");
