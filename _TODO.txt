@@ -1,7 +1,6 @@
 core features
 - golden crackers
 - show purchase efficiency
-- offline earnings - modal
 
 performance
 - account for clickers and limit particle generation

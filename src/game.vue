@@ -626,20 +626,6 @@
 
                 // load word lists
                 this.words = JSON.parse(JSON.stringify(Words));
-                // turn vars into Big
-                this.currency = Big(this.currency);
-                this.startingCurrency = Big(this.startingCurrency);
-                this.totalCurrency = Big(this.totalCurrency);
-                this.bonusCurrency = Big(this.bonusCurrency);
-                this.clicks = Big(this.clicks);
-                this.cps = Big(this.cps);
-                this.lastCps = Big(this.lastCps);
-                this.displayedCps = Big(this.displayedCps);
-                this.cpsTick = Big(this.cpsTick);
-                this.clickPower = Big(this.clickPower);
-                this.lastClickPower = Big(this.lastClickPower);
-                this.displayedClickPower = Big(this.displayedClickPower);
-                this.clickPowerTick = Big(this.clickPowerTick);
 
                 // get currency name & adjectives
                 //this.currencyName = this.shuffleArray(GameData.currencies).pop();
