@@ -27,7 +27,7 @@
 
                     <v-row class="building" v-for="building in buildings" v-bind:data="buildings" v-bind:key="building" v-if="building.owned > 0 || showBuilding(building)">
                         <v-col xs5>
-                            <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="buildingText(building)"></span></span>
+                            <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
                             <span v-bind:class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
                             <br /> ({{ building.owned }} owned)
                         </v-col>
@@ -43,7 +43,7 @@
                     <h3>Upgrades</h3>
 
                     <div class="upgrade" v-for="upgrade in sortedUpgrades" v-bind:data="sortedUpgrades" v-bind:key="upgrade" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="upgradeText(upgrade)"></span></span>
+                        <span v-tooltip:top="{ html: upgradeText(upgrade) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
                         <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                     </div>
                 </v-row>
@@ -52,8 +52,7 @@
                     <h3>Achievements</h3>
 
                     <div v-for="achievement in achievements" v-bind:data="achievements" v-bind:key="achievement" v-if="achievement.unlocked">
-                        <span class="glyphicon glyphicon-info-sign tooltips" aria-hidden="true"><span v-html="achievementText(achievement)"></span></span>
-                        {{ achievement.name }}
+                        <span v-tooltip:top="{ html: achievementText(achievement) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>                        {{ achievement.name }}
                     </div>
                 </v-row>
 
@@ -243,7 +242,7 @@
                 let buildingCpsPercent = 100 * buildingCps / this.cps;
                 //let buildingText = building.description;
                 let buildingText = "Each " + building.name + " produces " + building.currentCps + " " + this.currencyName + "s per second";
-                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " " + this.currencyName + "s per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
+                buildingText += "\n" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " " + this.currencyName + "s per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
                 return buildingText;
             },
             setBuyAmount(amount) {
@@ -370,16 +369,16 @@
                 } else if (upgrade.multiplier != null) {
                     upgradeText += "Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
                     if (upgrade.type == this.buildingNames[0]) {
-                        upgradeText += "<br/>Also multiplies clicks";
+                        upgradeText += "\nAlso multiplies clicks";
                     }
                 } else if (upgrade.addition != null) {
                     upgradeText += "Adds " + upgrade.addition + " " + this.currencyName + " production for every non-" + upgrade.type + " building owned";
                     if (upgrade.type == this.buildingNames[0]) {
-                        upgradeText += "<br/>Also adds to clicks";
+                        upgradeText += "\nAlso adds to clicks";
                     }
                 }
                 if (upgrade.type != 'Clicking' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) < upgrade.needed) {
-                    upgradeText += "<br/>Requires " + upgrade.needed + " " + upgrade.type;
+                    upgradeText += "\nRequires " + upgrade.needed + " " + upgrade.type;
                 }
 
                 return upgradeText;
@@ -1012,51 +1011,15 @@
         background-color: black;
         white-space: nowrap;
         -moz-transform: rotate(.8deg) skewx(-12deg);
+        transform: rotate(.8deg) skewx(-12deg);
         -moz-box-shadow: 3px 0 2px #444;
+        box-shadow: 3px 0 2px #444;
         border: 1px dotted #555;
         background: -moz-linear-gradient(180deg, #000, #222);
     }
-    /* tooltips */
 
-    .tooltips {
-        position: relative;
-        display: inline;
-    }
-
-    .tooltips span {
-        position: absolute;
-        width: 300px;
-        color: #FFFFFF;
-        background: #000000;
-        line-height: 24px;
-        text-align: center;
-        visibility: hidden;
-        border-radius: 6px;
-        font-family: "Helvetica Neue, Helvetica, Arial, sans-serif";
-        font-weight: bold;
-        padding-right: 5px;
-        padding-left: 5px;
-    }
-
-    .tooltips span:after {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        margin-left: -8px;
-        width: 0;
-        height: 0;
-        border-top: 8px solid #000000;
-        border-right: 8px solid transparent;
-        border-left: 8px solid transparent;
-    }
-
-     :hover.tooltips span {
-        visibility: visible;
-        opacity: 0.8;
-        bottom: 30px;
-        left: 50%;
-        margin-left: -76px;
-        z-index: 999;
+    [data-tooltip]:before {
+        font-size: 12px;
+        height: 60px;
     }
 </style>
