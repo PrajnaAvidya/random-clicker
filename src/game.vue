@@ -863,7 +863,6 @@
             clickGolden() {
                 // 0 - 99
                 let roll = Math.floor(Math.random() * 100);
-                roll = 99;
                 if (roll >= 95 && !this.clickFrenzyActive) {
                     // click frenzy
                     this.clickFrenzyActive = true;
