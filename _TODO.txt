@@ -1,4 +1,5 @@
 core features
+- tooltips on alerts
 - canvas in left panel
 -- falling cracker effect
 -- tea (milk) effect
