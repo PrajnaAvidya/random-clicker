@@ -1,8 +1,9 @@
 core features
-- show purchase efficiency
+- sounds
+- track golden cracker stats/attributes
 
 performance
-- account for clickers and limit particle generation
+- account for autoclickers and limit particle generation/updates if necessary
 - learn about js performance profiling to find bottlenecks
 
 upgrade checklist
@@ -20,13 +21,13 @@ NOT DONE:
 
 more achivements
 - building achievements
-- sell achivements
 - click achievements
 - click speed
 - tea (milk)
 - also the dismissable achievements
 
 juice/improvements
+- show purchase efficiency
 - generated descriptions
 -- what if i sourced them from reddit thread titles or something?
 - menu/preferences
@@ -38,7 +39,6 @@ juice/improvements
 -- nicer tooltips
 - generated/random icons for buildings/upgrades
 - falling cracker effect
-- sound
 - upgrade/achievement costs based on formula instead of static?
 
 6E = million
