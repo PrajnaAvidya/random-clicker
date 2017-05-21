@@ -1,4 +1,5 @@
 core features
+- clear alerts when hard reset
 - static descriptions for upgrades (like I did with achievements)
 - tooltips on alerts
 - canvas in left panel

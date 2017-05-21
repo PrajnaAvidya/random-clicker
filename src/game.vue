@@ -126,16 +126,13 @@
         methods: {
             defaultData() {
                 return {
-                    // debug mode doesn't load game & starts with a lot of currency + fast golden crackers
-                    debug: false,
-
                     // for fps calculations
                     lastFrame: 0,
 
                     // game data
                     currencyName: null,
                     currency: Big(0),
-                    startingCurrency: Big(1E12),
+                    startingCurrency: Big(0),
                     totalCurrency: Big(0),
                     bonusCurrency: Big(0),
                     bonusDialog: false,
@@ -1117,19 +1114,12 @@
             }
         },
         mounted() {
-            if (!this.debug && localStorage.getItem("SaveGame") != null) {
+            if (localStorage.getItem("SaveGame") != null) {
                 this.loadGame(localStorage.getItem("SaveGame"));
             } else {
                 this.newGame();
             }
 
-            // check for debug mode
-            if (this.debug) {
-                this.currency = Big(1E21);
-                //this.clickPower = Big(100);
-                //this.goldenMinimumTime = 3;
-                //this.goldenMaximumTime = 5;
-            }
 
             // load audio
             this.loadSounds();
