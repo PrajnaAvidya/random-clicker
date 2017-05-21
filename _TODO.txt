@@ -1,4 +1,9 @@
 core features
+- canvas in left panel
+-- falling cracker effect
+-- tea (milk) effect
+-- non-css cracker with pulsing click effect
+--- http://codepen.io/anon/pen/KmrXJJ
 - track more data
 -- golden cracker stats/attributes
 
@@ -19,27 +24,21 @@ NOT DONE:
 - golden cracker upgrades
 - heavenly chip upgrades
 
-more achivements
+achivement checklist
 - building achievements
 - click achievements
 - click speed
 - tea (milk)
-- also the dismissable achievements
 
 juice/improvements
+- break stuff off into other components if possible 
+- refactor new/load/save system
 - show purchase efficiency
-- more sounds
 - generated descriptions
 -- what if i sourced them from reddit thread titles or something?
 - menu/preferences
--- import/export save
-- ui overhaul
--- replace left panel with canvas
--- move cracker to canvas background
---- cracker pulsating effect
--- nicer tooltips
+-- import/export game
 - generated/random icons for buildings/upgrades
-- falling cracker effect
 - upgrade/achievement costs based on formula instead of static?
 
 6E = million

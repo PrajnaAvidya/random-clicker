@@ -107,7 +107,7 @@ export default {
         { type: 13, costs: [21E15, 105E15, 1.05E18, 105E18, 10.5E21, 1.05E24, 1.05E27, 1.05E30] },
     ],
 
-    buildingAchivements: [
+    buildingAchievements: [
         { type: 0, total: 1 },
         { type: 0, total: 2 },
 
@@ -133,16 +133,16 @@ export default {
 
     productionAchievements: [
         // total
-        /*{ total: Big(1) },
-        { total: Big(1000) },
+        { total: 1 },
+        { total: 1000 },
 
         // cps
-        { cps: Big(1) },
-        { cps: Big(10) },
+        { cps: 1 },
+        { cps: 10 },
 
         // clicking
-        { clicks: Big(10000) },
-        { clicks: Big(100000) },*/
+        { clicks: 10000 },
+        { clicks: 100000 },
 
         // TODO more
     ],

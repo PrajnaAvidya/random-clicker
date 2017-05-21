@@ -29,7 +29,7 @@
                             <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
                         </div>
 
-                        <v-row class="building" v-for="building in buildings" :data="buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
+                        <v-row class="building" v-for="building in buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
                             <v-col xs5>
                                 <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
                                 <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
@@ -55,7 +55,7 @@
                     <v-row class="achievements" v-if="showAchievements">
                         <h3>Achievements</h3>
 
-                        <div v-for="achievement in achievements" :data="achievements" :key="achievement" v-if="achievement.unlocked">
+                        <div v-for="achievement in achievements" :key="achievement" v-if="achievement.unlocked">
                             <span v-tooltip:top="{ html: achievementText(achievement) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>                            {{ achievement.name }}
                         </div>
                     </v-row>
@@ -66,6 +66,8 @@
                     </div>
                 </v-col>
             </v-row>
+
+            <GameAlerts></GameAlerts>
 
             <v-dialog v-model="bonusDialog">
                 <v-card>
@@ -93,6 +95,7 @@
 
 <script>
     import GameData from "./gameData.js";
+
     import Words from "./words.js";
     import Big from "big.js";
     import Sketch from "sketch-js";
@@ -166,7 +169,7 @@
                     goldenMinimumTime: 300,
                     goldenMaximumTime: 900,
                     goldenStay: 13,
-                    goldenNext: 0,
+                    goldenNext: 999999999999,
                     goldenDisappear: 0,
                     luckyActive: false,
                     luckyAmount: Big(0),
@@ -489,6 +492,8 @@
                 achievement.unlocked = true;
                 this.achievementCount++;
                 this.showAchievements = true;
+
+                Event.fire('addAlert', achievement.name)
             },
             achievementText(achievement) {
                 if (achievement.cps != null) {
@@ -683,7 +688,7 @@
                     vm.achievements.push(achievement);
                 });
 
-                GameData.buildingAchivements.forEach(function (buildingAchivement) {
+                GameData.buildingAchievements.forEach(function (buildingAchivement) {
                     let upgradeIndex = buildingAchivement.type;
 
                     let achievement = {
@@ -726,6 +731,7 @@
                 if (confirm("Are you sure?")) {
                     // start new game
                     this.newGame();
+                    this.loadSounds();
                 }
             },
             saveGame() {
@@ -847,6 +853,11 @@
                 }
 
                 console.log("Game Loaded");
+            },
+            loadSounds() {
+                this.clickSound = new Audio('/static/' + this.clickSound);
+                this.goldenSpawnSound = new Audio('/static/' + this.goldenSpawnSound);
+                this.goldenClickSound = new Audio('/static/' + this.goldenClickSound);
             },
 
             // golden
@@ -1098,16 +1109,14 @@
 
             // check for debug mode
             if (this.debug) {
-                //this.currency = Big(1E21);
+                this.currency = Big(1E21);
                 //this.clickPower = Big(100);
-                this.goldenMinimumTime = 3;
-                this.goldenMaximumTime = 5;
+                //this.goldenMinimumTime = 3;
+                //this.goldenMaximumTime = 5;
             }
 
             // load audio
-            this.clickSound = new Audio('/static/' + this.clickSound);
-            this.goldenSpawnSound = new Audio('/static/' + this.goldenSpawnSound);
-            this.goldenClickSound = new Audio('/static/' + this.goldenClickSound);
+            this.loadSounds();
 
             // check achievements every couple seconds
             setInterval(function () {
