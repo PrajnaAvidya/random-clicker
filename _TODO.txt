@@ -1,5 +1,5 @@
 core features
-- golden crackers
+- golden cracker UI (pop up bonus text)
 - show purchase efficiency
 
 performance

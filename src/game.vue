@@ -8,8 +8,10 @@
                         <h2>{{ currency | currency }} {{ currencyName}}s</h2>
 
                         <h3>Per second: {{ displayedCps | round }}</h3>
+                        <h4 class="red" v-show="frenzyActive">FRENZY! (x{{ this.frenzyAmount }} production)</h4>
 
                         <h4>Per click: {{ displayedClickPower | currency }}</h4>
+                        <h5 class="red" v-show="clickFrenzyActive">CLICK FRENZY!!! (x{{ this.clickFrenzyAmount }} clicks)</h5>
 
                     </v-row>
 
@@ -64,10 +66,6 @@
                 </v-col>
             </v-row>
 
-            <!--div class="golden" @click="clickGolden">
-            <img src="/static/cracker-golden.png">
-        </div-->
-
             <v-dialog v-model="bonusDialog">
                 <v-card>
                     <v-card-row>
@@ -83,6 +81,10 @@
                     </v-card-row>
                 </v-card>
             </v-dialog>
+
+            <div v-if="goldenActive" class="golden" @click="clickGolden" :style="{ top: goldenTop+'px', right: goldenRight+'px' }">
+                <img src="/static/cracker-golden.png">
+            </div>
 
         </v-container>
     </v-app>
@@ -155,23 +157,49 @@
 
                     achievements: [],
 
+                    goldenTop: 250,
+                    goldenRight: 850,
+                    goldenActive: false,
+                    goldenMinimumTime: 300,
+                    goldenMaximumTime: 900,
+                    goldenStay: 13,
+                    goldenNext: 0,
+                    goldenDisappear: 0,
+                    frenzyActive: false,
+                    frenzyAmount: 7,
+                    frenzyLength: 77,
+                    clickFrenzyActive: false,
+                    clickFrenzyAmount: 777,
+                    clickFrenzyLength: 13,
+                    frenzyEnd: 0,
+
                     words: null,
                 }
             },
 
+            unixTimestamp() {
+                return Math.round((new Date()).getTime() / 1000);
+            },
+
             // clicking/cps
             click() {
+                // check for click frenzy
+                let clickPower = this.clickPower;
+                if (this.clickFrenzyActive) {
+                    clickPower = clickPower.times(this.clickFrenzyAmount);
+                }
+
                 // add to overall stats
-                this.clicks = this.clicks.plus(this.clickPower);
-                this.totalCurrency = this.totalCurrency.plus(this.clickPower);
+                this.clicks = this.clicks.plus(clickPower);
+                this.totalCurrency = this.totalCurrency.plus(clickPower);
 
                 // skip loop if cps is too high or clickPower = 1
-                if (this.clickPower == 1 || this.cps.gte(this.clickPower.times(10))) {
-                    this.currency = this.currency.plus(this.clickPower);
+                if (clickPower == 1 || this.clickFrenzyActive || this.cps.gte(clickPower.times(10))) {
+                    this.currency = this.currency.plus(clickPower);
                     return;
                 }
 
-                this.loopCurrency(this.clickPower);
+                this.loopCurrency(clickPower);
             },
             // show currency ticking up effect (when clicking & loading)
             loopCurrency(amount, ms = 333) {
@@ -407,11 +435,6 @@
                 return upgradeText;
             },
 
-            // golden
-            clickGolden() {
-                console.log("Golden!");
-            },
-
             // achievements
             checkAchievements() {
                 let vm = this;
@@ -462,9 +485,28 @@
                 let progress = timestamp - this.lastFrame;
                 this.lastFrame = timestamp;
 
+                // how much to add this frame
                 let division = 1000 / progress;
-                this.currency = this.currency.plus(this.cps.div(division));
-                this.totalCurrency = this.totalCurrency.plus(this.cps.div(division));
+                let currencyIncrement = this.cps.div(division);
+
+                // check for click frenzy end
+                if (this.clickFrenzyActive) {
+                    if (this.unixTimestamp() > this.clickFrenzyEnd) {
+                        this.clickFrenzyActive = false;
+                    }
+                }
+
+                // check for frenzy
+                if (this.frenzyActive) {
+                    currencyIncrement = currencyIncrement.times(this.frenzyAmount);
+                    if (this.unixTimestamp() > this.frenzyEnd) {
+                        this.frenzyActive = false;
+                    }
+                }
+
+                // increment currency
+                this.currency = this.currency.plus(currencyIncrement);
+                this.totalCurrency = this.totalCurrency.plus(currencyIncrement);
 
                 if (!this.lastCps.eq(this.cps)) {
                     this.lastCps = this.cps;
@@ -485,6 +527,15 @@
                     this.displayedClickPower = this.displayedClickPower.plus(this.clickPowerTick);
                     if (this.displayedClickPower.gt(this.clickPower)) {
                         this.displayedClickPower = this.clickPower;
+                    }
+                }
+
+                if (!this.goldenActive && this.unixTimestamp() >= this.goldenNext) {
+                    this.spawnGolden();
+                } else if (this.goldenActive) {
+                    if (this.unixTimestamp() > this.goldenDisappear) {
+                        this.goldenActive = false;
+                        this.initGolden();
                     }
                 }
 
@@ -666,7 +717,7 @@
                     buildings: this.buildings,
                     upgrades: this.upgrades,
                     achievements: this.achievements,
-                    timestamp: Math.round((new Date()).getTime() / 1000)
+                    timestamp: this.unixTimestamp(),
                 };
 
                 localStorage.setItem("SaveGame", JSON.stringify(saveData));
@@ -753,7 +804,7 @@
                 });
 
                 // calculate bonus currency
-                let timeDifference = Math.round((new Date()).getTime() / 1000) - saveData.timestamp;
+                let timeDifference = this.unixTimestamp() - saveData.timestamp;
                 this.bonusCurrency = this.cps.div(2).times(timeDifference).round();
 
                 // show dialog if earned over 5% saved currency
@@ -768,6 +819,50 @@
                 }
 
                 console.log("Game Loaded");
+            },
+
+            // golden
+            initGolden() {
+                this.goldenNext = this.unixTimestamp() + Math.floor(Math.random() * (this.goldenMaximumTime - this.goldenMinimumTime)) + this.goldenMinimumTime;
+                this.goldenDisappear = this.goldenNext + this.goldenStay;
+            },
+            spawnGolden() {
+                let x = document.body.offsetWidth;
+                let y = document.body.offsetHeight;
+
+                let randomX = Math.floor(Math.random() * x);
+                let randomY = Math.floor(Math.random() * y);
+
+                this.goldenRight = randomX;
+                this.goldenTop = randomY;
+                this.goldenActive = true;
+            },
+            clickGolden() {
+                // 0 - 99
+                let roll = Math.floor(Math.random() * 100);
+                if (roll >= 95) {
+                    // click frenzy
+                    console.log("click frenzy!!!");
+                    this.clickFrenzyActive = true;
+                    this.clickFrenzyEnd = this.unixTimestamp() + this.clickFrenzyLength;
+                } else if (roll >= 47) {
+                    // frenzy
+                    console.log("frenzy!");
+                    this.frenzyActive = true;
+                    this.frenzyEnd = this.unixTimestamp() + this.frenzyLength;
+                } else {
+                    // lucky
+                    console.log("lucky!");
+                    let bonus1 = this.cps.times(900);
+                    let bonus2 = this.currency.times(0.15);
+                    let bonusAmount = bonus1;
+                    if (bonus1.gt(bonus2)) {
+                        bonusAmount = bonus2;
+                    }
+                    this.loopCurrency(bonusAmount.plus(13), 500);
+                }
+                this.goldenActive = false;
+                this.initGolden();
             },
 
             // randomize array
@@ -886,6 +981,9 @@
 
                         let particle = new NumberParticle();
                         let clickPower = vm.$options.filters.round(vm.clickPower);
+                        if (vm.clickFrenzyActive) {
+                            clickPower = vm.$options.filters.round(vm.clickPower * vm.clickFrenzyAmount);
+                        }
                         particle.init(x, y, clickPower);
                         numberParticles.push(particle);
                     },
@@ -974,6 +1072,9 @@
                 this.saveGame();
             }.bind(this), 30000);
 
+            // init next golden
+            this.initGolden();
+
             // start tick loop (dynamic fps)
             window.requestAnimationFrame(this.tick);
 
@@ -985,10 +1086,6 @@
 </script>
 
 <style>
-    #game {
-        padding: 50px;
-    }
-
     .left-panel {
         margin-right: 20px;
     }
@@ -1034,8 +1131,6 @@
     .golden {
         position: absolute;
         opacity: 0.75;
-        top: 250px;
-        right: 650px;
     }
 
     .active {
