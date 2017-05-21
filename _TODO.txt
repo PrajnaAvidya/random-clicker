@@ -1,6 +1,3 @@
-bugs
-- "requires" criteria for upgrades apparently not working
-
 core features
 - tooltips on alerts
 - canvas in left panel

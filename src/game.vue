@@ -343,10 +343,6 @@
 
             // upgrades
             canBuyUpgrade(upgrade) {
-                if (upgrade.unlocked == true) {
-                    return true;
-                }
-
                 if (upgrade.type == this.currencyName) {
                     if (this.currency.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
