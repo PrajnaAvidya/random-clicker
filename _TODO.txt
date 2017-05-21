@@ -32,6 +32,7 @@ achivement checklist
 - tea (milk)
 
 juice/improvements
+- scroll upgrades/achievements
 - break stuff off into other components if possible 
 - refactor new/load/save system
 - show purchase efficiency
