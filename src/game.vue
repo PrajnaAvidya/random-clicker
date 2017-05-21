@@ -6,6 +6,7 @@
                     <v-row class="totals">
 
                         <h2>{{ currency | currency }} {{ currencyName}}s</h2>
+                        <h3 class="red" v-show="luckyActive">Lucky! ({{ luckyAmount | currency }} bonus)</h3>
 
                         <h3>Per second: {{ displayedCps | round }}</h3>
                         <h4 class="red" v-show="frenzyActive">FRENZY! (x{{ this.frenzyAmount }} production)</h4>
@@ -165,6 +166,10 @@
                     goldenStay: 13,
                     goldenNext: 0,
                     goldenDisappear: 0,
+                    luckyActive: false,
+                    luckyAmount: Big(0),
+                    luckyLength: 10,
+                    luckyEnd: 0,
                     frenzyActive: false,
                     frenzyAmount: 7,
                     frenzyLength: 77,
@@ -489,7 +494,12 @@
                 let division = 1000 / progress;
                 let currencyIncrement = this.cps.div(division);
 
-                // check for click frenzy end
+                // check for lucky/clickfrenzy end
+                if (this.luckyActive) {
+                    if (this.unixTimestamp() > this.luckyEnd) {
+                        this.luckyActive = false;
+                    }
+                }
                 if (this.clickFrenzyActive) {
                     if (this.unixTimestamp() > this.clickFrenzyEnd) {
                         this.clickFrenzyActive = false;
@@ -855,11 +865,13 @@
                     console.log("lucky!");
                     let bonus1 = this.cps.times(900);
                     let bonus2 = this.currency.times(0.15);
-                    let bonusAmount = bonus1;
+                    this.luckyAmount = bonus1;
                     if (bonus1.gt(bonus2)) {
-                        bonusAmount = bonus2;
+                        this.luckyAmount = bonus2;
                     }
-                    this.loopCurrency(bonusAmount.plus(13), 500);
+                    this.luckyActive = true;
+                    this.luckyEnd = this.unixTimestamp() + this.luckyLength;
+                    this.loopCurrency(this.luckyAmount.plus(13), 500);
                 }
                 this.goldenActive = false;
                 this.initGolden();
