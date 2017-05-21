@@ -16,7 +16,9 @@
 
                     </v-layout>
 
-                    <div class="row currency" id="currency" @click="click"></div>
+                    <center>
+                        <div class="row currency" id="currency" @click="click"></div>
+                    </center>
                 </v-flex>
 
                 <v-flex md4>
@@ -24,9 +26,9 @@
                         <h3>Buildings</h3>
 
                         <div class="buy-sell-buttons">
-                            <v-btn light default :class="{ active:this.buyAmount == 1 }" @click.native="setBuyAmount(1)">Buy 1</v-btn>
-                            <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 10 }" @click.native="setBuyAmount(10)">Buy 10</v-btn>
-                            <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
+                            <v-btn dark default class="green" :class="{ active:this.buyAmount == 1 }" @click.native="setBuyAmount(1)">Buy 1</v-btn>
+                            <v-btn dark default class="green" :class="{ active:this.buyAmount == 10 }" @click.native="setBuyAmount(10)">Buy 10</v-btn>
+                            <v-btn dark default class="green" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
                         </div>
 
                         <v-layout class="building" v-for="building in buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
@@ -36,7 +38,7 @@
                                 <span>({{ building.owned }} owned)</span>
                             </v-flex>
                             <v-flex xs7>
-                                <v-btn light default class="btn btn-default" @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
+                                <v-btn dark default @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
                             </v-flex>
                         </v-layout>
                     </v-layout>
@@ -61,8 +63,8 @@
                     </v-layout>
 
                     <div class="game-utils">
-                        <v-btn light default class="btn btn-default" @click.native="saveGame">Save Game</v-btn>
-                        <v-btn light error default class="btn btn-danger" @click.native="hardReset">Hard Reset</v-btn>
+                        <v-btn dark default class="blue" @click.native="saveGame">Save Game</v-btn>
+                        <v-btn dark default class="red" @click.native="hardReset">Hard Reset</v-btn>
                     </div>
                 </v-flex>
             </v-layout>
@@ -80,7 +82,7 @@
                         </v-card-text>
                     </v-card-row>
                     <v-card-row actions>
-                        <v-btn light default @click.native="bonusDialog = false">Cool!</v-btn>
+                        <v-btn dark default @click.native="bonusDialog = false">Cool!</v-btn>
                     </v-card-row>
                 </v-card>
             </v-dialog>
@@ -1209,5 +1211,9 @@
     [data-tooltip]:before {
         font-size: 12px;
         height: 60px;
+    }
+
+    canvas {
+        align-self: center;
     }
 </style>
