@@ -58,7 +58,7 @@
                         <h3>Achievements</h3>
 
                         <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
-                            <span v-tooltip:top="{ html: achievementText(achievement) }"><v-icon dark>{{ achievement.icon }}</v-icon></span>
+                            <span v-tooltip:top="{ html: achievement.description }"><v-icon dark>{{ achievement.icon }}</v-icon></span>
                             <span>{{ achievement.name }}</span>
                         </div>
                     </v-layout>
@@ -497,18 +497,7 @@
                 this.achievementCount++;
                 this.showAchievements = true;
 
-                Event.fire('addAlert', achievement.name)
-            },
-            achievementText(achievement) {
-                if (achievement.cps != null) {
-                    return "Reached a total of " + achievement.cps + " " + this.currencyName + "/sec";
-                } else if (achievement.clicks != null) {
-                    return "Generated a total of " + achievement.clicks + " " + this.currencyName + "s using clicks";
-                } else if (achievement.type == this.currencyName) {
-                    return "Generated a total of " + achievement.total + " " + this.currencyName + "s";
-                } else {
-                    return "Built a total of " + achievement.total + " " + achievement.type;
-                }
+                Event.fire('addAlert', achievement)
             },
 
             // tick function
@@ -694,12 +683,15 @@
                     if (productionAchievement.total != null) {
                         achievement.total = Big(productionAchievement.total);
                         achievement.icon = vm.totalIcon;
+                        achievement.description = "Generated a total of " + productionAchievement.total + " " + vm.currencyName + "s";
                     } else if (productionAchievement.cps != null) {
                         achievement.cps = Big(productionAchievement.cps);
                         achievement.icon = vm.cpsIcon;
+                        achievement.description = "Reached a total of " + productionAchievement.cps + " " + vm.currencyName + "/sec";
                     } else if (productionAchievement.clicks != null) {
                         achievement.clicks = Big(productionAchievement.clicks);
                         achievement.icon = vm.clicksIcon;
+                        achievement.description = "Generated a total of " + productionAchievement.clicks + " " + vm.currencyName + "s using clicks";
                     }
 
                     vm.achievements.push(achievement);
@@ -714,12 +706,11 @@
                         total: Big(buildingAchivement.total),
                         unlocked: false,
                         icon: vm.buildingIcons[upgradeIndex],
+                        description: "Built a total of " + buildingAchivement.total + " " + vm.buildingNames[upgradeIndex],
                     };
 
                     vm.achievements.push(achievement);
                 });
-
-                console.log(this.achievements);
             },
 
             // setup/save

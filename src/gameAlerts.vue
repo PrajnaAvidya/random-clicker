@@ -2,7 +2,9 @@
     <v-layout class="alerts">
         <v-flex md8 offset-md2>
             <v-alert info dismissible v-for="alert in alerts" :key="alert" v-model="alert.show">
-                {{ alert.name }}
+                <span v-tooltip:top="{ html: alert.description }">
+                    {{ alert.name }}
+                </span>
             </v-alert>
         </v-flex>
     </v-layout>
@@ -24,7 +26,7 @@
                 }
 
                 this.alerts.push(
-                    { name: alert, show: true }
+                    { name: alert.name, description: alert.description, show: true }
                 );
             }
         },
