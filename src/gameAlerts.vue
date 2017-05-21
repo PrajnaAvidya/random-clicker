@@ -1,11 +1,11 @@
 <template>
-    <v-row class="alerts">
-        <v-col md8 offset-md2>
+    <v-layout class="alerts">
+        <v-flex md8 offset-md2>
             <v-alert info dismissible v-for="alert in alerts" :key="alert" v-model="alert.show">
                 {{ alert.name }}
             </v-alert>
-        </v-col>
-    </v-row>
+        </v-flex>
+    </v-layout>
 </template>
 
 <script>

@@ -1,9 +1,9 @@
 <template>
     <v-app>
         <v-container fluid="fluid">
-            <v-row>
-                <v-col md5>
-                    <v-row class="totals">
+            <v-layout>
+                <v-flex md5>
+                    <v-layout class="totals">
 
                         <h2>{{ currency | currency }} {{ currencyName}}s</h2>
                         <h3 class="red" v-show="luckyActive">Lucky! ({{ luckyAmount | currency }} bonus)</h3>
@@ -14,13 +14,13 @@
                         <h4>Per click: {{ displayedClickPower | currency }}</h4>
                         <h5 class="red" v-show="clickFrenzyActive">CLICK FRENZY!!! (x{{ this.clickFrenzyAmount }} clicks)</h5>
 
-                    </v-row>
+                    </v-layout>
 
                     <div class="row currency" id="currency" @click="click"></div>
-                </v-col>
+                </v-flex>
 
-                <v-col md4>
-                    <v-row class="buildings">
+                <v-flex md4>
+                    <v-layout class="buildings">
                         <h3>Buildings</h3>
 
                         <div class="buy-sell-buttons">
@@ -29,43 +29,43 @@
                             <v-btn light default class="btn btn-default" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
                         </div>
 
-                        <v-row class="building" v-for="building in buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
-                            <v-col xs5>
+                        <v-layout class="building" v-for="building in buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
+                            <v-flex xs5>
                                 <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
                                 <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
                                 <span>({{ building.owned }} owned)</span>
-                            </v-col>
-                            <v-col xs7>
+                            </v-flex>
+                            <v-flex xs7>
                                 <v-btn light default class="btn btn-default" @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
-                            </v-col>
-                        </v-row>
-                    </v-row>
-                </v-col>
+                            </v-flex>
+                        </v-layout>
+                    </v-layout>
+                </v-flex>
 
-                <v-col md3>
-                    <v-row class="upgrades" v-if="showUpgrades">
+                <v-flex md3>
+                    <v-layout class="upgrades" v-if="showUpgrades">
                         <h3>Upgrades</h3>
 
                         <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
                             <span v-tooltip:top="{ html: upgradeText(upgrade) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
                             <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                         </div>
-                    </v-row>
+                    </v-layout>
 
-                    <v-row class="achievements" v-if="showAchievements">
+                    <v-layout class="achievements" v-if="showAchievements">
                         <h3>Achievements</h3>
 
                         <div v-for="achievement in achievements" :key="achievement" v-if="achievement.unlocked">
                             <span v-tooltip:top="{ html: achievementText(achievement) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>                            {{ achievement.name }}
                         </div>
-                    </v-row>
+                    </v-layout>
 
                     <div class="game-utils">
                         <v-btn light default class="btn btn-default" @click.native="saveGame">Save Game</v-btn>
                         <v-btn light error default class="btn btn-danger" @click.native="hardReset">Hard Reset</v-btn>
                     </div>
-                </v-col>
-            </v-row>
+                </v-flex>
+            </v-layout>
 
             <GameAlerts></GameAlerts>
 
