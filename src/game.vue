@@ -163,6 +163,8 @@
                     goldenActive: false,
                     goldenMinimumTime: 300,
                     goldenMaximumTime: 900,
+                    /*goldenMinimumTime: 1,
+                    goldenMaximumTime: 2,*/
                     goldenStay: 13,
                     goldenNext: 0,
                     goldenDisappear: 0,
@@ -188,23 +190,17 @@
 
             // clicking/cps
             click() {
-                // check for click frenzy
-                let clickPower = this.clickPower;
-                if (this.clickFrenzyActive) {
-                    clickPower = clickPower.times(this.clickFrenzyAmount);
-                }
-
                 // add to overall stats
-                this.clicks = this.clicks.plus(clickPower);
-                this.totalCurrency = this.totalCurrency.plus(clickPower);
+                this.clicks = this.clicks.plus(this.clickPower);
+                this.totalCurrency = this.totalCurrency.plus(this.clickPower);
 
                 // skip loop if cps is too high or clickPower = 1
-                if (clickPower == 1 || this.clickFrenzyActive || this.cps.gte(clickPower.times(10))) {
-                    this.currency = this.currency.plus(clickPower);
+                if (this.clickPower == 1 || this.clickFrenzyActive || this.cps.gte(this.clickPower.times(10))) {
+                    this.currency = this.currency.plus(this.clickPower);
                     return;
                 }
 
-                this.loopCurrency(clickPower);
+                this.loopCurrency(this.clickPower);
             },
             // show currency ticking up effect (when clicking & loading)
             loopCurrency(amount, ms = 333) {
@@ -222,7 +218,18 @@
             },
             recalculateClickPower() {
                 let clickPower = this.upgradeMultiplier(this.buildingNames[0]).plus(this.upgradeAddition());
+
+                // add click frenzy bonus
+                if (this.clickFrenzyActive) {
+                    clickPower = clickPower.times(this.clickFrenzyAmount);
+                }
+
                 let cpsMultiplierBonus = this.upgradeMultiplier('Clicking').minus(1).times(this.cps);
+
+                // add frenzy bonus
+                if (this.frenzyActive) {
+                    cpsMultiplierBonus = cpsMultiplierBonus.times(this.frenzyAmount);
+                }
                 this.clickPower = clickPower.plus(cpsMultiplierBonus);
             },
             recalculateCps() {
@@ -239,6 +246,11 @@
 
                 // add production upgrades
                 cps = cps.times(this.upgradeProduction());
+
+                // add frenzy bonus
+                if (this.frenzyActive) {
+                    cps = cps.times(this.frenzyAmount);
+                }
 
                 this.cps = cps;
             },
@@ -494,7 +506,7 @@
                 let division = 1000 / progress;
                 let currencyIncrement = this.cps.div(division);
 
-                // check for lucky/clickfrenzy end
+                // check for bonus end
                 if (this.luckyActive) {
                     if (this.unixTimestamp() > this.luckyEnd) {
                         this.luckyActive = false;
@@ -503,14 +515,15 @@
                 if (this.clickFrenzyActive) {
                     if (this.unixTimestamp() > this.clickFrenzyEnd) {
                         this.clickFrenzyActive = false;
+                        this.recalculateCps();
+                        this.recalculateClickPower();
                     }
                 }
-
-                // check for frenzy
                 if (this.frenzyActive) {
-                    currencyIncrement = currencyIncrement.times(this.frenzyAmount);
                     if (this.unixTimestamp() > this.frenzyEnd) {
                         this.frenzyActive = false;
+                        this.recalculateCps();
+                        this.recalculateClickPower();
                     }
                 }
 
@@ -850,29 +863,32 @@
             clickGolden() {
                 // 0 - 99
                 let roll = Math.floor(Math.random() * 100);
-                if (roll >= 95) {
+                roll = 99;
+                if (roll >= 95 && !this.clickFrenzyActive) {
                     // click frenzy
-                    console.log("click frenzy!!!");
                     this.clickFrenzyActive = true;
                     this.clickFrenzyEnd = this.unixTimestamp() + this.clickFrenzyLength;
-                } else if (roll >= 47) {
+                } else if (roll >= 47 && !this.frenzyActive) {
                     // frenzy
-                    console.log("frenzy!");
                     this.frenzyActive = true;
                     this.frenzyEnd = this.unixTimestamp() + this.frenzyLength;
                 } else {
                     // lucky
-                    console.log("lucky!");
                     let bonus1 = this.cps.times(900);
                     let bonus2 = this.currency.times(0.15);
                     this.luckyAmount = bonus1;
                     if (bonus1.gt(bonus2)) {
                         this.luckyAmount = bonus2;
                     }
+                    this.luckyAmount = this.luckyAmount.plus(13)
                     this.luckyActive = true;
                     this.luckyEnd = this.unixTimestamp() + this.luckyLength;
-                    this.loopCurrency(this.luckyAmount.plus(13), 500);
+                    this.loopCurrency(this.luckyAmount, 500);
                 }
+
+                this.recalculateCps();
+                this.recalculateClickPower();
+
                 this.goldenActive = false;
                 this.initGolden();
             },
@@ -993,9 +1009,6 @@
 
                         let particle = new NumberParticle();
                         let clickPower = vm.$options.filters.round(vm.clickPower);
-                        if (vm.clickFrenzyActive) {
-                            clickPower = vm.$options.filters.round(vm.clickPower * vm.clickFrenzyAmount);
-                        }
                         particle.init(x, y, clickPower);
                         numberParticles.push(particle);
                     },
