@@ -120,12 +120,13 @@
         methods: {
             defaultData() {
                 return {
-                    // disable for debug
-                    enableLoad: true,
+                    // debug mode doesn't load game & starts with a lot of currency + fast golden crackers
+                    debug: false,
 
                     // for fps calculations
                     lastFrame: 0,
 
+                    // game data
                     currencyName: null,
                     currency: Big(0),
                     startingCurrency: Big(0),
@@ -148,23 +149,22 @@
                     achievementCount: 0,
 
                     buildingCostMultiplier: 0.15,
+
+                    // this stuff gets loaded from data files
                     buildingNames: [],
                     buildings: [],
-
                     upgrades: [],
                     _sortedUpgrades: null,
-
                     adjectives: [],
-
                     achievements: [],
+                    words: [],
 
+                    // golden crackers
                     goldenTop: 250,
                     goldenRight: 850,
                     goldenActive: false,
                     goldenMinimumTime: 300,
                     goldenMaximumTime: 900,
-                    /*goldenMinimumTime: 1,
-                    goldenMaximumTime: 2,*/
                     goldenStay: 13,
                     goldenNext: 0,
                     goldenDisappear: 0,
@@ -180,7 +180,10 @@
                     clickFrenzyLength: 13,
                     frenzyEnd: 0,
 
-                    words: null,
+                    // audio (gets loaded)
+                    clickSound: 'tick.ogg',
+                    goldenSpawnSound: 'bell.ogg',
+                    goldenClickSound: 'chaching.ogg',
                 }
             },
 
@@ -190,6 +193,8 @@
 
             // clicking/cps
             click() {
+                this.clickSound.play();
+
                 // add to overall stats
                 this.clicks = this.clicks.plus(this.clickPower);
                 this.totalCurrency = this.totalCurrency.plus(this.clickPower);
@@ -859,6 +864,8 @@
                 this.goldenRight = randomX;
                 this.goldenTop = randomY;
                 this.goldenActive = true;
+
+                this.goldenSpawnSound.play();
             },
             clickGolden() {
                 // 0 - 99
@@ -884,6 +891,8 @@
                     this.luckyEnd = this.unixTimestamp() + this.luckyLength;
                     this.loopCurrency(this.luckyAmount, 500);
                 }
+
+                this.goldenClickSound.play();
 
                 this.recalculateCps();
                 this.recalculateClickPower();
@@ -1039,6 +1048,7 @@
                     return 0;
                 }
                 if (value < 10) {
+                    // TODO maybe bump this up
                     return Number((value).toFixed(1));
                 } else if (value <= 999999) {
                     return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -1080,11 +1090,24 @@
             }
         },
         mounted() {
-            if (this.enableLoad && localStorage.getItem("SaveGame") != null) {
+            if (!this.debug && localStorage.getItem("SaveGame") != null) {
                 this.loadGame(localStorage.getItem("SaveGame"));
             } else {
                 this.newGame();
             }
+
+            // check for debug mode
+            if (this.debug) {
+                //this.currency = Big(1E21);
+                //this.clickPower = Big(100);
+                this.goldenMinimumTime = 3;
+                this.goldenMaximumTime = 5;
+            }
+
+            // load audio
+            this.clickSound = new Audio('/static/' + this.clickSound);
+            this.goldenSpawnSound = new Audio('/static/' + this.goldenSpawnSound);
+            this.goldenClickSound = new Audio('/static/' + this.goldenClickSound);
 
             // check achievements every couple seconds
             setInterval(function () {
@@ -1096,10 +1119,10 @@
                 this.saveGame();
             }.bind(this), 30000);
 
-            // init next golden
+            // init next golden cracker
             this.initGolden();
 
-            // start tick loop (dynamic fps)
+            // start update loop (dynamic fps)
             window.requestAnimationFrame(this.tick);
 
             // start particle effects

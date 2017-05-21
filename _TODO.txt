@@ -1,6 +1,6 @@
 core features
-- sounds
-- track golden cracker stats/attributes
+- track more data
+-- golden cracker stats/attributes
 
 performance
 - account for autoclickers and limit particle generation/updates if necessary
@@ -28,6 +28,7 @@ more achivements
 
 juice/improvements
 - show purchase efficiency
+- more sounds
 - generated descriptions
 -- what if i sourced them from reddit thread titles or something?
 - menu/preferences
