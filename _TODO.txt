@@ -43,7 +43,6 @@ juice/improvements
 -- what if i sourced them from reddit thread titles or something?
 - menu/preferences
 -- import/export game
-- generated/random icons for buildings/upgrades
 - upgrade/achievement costs based on formula instead of static?
 
 6E = million

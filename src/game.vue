@@ -33,7 +33,7 @@
 
                         <v-layout class="building" v-for="building in buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
                             <v-flex xs5>
-                                <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
+                                <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon dark>{{ building.icon }}</v-icon></span>
                                 <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
                                 <span>({{ building.owned }} owned)</span>
                             </v-flex>
@@ -49,7 +49,7 @@
                         <h3>Upgrades</h3>
 
                         <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                            <span v-tooltip:top="{ html: upgradeText(upgrade) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>
+                            <span v-tooltip:top="{ html: upgradeText(upgrade) }"><v-icon dark>{{ upgrade.icon }}</v-icon></span>
                             <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                         </div>
                     </v-layout>
@@ -57,8 +57,9 @@
                     <v-layout class="achievements" v-if="showAchievements">
                         <h3>Achievements</h3>
 
-                        <div v-for="achievement in achievements" :key="achievement" v-if="achievement.unlocked">
-                            <span v-tooltip:top="{ html: achievementText(achievement) }"><v-icon class="grey--text text--darken-2">info</v-icon></span>                            {{ achievement.name }}
+                        <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
+                            <span v-tooltip:top="{ html: achievementText(achievement) }"><v-icon dark>{{ achievement.icon }}</v-icon></span>
+                            <span>{{ achievement.name }}</span>
                         </div>
                     </v-layout>
 
@@ -134,7 +135,7 @@
                     // game data
                     currencyName: null,
                     currency: Big(0),
-                    startingCurrency: Big(0),
+                    startingCurrency: Big(1E12),
                     totalCurrency: Big(0),
                     bonusCurrency: Big(0),
                     bonusDialog: false,
@@ -157,12 +158,17 @@
 
                     // this stuff gets loaded from data files
                     buildingNames: [],
+                    buildingIcons: [],
                     buildings: [],
                     upgrades: [],
                     _sortedUpgrades: null,
                     adjectives: [],
+                    icons: [],
                     achievements: [],
                     words: [],
+                    totalIcon: null,
+                    cpsIcon: null,
+                    clicksIcon: null,
 
                     // golden crackers
                     goldenTop: 250,
@@ -583,6 +589,7 @@
                 for (let i = 0; i < GameData.buildings.length; i++) {
                     let buildingName = buildingNames.pop();
                     let building = JSON.parse(JSON.stringify(GameData.buildings[i]));
+                    let buildingIcon = this.icons.pop();
                     building.baseCost = Big(building.baseCost);
                     building.buyCost = Big(building.baseCost);
                     building.baseCps = Big(building.baseCps);
@@ -595,15 +602,18 @@
                     } else {
                         building.showAt = Big(0);
                     }
+                    building.icon = buildingIcon;
 
                     this.buildings.push(building);
                     this.buildingNames.push(buildingName);
+                    this.buildingIcons.push(buildingIcon);
                 }
             },
             generateUpgrades() {
                 let vm = this;
 
                 // cps upgrades
+                this.cpsIcon = this.icons.pop();
                 GameData.productionUpgrades.forEach(function (productionUpgrade) {
                     let upgrade = {
                         type: vm.currencyName,
@@ -612,7 +622,9 @@
                         cost: Big(productionUpgrade.cost),
                         multiplier: productionUpgrade.multiplier,
                         description: "Need Description",
-                        unlocked: false, active: false
+                        unlocked: false,
+                        active: false,
+                        icon: vm.cpsIcon,
                     };
 
                     vm.upgrades.push(upgrade)
@@ -638,6 +650,7 @@
                             description: "Need Description",
                             unlocked: false,
                             active: false,
+                            icon: vm.buildingIcons[upgradeIndex]
                         };
 
                         // parse amount
@@ -654,6 +667,7 @@
                 });
 
                 // clicking upgrades
+                this.clicksIcon = this.icons.pop();
                 GameData.clickingUpgrades.forEach(function (upgradeParams) {
                     let upgrade = {
                         type: 'Clicking',
@@ -664,6 +678,7 @@
                         description: "Need Description",
                         unlocked: false,
                         active: false,
+                        icon: vm.clicksIcon,
                     };
 
                     vm.upgrades.push(upgrade)
@@ -672,6 +687,7 @@
             generateAchievements() {
                 let vm = this;
 
+                this.totalIcon = this.icons.pop();
                 GameData.productionAchievements.forEach(function (productionAchievement) {
                     let achievement = {
                         type: vm.currencyName,
@@ -681,10 +697,13 @@
 
                     if (productionAchievement.total != null) {
                         achievement.total = Big(productionAchievement.total);
+                        achievement.icon = vm.totalIcon;
                     } else if (productionAchievement.cps != null) {
                         achievement.cps = Big(productionAchievement.cps);
+                        achievement.icon = vm.cpsIcon;
                     } else if (productionAchievement.clicks != null) {
                         achievement.clicks = Big(productionAchievement.clicks);
+                        achievement.icon = vm.clicksIcon;
                     }
 
                     vm.achievements.push(achievement);
@@ -698,10 +717,13 @@
                         name: vm.adjectives.pop() + " " + vm.buildingNames[upgradeIndex],
                         total: Big(buildingAchivement.total),
                         unlocked: false,
+                        icon: vm.buildingIcons[upgradeIndex],
                     };
 
                     vm.achievements.push(achievement);
                 });
+
+                console.log(this.achievements);
             },
 
             // setup/save
@@ -718,6 +740,7 @@
                 this.currencyName = 'Cracker';
                 document.title = this.currencyName + ' Clicker';
                 this.adjectives = this.shuffleArray(this.words.adjectives);
+                this.icons = this.shuffleArray(this.words.icons);
 
                 // generate stuff
                 this.generateBuildings();
@@ -734,6 +757,7 @@
                     // start new game
                     this.newGame();
                     this.loadSounds();
+                    this.initGolden();
                 }
             },
             saveGame() {
@@ -792,7 +816,8 @@
                         description: saveBuilding.description,
                         unlocked: saveBuilding.unlocked,
                         showAt: saveBuilding.showAt,
-                        owned: saveBuilding.owned
+                        owned: saveBuilding.owned,
+                        icon: saveBuilding.icon
                     };
                     vm.buildings.push(building);
                 });
@@ -804,6 +829,7 @@
                         name: saveUpgrade.name,
                         needed: saveUpgrade.needed,
                         cost: Big(saveUpgrade.cost),
+                        icon: saveUpgrade.icon,
 
                         description: saveUpgrade.description,
                         unlocked: saveUpgrade.unlocked,
@@ -824,7 +850,8 @@
                     let achievement = {
                         type: saveAchievement.type,
                         name: saveAchievement.name,
-                        unlocked: saveAchievement.unlocked
+                        unlocked: saveAchievement.unlocked,
+                        icon: saveAchievement.icon,
                     };
                     if (saveAchievement.total != null) {
                         achievement.total = Big(saveAchievement.total);
