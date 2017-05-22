@@ -836,6 +836,7 @@
                         name: saveAchievement.name,
                         unlocked: saveAchievement.unlocked,
                         icon: saveAchievement.icon,
+                        description: saveAchievement.description,
                     };
                     if (saveAchievement.total != null) {
                         achievement.total = Big(saveAchievement.total);

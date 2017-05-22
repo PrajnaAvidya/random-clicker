@@ -1,7 +1,6 @@
-core features
-- clear alerts when hard reset
+bugs/core features
 - static descriptions for upgrades (like I did with achievements)
-- tooltips on alerts
+- clear alerts when hard reset
 - canvas in left panel
 -- falling cracker effect
 -- tea (milk) effect
