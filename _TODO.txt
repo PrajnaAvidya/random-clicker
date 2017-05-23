@@ -1,5 +1,4 @@
-bugs/core features
-- clear alerts when hard reset
+core features
 - canvas in left panel
 -- falling cracker effect
 -- tea (milk) effect

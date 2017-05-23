@@ -472,7 +472,7 @@
                 this.achievementCount++;
                 this.showAchievements = true;
 
-                Event.fire('addAlert', achievement)
+                Event.fire('addAlert', achievement);
             },
 
             // tick function
@@ -727,6 +727,8 @@
             },
             hardReset() {
                 if (confirm("Are you sure?")) {
+                    Event.fire('clearAlerts');
+
                     // start new game
                     this.newGame();
                     this.loadSounds();
