@@ -49,7 +49,7 @@
                         <h3>Upgrades</h3>
 
                         <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                            <span v-tooltip:top="{ html: upgradeText(upgrade) }"><v-icon dark>{{ upgrade.icon }}</v-icon></span>
+                            <span v-tooltip:top="{ html: upgrade.description }"><v-icon dark>{{ upgrade.icon }}</v-icon></span>
                             <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                         </div>
                     </v-layout>
@@ -150,7 +150,6 @@
                     showUpgrades: false,
                     showAchievements: false,
                     achievementCount: 0,
-
                     buildingCostMultiplier: 0.15,
 
                     // this stuff gets loaded from data files
@@ -439,27 +438,6 @@
                 });
                 return production;
             },
-            upgradeText(upgrade) {
-                let upgradeText = '';// upgrade.description;
-                if (upgrade.type == 'Clicking') {
-                    upgradeText += 'Clicking gains 1% of your ' + this.currencyName + ' per second';
-                } else if (upgrade.multiplier != null) {
-                    upgradeText += "Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
-                    if (upgrade.type == this.buildingNames[0]) {
-                        upgradeText += "\nAlso multiplies clicks";
-                    }
-                } else if (upgrade.addition != null) {
-                    upgradeText += "Adds " + upgrade.addition + " " + this.currencyName + " production for every non-" + upgrade.type + " building owned";
-                    if (upgrade.type == this.buildingNames[0]) {
-                        upgradeText += "\nAlso adds to clicks";
-                    }
-                }
-                if (upgrade.type != 'Clicking' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) < upgrade.needed) {
-                    upgradeText += "\nRequires " + upgrade.needed + " " + upgrade.type;
-                }
-
-                return upgradeText;
-            },
 
             // achievements
             checkAchievements() {
@@ -603,7 +581,7 @@
                         needed: Big(productionUpgrade.needed),
                         cost: Big(productionUpgrade.cost),
                         multiplier: productionUpgrade.multiplier,
-                        description: "Need Description",
+                        description: "Multiplies " + vm.currencyName + " production by " + productionUpgrade.multiplier + "x",
                         unlocked: false,
                         active: false,
                         icon: vm.cpsIcon,
@@ -629,7 +607,6 @@
                             name: vm.adjectives.pop() + " " + vm.buildingNames[upgradeIndex] + "s",
                             needed: upgradeNeeds[i],
                             cost: Big(upgradeCosts[i]),
-                            description: "Need Description",
                             unlocked: false,
                             active: false,
                             icon: vm.buildingIcons[upgradeIndex]
@@ -638,9 +615,21 @@
                         // parse amount
                         if (upgradeAmounts[i].substr(0, 1) == "m") {
                             upgrade.multiplier = parseInt(upgradeAmounts[i].substr(1));
+                            upgrade.description = "Multiplies " + vm.buildingNames[upgradeIndex] + " production by " + upgrade.multiplier + "x";
+                            if (upgradeIndex == 0) {
+                                upgrade.description += "\nAlso multiplies clicks";
+                            }
                         } else if (upgradeAmounts[i].substr(0, 1) == "a") {
                             upgrade.addition = parseFloat(upgradeAmounts[i].substr(1));
+                            upgrade.description = "Adds " + upgrade.addition + " " + vm.currencyName + " production for every non-" + vm.buildingNames[upgradeIndex] + " building owned";
+                            if (upgradeIndex == 0) {
+                                upgrade.description += "\nAlso adds to clicks";
+                            }
                         }
+
+                        /*if (vm.buildingCount(upgrade.type) < upgrade.needed) {
+                            upgradeText += "\nRequires " + upgrade.needed + " " + upgrade.type;
+                        }*/
 
                         vm.upgrades.push(upgrade)
                     }
@@ -657,7 +646,7 @@
                         multiplier: upgradeParams.multiplier,
                         needed: Big(upgradeParams.needed),
                         cost: Big(upgradeParams.cost),
-                        description: "Need Description",
+                        description: 'Clicking gains 1% of your ' + vm.currencyName + ' per second',
                         unlocked: false,
                         active: false,
                         icon: vm.clicksIcon,
@@ -1211,11 +1200,6 @@
         box-shadow: 3px 0 2px #444;
         border: 1px dotted #555;
         background: -moz-linear-gradient(180deg, #000, #222);
-    }
-
-    [data-tooltip]:before {
-        font-size: 12px;
-        height: 60px;
     }
 
     canvas {

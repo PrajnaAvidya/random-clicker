@@ -1,5 +1,4 @@
 bugs/core features
-- static descriptions for upgrades (like I did with achievements)
 - clear alerts when hard reset
 - canvas in left panel
 -- falling cracker effect
