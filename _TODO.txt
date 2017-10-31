@@ -1,3 +1,8 @@
+bugs
+- idle currency won't let me buy some upgrades
+- color scheme/theme changes in vuetify
+- achievement dismiss styling
+
 core features
 - canvas in left panel
 -- falling cracker effect

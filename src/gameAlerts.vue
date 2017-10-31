@@ -1,10 +1,11 @@
 <template>
     <v-layout class="alerts">
         <v-flex md8 offset-md2>
-            <v-alert info dismissible v-for="alert in alerts" :key="alert" v-model="alert.show">
-                <span v-tooltip:top="{ html: alert.description }">
-                    {{ alert.name }}
-                </span>
+            <v-alert info dismissible v-for="(alert, alertIndex) in alerts" :key="alertIndex" v-model="alert.show">
+                <v-tooltip top>
+                    <span slot="activator">{{ alert.name }}</span>
+                    <span>{{ alert.description }}</span>
+                </v-tooltip>
             </v-alert>
         </v-flex>
     </v-layout>

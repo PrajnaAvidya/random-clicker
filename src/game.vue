@@ -31,9 +31,12 @@
                             <v-btn dark default class="green" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
                         </div>
 
-                        <v-layout class="building" v-for="building in buildings" :key="building" v-if="building.owned > 0 || showBuilding(building)">
+                        <v-layout class="building" v-for="(building, buildingIndex) in buildings" :key="buildingIndex" v-if="building.owned > 0 || showBuilding(building)">
                             <v-flex xs5>
-                                <span v-if="building.unlocked" v-tooltip:top="{ html: buildingText(building) }"><v-icon dark>{{ building.icon }}</v-icon></span>
+                                <v-tooltip top v-if="building.unlocked">
+                                    <v-icon light slot="activator">{{ building.icon }}</v-icon>
+                                    <span>{{ buildingText(building) }}</span>
+                                </v-tooltip>
                                 <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
                                 <span>({{ building.owned }} owned)</span>
                             </v-flex>
@@ -49,7 +52,10 @@
                         <h3>Upgrades</h3>
 
                         <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                            <span v-tooltip:top="{ html: upgrade.description }"><v-icon dark>{{ upgrade.icon }}</v-icon></span>
+                            <v-tooltip top>
+                                <v-icon light slot="activator">{{ upgrade.icon }}</v-icon>
+                                <span>{{ upgrade.description }}</span>
+                            </v-tooltip>
                             <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                         </div>
                     </v-layout>
@@ -58,7 +64,10 @@
                         <h3>Achievements</h3>
 
                         <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
-                            <span v-tooltip:top="{ html: achievement.description }"><v-icon dark>{{ achievement.icon }}</v-icon></span>
+                            <v-tooltip top>
+                                <v-icon light slot="activator">{{ achievement.icon }}</v-icon>
+                                <span>{{ achievement.description }}</span>
+                            </v-tooltip>
                             <span>{{ achievement.name }}</span>
                         </div>
                     </v-layout>
@@ -74,17 +83,15 @@
 
             <v-dialog v-model="bonusDialog">
                 <v-card>
-                    <v-card-row>
+                    <v-card-title>
                         <v-card-title>Bonus {{ currencyName }}s</v-card-title>
-                    </v-card-row>
-                    <v-card-row>
-                        <v-card-text>
-                            While you were away, you earned {{ bonusCurrency | currency }} bonus {{ currencyName }}s!
-                        </v-card-text>
-                    </v-card-row>
-                    <v-card-row actions>
+                    </v-card-title>
+                    <v-card-text>
+                        While you were away, you earned {{ bonusCurrency | currency }} bonus {{ currencyName }}s!
+                    </v-card-text>
+                    <v-card-actions>
                         <v-btn dark default @click.native="bonusDialog = false">Cool!</v-btn>
-                    </v-card-row>
+                    </v-card-actions>
                 </v-card>
             </v-dialog>
 
@@ -778,7 +785,7 @@
                 this.achievementCount = saveData.achievementCount;
                 this.buildingNames = saveData.buildingNames;
                 this.buildingCostMultiplier = saveData.buildingCostMultiplier;
-
+                
                 // parse buildings/upgrades/achievements (cast numbers to big.js)
                 this.buildings = [];
                 saveData.buildings.forEach(function (saveBuilding) {
