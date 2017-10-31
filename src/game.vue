@@ -26,9 +26,9 @@
                         <h3>Buildings</h3>
 
                         <div class="buy-sell-buttons">
-                            <v-btn dark default class="green" :class="{ active:this.buyAmount == 1 }" @click.native="setBuyAmount(1)">Buy 1</v-btn>
-                            <v-btn dark default class="green" :class="{ active:this.buyAmount == 10 }" @click.native="setBuyAmount(10)">Buy 10</v-btn>
-                            <v-btn dark default class="green" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
+                            <v-btn default class="green" :class="{ active:this.buyAmount == 1 }" @click.native="setBuyAmount(1)">Buy 1</v-btn>
+                            <v-btn default class="green" :class="{ active:this.buyAmount == 10 }" @click.native="setBuyAmount(10)">Buy 10</v-btn>
+                            <v-btn default class="green" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
                         </div>
 
                         <v-layout class="building" v-for="(building, buildingIndex) in buildings" :key="buildingIndex" v-if="building.owned > 0 || showBuilding(building)">
@@ -41,7 +41,7 @@
                                 <span>({{ building.owned }} owned)</span>
                             </v-flex>
                             <v-flex xs7>
-                                <v-btn dark default @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
+                                <v-btn default @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
                             </v-flex>
                         </v-layout>
                     </v-layout>
@@ -73,8 +73,8 @@
                     </v-layout>
 
                     <div class="game-utils">
-                        <v-btn dark default class="blue" @click.native="saveGame">Save Game</v-btn>
-                        <v-btn dark default class="red" @click.native="hardReset">Hard Reset</v-btn>
+                        <v-btn default class="blue" @click.native="saveGame">Save Game</v-btn>
+                        <v-btn default class="red" @click.native="hardReset">Hard Reset</v-btn>
                     </div>
                 </v-flex>
             </v-layout>
@@ -90,7 +90,7 @@
                         While you were away, you earned {{ bonusCurrency | currency }} bonus {{ currencyName }}s!
                     </v-card-text>
                     <v-card-actions>
-                        <v-btn dark default @click.native="bonusDialog = false">Cool!</v-btn>
+                        <v-btn default @click.native="bonusDialog = false">Cool!</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>

@@ -1,9 +1,8 @@
 bugs
 - idle currency won't let me buy some upgrades
 - color scheme/theme changes in vuetify
-- achievement dismiss styling
 
-core features
+core features TODO
 - canvas in left panel
 -- falling cracker effect
 -- tea (milk) effect
@@ -14,7 +13,7 @@ core features
 
 performance
 - account for autoclickers and limit particle generation/updates if necessary
-- learn about js performance profiling to find bottlenecks
+- learn about js performance profiling to find bottlenecks (game gets really laggy in later stages)
 
 upgrade checklist
 DONE:

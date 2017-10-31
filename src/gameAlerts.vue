@@ -1,7 +1,7 @@
 <template>
     <v-layout class="alerts">
         <v-flex md8 offset-md2>
-            <v-alert info dismissible v-for="(alert, alertIndex) in alerts" :key="alertIndex" v-model="alert.show">
+            <v-alert dismissible color="info" value="true" v-for="(alert, alertIndex) in alerts" :key="alertIndex" v-model="alert.show">
                 <v-tooltip top>
                     <span slot="activator">{{ alert.name }}</span>
                     <span>{{ alert.description }}</span>
@@ -53,13 +53,5 @@
     .alerts {
         margin-top: 30px;
         flex-direction: column;
-    }
-
-    .alert {
-        height: 12px !important;
-    }
-
-    .alert__dismissible {
-        align-self: center;
     }
 </style>
