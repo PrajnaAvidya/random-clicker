@@ -1,6 +1,8 @@
-bugs
-- idle currency won't let me buy some upgrades
-- color scheme/theme changes in vuetify
+bugs/misc todo
+- idle currency won't let me buy some upgrades - i think this was actually an issue with upgrade descriptions? RETEST
+- alerts should be newest on top (not bottom)
+- maybe an animation for new alerts?
+- save immediately after hard reset
 
 core features TODO
 - canvas in left panel
@@ -39,7 +41,6 @@ juice/improvements
 - break stuff off into other components if possible 
 - refactor new/load/save system
 - show purchase efficiency
-- generated descriptions
 -- what if i sourced them from reddit thread titles or something?
 - menu/preferences
 -- import/export game
