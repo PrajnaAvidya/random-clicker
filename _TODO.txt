@@ -35,7 +35,7 @@ achivement todo
 
 juice/improvements
 - break stuff off into other components if possible 
-- refactor new/load/save system
+-- refactor new/load/save system (turn into component)
 - flavor texts - what if i sourced them from reddit thread titles or something?
 - upgrade/achievement costs based on formula instead of static? that way we could tweak it in game settings for fast/slow
 
