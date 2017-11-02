@@ -69,6 +69,7 @@ export default {
         { needed: 1E15, cost: 50E15, multiplier: 1.01 },
         { needed: 100E15, cost: 5E18, multiplier: 1.01 },
         { needed: 10E18, cost: 500E18, multiplier: 1.01 },
+        { needed: 1E21, cost: 50E21, multiplier: 1.01 },
     ],
 
     tierOneUpgradeTypes: [
