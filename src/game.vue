@@ -17,7 +17,8 @@
                     </v-layout>
 
                     <center>
-                        <div class="row currency" id="currency" @click="click"></div>
+                        <div class="row currency" v-bind:class="{ pulse: currencyPulsing }" id="currency" @click="click">
+                        </div>
                     </center>
                 </v-flex>
 
@@ -143,6 +144,8 @@
                     totalCurrency: Big(0),
                     bonusCurrency: Big(0),
                     bonusDialog: false,
+                    currencyPulsing: false,
+                    currencyPulseLast: null,
                     currencySuffix: '',
                     clicks: Big(0),
                     cps: Big(0),
@@ -173,7 +176,7 @@
                     cpsIcon: null,
                     clicksIcon: null,
 
-                    // golden crackers
+                    // golden currency
                     goldenTop: 250,
                     goldenRight: 850,
                     goldenActive: false,
@@ -220,6 +223,9 @@
                 }
 
                 this.loopCurrency(this.clickPower);
+
+                this.currencyPulsing = true;
+                this.currencyPulseLast = this.unixTimestamp();
             },
             // show currency ticking up effect (when clicking & loading)
             loopCurrency(amount, ms = 333) {
@@ -1134,7 +1140,6 @@
                 this.newGame();
             }
 
-
             // load audio
             this.loadSounds();
 
@@ -1148,7 +1153,14 @@
                 this.saveGame();
             }.bind(this), 30000);
 
-            // init next golden cracker
+            // check for currency pulse end every second
+            setInterval(function() {
+                if (this.currencyPulseLast && this.unixTimestamp() > this.currencyPulseLast) {
+                    this.currencyPulsing = false;
+                }
+            }.bind(this), 1000);
+
+            // init next golden currency
             this.initGolden();
 
             // start update loop (dynamic fps)
@@ -1213,8 +1225,8 @@
         filter: brightness(85%);
     }
 
+    /* "spoiler" effect */
     .redacted {
-        /* "spoiler" effect */
         color: black;
         background-color: black;
         white-space: nowrap;
@@ -1226,7 +1238,15 @@
         background: -moz-linear-gradient(180deg, #000, #222);
     }
 
-    canvas {
-        align-self: center;
+    /* currency pulsing effect */
+    .pulse {
+        -webkit-animation: pulsate 1s ease-out;
+        -webkit-animation-iteration-count: infinite;
     }
+    @-webkit-keyframes pulsate {
+        0% {-webkit-transform: scale(1.0, 1.0);}
+        50% {-webkit-transform: scale(1.05, 1.05);}
+        100% {-webkit-transform: scale(1.0, 1.0);}
+    }
+
 </style>

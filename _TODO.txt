@@ -4,10 +4,8 @@ bugs/misc todo
 
 core features TODO
 - canvas in left panel
--- falling cracker effect
+-- falling cracker background effect
 -- tea (milk) effect
--- non-css cracker with pulsing click effect
---- http://codepen.io/anon/pen/KmrXJJ
 - track more data
 -- golden cracker stats/attributes
 
@@ -39,7 +37,7 @@ juice/improvements
 - break stuff off into other components if possible 
 - refactor new/load/save system
 - show purchase efficiency
--- what if i sourced them from reddit thread titles or something?
+- flavor texts - what if i sourced them from reddit thread titles or something?
 - menu/preferences
 -- import/export game
 - upgrade/achievement costs based on formula instead of static?
