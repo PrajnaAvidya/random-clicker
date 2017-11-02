@@ -1,7 +1,7 @@
 <template>
     <v-layout class="alerts">
         <v-flex md8 offset-md2>
-            <v-alert dismissible color="info" value="true" v-for="(alert, alertIndex) in alerts" :key="alertIndex" v-model="alert.show">
+            <v-alert dismissible color="info" value="true" v-for="(alert, alertIndex) in reverseAlerts" :key="alertIndex" v-model="alert.show">
                 <v-tooltip top>
                     <span slot="activator">{{ alert.name }}</span>
                     <span>{{ alert.description }}</span>
@@ -20,6 +20,13 @@
             }
         },
 
+        computed: {
+            // return alerts in reverse order (newest on top)
+            reverseAlerts: function() {
+                return this.alerts.reverse();
+            },
+        },
+
         methods: {
             addAlert(alert) {
                 if (this.alerts.length >= 5) {
@@ -30,6 +37,8 @@
                     { name: alert.name, description: alert.description, show: true }
                 );
             },
+
+            
 
             clearAlerts(alert) {
                 this.alerts = [];

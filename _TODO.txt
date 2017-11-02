@@ -1,6 +1,5 @@
 bugs/misc todo
 - idle currency won't let me buy some upgrades - i think this was actually an issue with upgrade descriptions? RETEST
-- alerts should be newest on top (not bottom)
 - maybe an animation for new alerts?
 
 core features TODO
