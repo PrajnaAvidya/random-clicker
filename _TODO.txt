@@ -1,6 +1,5 @@
 bugs/misc todo
 - other elements I can animate/transition?
-- highlight buyable upgrades/grey out not buyable
 
 core features TODO
 - menu

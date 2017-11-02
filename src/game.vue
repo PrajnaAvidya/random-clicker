@@ -66,7 +66,7 @@
                                 <v-tooltip left>
                                     <span slot="activator">
                                         <v-icon light>{{ upgrade.icon }}</v-icon>
-                                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
+                                        <span class="upgrade-link" :class="{ cantbuy:!canBuyUpgrade(upgrade), canafford:canAffordUpgrade(upgrade) }" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                                     </span>
                                     <span v-html="upgradeText(upgrade)"></span>
                                 </v-tooltip>
@@ -311,7 +311,7 @@
                 return this.currency.gte(this.buildingCost(building, this.buyAmount));
             },
             buyBuilding(building) {
-                if (this.canBuyBuilding(building, this.buyAmount)) {
+                if (this.canBuyBuilding(building)) {
                     this.currency = this.currency.minus(this.buildingCost(building));
                     building.owned += this.buyAmount;
                     building.unlocked = true; // just in case
@@ -371,6 +371,9 @@
             },
 
             // upgrades
+            canAffordUpgrade(upgrade) {
+                return this.currency.gte(upgrade.cost);
+            },
             canBuyUpgrade(upgrade) {
                 if (upgrade.type == this.currencyName) {
                     if (this.currency.gte(upgrade.needed)) {
@@ -423,7 +426,7 @@
                 }
             },
             buyUpgrade(upgrade) {
-                if (this.canBuyUpgrade(upgrade) && this.currency.gte(upgrade.cost)) {
+                if (this.canBuyUpgrade(upgrade) && this.canAffordUpgrade(upgrade)) {
                     this.currency = this.currency.minus(upgrade.cost);
                     upgrade.active = true;
 
@@ -1249,6 +1252,15 @@
 
     .active {
         filter: brightness(85%);
+    }
+
+    .cantbuy {
+        text-decoration-line: line-through;
+        color: #999;
+    }
+
+    .canafford {
+        font-weight: bolder;
     }
 
     /* "spoiler" effect */
