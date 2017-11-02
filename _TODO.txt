@@ -1,12 +1,16 @@
 bugs/misc todo
 - other elements I can animate/transition?
+- display clicking/cracker upgrade requirements
 
 core features TODO
-- canvas in left panel
--- falling cracker background effect
--- tea (milk) effect
-- track more data
--- golden cracker stats/attributes
+- menu
+-- save/import/export
+-- hard reset
+-- sounds on/off
+-- particle effects on/off
+-- stats page (track more data)
+--- total crackers earned
+--- golden cracker stats/attributes
 
 performance
 - account for autoclickers and limit particle generation/updates if necessary
@@ -25,20 +29,15 @@ NOT DONE:
 - golden cracker upgrades
 - heavenly chip upgrades
 
-achivement checklist
+achivement todo
 - building achievements
 - click achievements
 - click speed
-- tea (milk)
 
 juice/improvements
-- scroll upgrades/achievements when there's a bunch
 - break stuff off into other components if possible 
 - refactor new/load/save system
-- show purchase efficiency
 - flavor texts - what if i sourced them from reddit thread titles or something?
-- menu/preferences
--- import/export game
 - upgrade/achievement costs based on formula instead of static?
 
 6E = million

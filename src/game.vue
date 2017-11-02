@@ -61,30 +61,34 @@
                     <v-layout class="upgrades" v-if="showUpgrades">
                         <h3>Upgrades</h3>
 
-                        <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                            <v-tooltip left>
-                                <span slot="activator">
-                                    <v-icon light>{{ upgrade.icon }}</v-icon>
-                                    <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
-                                </span>
-                                <span v-html="upgradeDescription(upgrade)"></span>
-                            </v-tooltip>
-                            
-                        </div>
+                        <v-container class="scroll-y">
+                            <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
+                                <v-tooltip left>
+                                    <span slot="activator">
+                                        <v-icon light>{{ upgrade.icon }}</v-icon>
+                                        <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
+                                    </span>
+                                    <span v-html="upgradeDescription(upgrade)"></span>
+                                </v-tooltip>
+                                
+                            </div>
+                        </v-container>
                     </v-layout>
 
                     <v-layout class="achievements" v-if="showAchievements">
                         <h3>Achievements</h3>
 
-                        <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
-                            <v-tooltip left>
-                                <span slot="activator">
-                                    <v-icon light>{{ achievement.icon }}</v-icon>
-                                    <span>{{ achievement.name }}</span>
-                                </span>
-                                <span v-html="achievement.description"></span>
-                            </v-tooltip>
-                        </div>
+                        <v-container class="scroll-y">
+                            <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
+                                <v-tooltip left>
+                                    <span slot="activator">
+                                        <v-icon light>{{ achievement.icon }}</v-icon>
+                                        <span>{{ achievement.name }}</span>
+                                    </span>
+                                    <span v-html="achievement.description"></span>
+                                </v-tooltip>
+                            </div>
+                        </v-container>
                     </v-layout>
 
                     <div class="game-utils">
@@ -475,6 +479,7 @@
 
                 // clicking upgrade
                 if (upgrade.type == "Clicking") {
+                    // TODO show requirements for this one?
                     return 'Clicking gains 1% of your ' + this.currencyName + ' per second';
                 }
 
@@ -1201,6 +1206,10 @@
     .game-utils {
         margin-top: 30px;
         flex-direction: column;
+    }
+
+    .upgrades, .achievements {
+        max-height: 400px;
     }
 
     .totals,
