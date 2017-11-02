@@ -2,7 +2,7 @@
     <v-app>
         <v-container fluid="fluid">
             <v-layout>
-                <v-flex md5>
+                <v-flex sm5>
                     <v-layout class="totals">
 
                         <h2>{{ currency | currency }} {{ currencyName}}s</h2>
@@ -22,7 +22,7 @@
                     </center>
                 </v-flex>
 
-                <v-flex md4>
+                <v-flex sm4>
                     <v-layout class="buildings">
                         <h3>Buildings</h3>
 
@@ -57,7 +57,7 @@
                     </v-layout>
                 </v-flex>
 
-                <v-flex md3>
+                <v-flex sm3>
                     <v-layout class="upgrades" v-if="showUpgrades">
                         <h3>Upgrades</h3>
 
@@ -492,7 +492,7 @@
                     }
                 }
                 if (this.buildingCount(upgrade.type) < upgrade.needed) {
-                    description += "<br />Requires " + upgrade.needed + " " + upgrade.type;
+                    description += "<br /><strong>Requires: " + upgrade.needed + " " + upgrade.type + "</strong>";
                 }
                 
                 return description;
