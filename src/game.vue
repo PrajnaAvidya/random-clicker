@@ -230,16 +230,18 @@
                 this.clicks = this.clicks.plus(this.clickPower);
                 this.totalCurrency = this.totalCurrency.plus(this.clickPower);
 
+                // enable pulsing
+                this.currencyPulsing = true;
+                this.currencyPulseLast = this.unixTimestamp();
+
                 // skip loop if cps is too high or clickPower = 1
                 if (this.clickPower == 1 || this.clickFrenzyActive || this.cps.gte(this.clickPower.times(10))) {
                     this.currency = this.currency.plus(this.clickPower);
                     return;
                 }
 
+                // show currency increase animation
                 this.loopCurrency(this.clickPower);
-
-                this.currencyPulsing = true;
-                this.currencyPulseLast = this.unixTimestamp();
             },
             // show currency ticking up effect (when clicking & loading)
             loopCurrency(amount, ms = 333) {
