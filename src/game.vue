@@ -756,6 +756,7 @@
                     this.newGame();
                     this.loadSounds();
                     this.initGolden();
+                    this.saveGame();
                 }
             },
             saveGame() {
