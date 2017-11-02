@@ -34,12 +34,21 @@
 
                         <v-layout class="building" v-for="(building, buildingIndex) in buildings" :key="buildingIndex" v-if="building.owned > 0 || showBuilding(building)">
                             <v-flex xs5>
-                                <v-tooltip top v-if="building.unlocked">
-                                    <v-icon light slot="activator">{{ building.icon }}</v-icon>
-                                    <span v-html="buildingText(building)"></span>
-                                </v-tooltip>
-                                <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
-                                <span>({{ building.owned }} owned)</span>
+                                <div v-if="building.unlocked">
+                                    <v-tooltip top v-if="building.unlocked">
+                                        <span slot="activator">
+                                            <v-icon light>{{ building.icon }}</v-icon>
+                                            {{ building.name }} ({{ building.owned }} owned)
+                                        </span>
+                                        <span v-html="buildingText(building)"></span>
+                                    </v-tooltip>
+                                </div>
+                                <div v-else>
+                                    <span slot="activator">
+                                        <v-icon light>{{ building.icon }}</v-icon>
+                                        <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
+                                    </span>
+                                </div>
                             </v-flex>
                             <v-flex xs7>
                                 <v-btn default @click.native="buyBuilding(building)" :disabled="!canBuyBuilding(building)">Buy ({{ building.buyCost | currency }})</v-btn>
@@ -54,10 +63,13 @@
 
                         <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
                             <v-tooltip top>
-                                <v-icon light slot="activator">{{ upgrade.icon }}</v-icon>
+                                <span slot="activator">
+                                    <v-icon light>{{ upgrade.icon }}</v-icon>
+                                    <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
+                                </span>
                                 <span v-html="upgradeDescription(upgrade)"></span>
                             </v-tooltip>
-                            <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
+                            
                         </div>
                     </v-layout>
 
@@ -66,10 +78,12 @@
 
                         <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
                             <v-tooltip top>
-                                <v-icon light slot="activator">{{ achievement.icon }}</v-icon>
+                                <span slot="activator">
+                                    <v-icon light>{{ achievement.icon }}</v-icon>
+                                    <span>{{ achievement.name }}</span>
+                                </span>
                                 <span v-html="achievement.description"></span>
                             </v-tooltip>
-                            <span>{{ achievement.name }}</span>
                         </div>
                     </v-layout>
 
@@ -1092,7 +1106,6 @@
                     return 0;
                 }
                 if (value < 10) {
-                    // TODO maybe bump this up
                     return Number((value).toFixed(1));
                 } else if (value <= 999999) {
                     return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
