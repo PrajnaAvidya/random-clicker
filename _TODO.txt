@@ -1,5 +1,4 @@
 bugs/misc todo
-- idle currency won't let me buy some upgrades - i think this was actually an issue with upgrade descriptions? RETEST
 - maybe an animation for new alerts?
 
 core features TODO
@@ -33,7 +32,7 @@ achivement checklist
 - tea (milk)
 
 juice/improvements
-- scroll upgrades/achievements
+- scroll upgrades/achievements when there's a bunch
 - break stuff off into other components if possible 
 - refactor new/load/save system
 - show purchase efficiency

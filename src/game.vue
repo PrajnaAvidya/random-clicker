@@ -35,7 +35,7 @@
                         <v-layout class="building" v-for="(building, buildingIndex) in buildings" :key="buildingIndex" v-if="building.owned > 0 || showBuilding(building)">
                             <v-flex xs5>
                                 <div v-if="building.unlocked">
-                                    <v-tooltip top v-if="building.unlocked">
+                                    <v-tooltip left v-if="building.unlocked">
                                         <span slot="activator">
                                             <v-icon light>{{ building.icon }}</v-icon>
                                             {{ building.name }} ({{ building.owned }} owned)
@@ -62,7 +62,7 @@
                         <h3>Upgrades</h3>
 
                         <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                            <v-tooltip top>
+                            <v-tooltip left>
                                 <span slot="activator">
                                     <v-icon light>{{ upgrade.icon }}</v-icon>
                                     <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
@@ -77,7 +77,7 @@
                         <h3>Achievements</h3>
 
                         <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
-                            <v-tooltip top>
+                            <v-tooltip left>
                                 <span slot="activator">
                                     <v-icon light>{{ achievement.icon }}</v-icon>
                                     <span>{{ achievement.name }}</span>
