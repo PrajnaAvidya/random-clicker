@@ -4,20 +4,18 @@
             <v-layout>
                 <v-flex sm5>
                     <v-layout class="totals">
-
                         <h2>{{ currency | currency }} {{ currencyName}}s</h2>
-                        <h3 class="red" v-show="luckyActive">Lucky! ({{ luckyAmount | currency }} bonus)</h3>
+                        <h3 class="red bonusMessage" v-show="luckyActive">Lucky! ({{ luckyAmount | currency }} bonus)</h3>
 
                         <h3>Per second: {{ displayedCps | round }}</h3>
-                        <h4 class="red" v-show="frenzyActive">FRENZY! (x{{ this.frenzyAmount }} production)</h4>
+                        <h4 class="red bonusMessage" v-show="frenzyActive">FRENZY! (x{{ this.frenzyAmount }} production)</h4>
 
                         <h4>Per click: {{ displayedClickPower | currency }}</h4>
-                        <h5 class="red" v-show="clickFrenzyActive">CLICK FRENZY!!! (x{{ this.clickFrenzyAmount }} clicks)</h5>
-
+                        <h5 class="red bonusMessage" v-show="clickFrenzyActive">CLICK FRENZY!!! (x{{ this.clickFrenzyAmount }} clicks)</h5>
                     </v-layout>
 
                     <center>
-                        <div class="row currency" v-bind:class="{ pulse: currencyPulsing }" id="currency" @click="click">
+                        <div class="row currency" v-bind:class="{ pulse: currencyPulsing, frenzy: frenzyActive || clickFrenzyActive || luckyActive }" id="currency" @click="click">
                         </div>
                     </center>
                 </v-flex>
@@ -1263,6 +1261,10 @@
         font-weight: bolder;
     }
 
+    .bonusMessage {
+        padding: 5px;
+    }
+
     /* "spoiler" effect */
     .redacted {
         color: black;
@@ -1286,5 +1288,13 @@
         50% {-webkit-transform: scale(1.05, 1.05);}
         100% {-webkit-transform: scale(1.0, 1.0);}
     }
-
+    .frenzy {
+        -webkit-animation: frenzy 0.5s ease-out;
+        -webkit-animation-iteration-count: infinite;
+    }
+    @-webkit-keyframes frenzy {
+        0% {-webkit-transform: scale(1.0, 1.0);}
+        50% {-webkit-transform: scale(1.15, 1.15);}
+        100% {-webkit-transform: scale(1.0, 1.0);}
+    }
 </style>
