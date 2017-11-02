@@ -68,7 +68,7 @@
                                         <v-icon light>{{ upgrade.icon }}</v-icon>
                                         <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                                     </span>
-                                    <span v-html="upgradeDescription(upgrade)"></span>
+                                    <span v-html="upgradeText(upgrade)"></span>
                                 </v-tooltip>
                                 
                             </div>
@@ -381,7 +381,7 @@
                     return false;
                 } else {
                     if (upgrade.type == 'Clicking') {
-                        if (this.clicks.gte(upgrade.cost)) {
+                        if (this.clicks.gte(upgrade.needed)) {
                             upgrade.unlocked = true;
                             return true;
                         }
@@ -402,7 +402,7 @@
                     return false;
                 }
                 if (upgrade.type == this.currencyName) {
-                    if (this.currency.gte(upgrade.needed / 10)) {
+                    if (this.currency.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
                     }
@@ -471,20 +471,22 @@
                 });
                 return production;
             },
-            upgradeDescription(upgrade) {
+            upgradeText(upgrade) {
+                let description = '';
+
                 // production upgrade
                 if (upgrade.type == this.currencyName) {
-                    return "Multiplies " + this.currencyName + " production by " + upgrade.multiplier + "x";
+                    description += "Multiplies " + this.currencyName + " production by " + upgrade.multiplier + "x";
+                    return description;
                 }
 
                 // clicking upgrade
                 if (upgrade.type == "Clicking") {
-                    // TODO show requirements for this one?
-                    return 'Clicking gains 1% of your ' + this.currencyName + ' per second';
+                    description += 'Clicking gains 1% of your ' + this.currencyName + ' per second';
+                    return description;
                 }
 
                 // building upgrade
-                let description = '';
                 if (upgrade.multiplier > 0) {
                     description += "Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
                     if (upgrade.type == this.buildingNames[0]) {

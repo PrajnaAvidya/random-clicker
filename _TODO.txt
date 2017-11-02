@@ -1,6 +1,6 @@
 bugs/misc todo
 - other elements I can animate/transition?
-- display clicking/cracker upgrade requirements
+- highlight buyable upgrades/grey out not buyable
 
 core features TODO
 - menu
@@ -38,7 +38,7 @@ juice/improvements
 - break stuff off into other components if possible 
 - refactor new/load/save system
 - flavor texts - what if i sourced them from reddit thread titles or something?
-- upgrade/achievement costs based on formula instead of static?
+- upgrade/achievement costs based on formula instead of static? that way we could tweak it in game settings for fast/slow
 
 6E = million
 9E = billion
