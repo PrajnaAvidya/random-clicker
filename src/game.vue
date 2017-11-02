@@ -483,12 +483,12 @@
                 if (upgrade.multiplier > 0) {
                     description += "Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
                     if (upgrade.type == this.buildingNames[0]) {
-                        description += "<br />Also multiplies clicks";
+                        description += "<br /><strong>Also multiplies clicks</strong>";
                     }
                 } else if (upgrade.addition > 0) {
                     description += "Adds " + upgrade.addition + " " + this.currencyName + " production for every non-" + upgrade.type + " building owned";
                     if (upgrade.type == this.buildingNames[0]) {
-                        description += "<br />Also adds to clicks";
+                        description += "<br /><strong>Also adds to clicks</strong>";
                     }
                 }
                 if (this.buildingCount(upgrade.type) < upgrade.needed) {
