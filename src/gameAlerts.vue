@@ -1,12 +1,14 @@
 <template>
-    <v-layout class="alerts">
+    <v-layout>
         <v-flex md8 offset-md2>
-            <v-alert dismissible color="info" value="true" v-for="(alert, alertIndex) in reverseAlerts" :key="alertIndex" v-model="alert.show">
-                <v-tooltip top>
-                    <span slot="activator">{{ alert.name }}</span>
-                    <span>{{ alert.description }}</span>
-                </v-tooltip>
-            </v-alert>
+            <div class="alerts">
+                <v-alert dismissible color="info" transition="scale-transition" v-for="(alert, alertIndex) in alerts" :key="alertIndex" v-model="alert.show">
+                    <v-tooltip top>
+                        <span slot="activator">{{ alert.name }}</span>
+                        <span>{{ alert.description }}</span>
+                    </v-tooltip>
+                </v-alert>
+            </div>
         </v-flex>
     </v-layout>
 </template>
@@ -61,6 +63,10 @@
 <style>
     .alerts {
         margin-top: 30px;
-        flex-direction: column;
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    .alert {
+        width: 100%;
     }
 </style>

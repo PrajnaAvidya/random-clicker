@@ -1,5 +1,5 @@
 bugs/misc todo
-- maybe an animation for new alerts?
+- other elements I can animate/transition?
 
 core features TODO
 - canvas in left panel
