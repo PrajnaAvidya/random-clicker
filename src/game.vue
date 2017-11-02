@@ -36,7 +36,7 @@
                             <v-flex xs5>
                                 <v-tooltip top v-if="building.unlocked">
                                     <v-icon light slot="activator">{{ building.icon }}</v-icon>
-                                    <span>{{ buildingText(building) }}</span>
+                                    <span v-html="buildingText(building)"></span>
                                 </v-tooltip>
                                 <span :class="{ redacted:building.unlocked == false }">{{ building.name }}</span>
                                 <span>({{ building.owned }} owned)</span>
@@ -55,7 +55,7 @@
                         <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
                             <v-tooltip top>
                                 <v-icon light slot="activator">{{ upgrade.icon }}</v-icon>
-                                <span>{{ upgradeDescription(upgrade) }}</span>
+                                <span v-html="upgradeDescription(upgrade)"></span>
                             </v-tooltip>
                             <span class="upgrade-link" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
                         </div>
@@ -67,7 +67,7 @@
                         <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
                             <v-tooltip top>
                                 <v-icon light slot="activator">{{ achievement.icon }}</v-icon>
-                                <span>{{ achievement.description }}</span>
+                                <span v-html="achievement.description"></span>
                             </v-tooltip>
                             <span>{{ achievement.name }}</span>
                         </div>
@@ -335,7 +335,7 @@
                 let buildingCpsPercent = 100 * buildingCps / this.cps;
                 //let buildingText = building.description;
                 let buildingText = "Each " + building.name + " produces " + building.currentCps + " " + this.currencyName + "s per second";
-                buildingText += "\n" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " " + this.currencyName + "s per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
+                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " " + this.currencyName + "s per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
                 return buildingText;
             },
             setBuyAmount(amount) {
@@ -467,16 +467,16 @@
                 if (upgrade.multiplier > 0) {
                     description += "Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
                     if (upgrade.type == this.buildingNames[0]) {
-                        description += " -- Also multiplies clicks";
+                        description += "<br />Also multiplies clicks";
                     }
                 } else if (upgrade.addition > 0) {
                     description += "Adds " + upgrade.addition + " " + this.currencyName + " production for every non-" + upgrade.type + " building owned";
                     if (upgrade.type == this.buildingNames[0]) {
-                        description += " -- Also adds to clicks";
+                        description += "<br />Also adds to clicks";
                     }
                 }
                 if (this.buildingCount(upgrade.type) < upgrade.needed) {
-                    description += " (Requires " + upgrade.needed + " " + upgrade.type + ")";
+                    description += "<br />Requires " + upgrade.needed + " " + upgrade.type;
                 }
                 
                 return description;
