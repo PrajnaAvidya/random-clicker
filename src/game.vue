@@ -378,28 +378,32 @@
                         upgrade.unlocked = true;
                         return true;
                     }
-
-                    return false;
-                } else {
-                    if (upgrade.type == 'Clicking') {
-                        if (this.clicks.gte(upgrade.needed)) {
-                            upgrade.unlocked = true;
-                            return true;
-                        }
-                    } else if (this.buildingCount(upgrade.type) >= upgrade.needed) {
+                } else if (upgrade.type == 'Clicking') {
+                    if (this.clicks.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
                     }
-
-                    return false;
+                } else if (upgrade.type == 'Buildings') {
+                    let canBuy = true;
+                    this.buildings.forEach(function (building) {
+                        if (building.owned < upgrade.needed) {
+                            canBuy = false;
+                        }
+                    });
+                    return canBuy;
+                } else if (this.buildingCount(upgrade.type) >= upgrade.needed) {
+                    upgrade.unlocked = true;
+                    return true;
                 }
+
+                return false;
             },
             canSeeUpgrade(upgrade) {
                 if (upgrade.unlocked == true) {
                     return true;
                 }
 
-                if (upgrade.type != 'Clicking' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) == 0) {
+                if (upgrade.type != 'Clicking' && upgrade.type != 'Buildings' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) == 0) {
                     return false;
                 }
                 if (upgrade.type == this.currencyName) {
@@ -407,21 +411,19 @@
                         upgrade.unlocked = true;
                         return true;
                     }
-
-                    return false;
-                } else {
-                    if (upgrade.type == 'Clicking') {
-                        if (this.clicks.gte(upgrade.needed)) {
-                            upgrade.unlocked = true;
-                            return true;
-                        }
-                    } else if (upgrade.cost == this.nextUpgrade(upgrade.type).cost) {
+                } else if (upgrade.type == 'Clicking') {
+                    if (this.clicks.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
                     }
-
-                    return false;
+                } else if (upgrade.type == 'Buildings') {
+                    return this.canBuyUpgrade(upgrade);
+                } else if (upgrade.cost == this.nextUpgrade(upgrade.type).cost) {
+                    upgrade.unlocked = true;
+                    return true;
                 }
+
+                return false;
             },
             buyUpgrade(upgrade) {
                 if (this.canBuyUpgrade(upgrade) && this.canAffordUpgrade(upgrade)) {
@@ -470,13 +472,18 @@
                         production *= upgrade.multiplier;
                     }
                 });
+                this.activeUpgrades("Buildings").forEach(function (upgrade) {
+                    if (upgrade.multiplier != null) {
+                        production *= upgrade.multiplier;
+                    }
+                });
                 return production;
             },
             upgradeText(upgrade) {
                 let description = '';
 
                 // production upgrade
-                if (upgrade.type == this.currencyName) {
+                if (upgrade.type == this.currencyName || upgrade.type == "Buildings") {
                     description += "Multiplies " + this.currencyName + " production by " + upgrade.multiplier + "x";
                     return description;
                 }
@@ -653,7 +660,23 @@
                         icon: vm.cpsIcon,
                     };
 
-                    vm.upgrades.push(upgrade)
+                    vm.upgrades.push(upgrade);
+                });
+
+                // X of every building production upgrades
+                GameData.buildingProductionUpgrades.forEach(function (buildingUpgrade) {
+                    let upgrade = {
+                        type: 'Buildings',
+                        name: vm.adjectives.pop() + " " + vm.currencyName + "s",
+                        needed: Big(buildingUpgrade.needed),
+                        cost: Big(buildingUpgrade.cost),
+                        multiplier: buildingUpgrade.multiplier,
+                        unlocked: false,
+                        active: false,
+                        icon: vm.cpsIcon,
+                    };
+
+                    vm.upgrades.push(upgrade);
                 });
 
                 // building upgrades
@@ -685,7 +708,7 @@
                             upgrade.addition = parseFloat(upgradeAmounts[i].substr(1));
                         }
 
-                        vm.upgrades.push(upgrade)
+                        vm.upgrades.push(upgrade);
                     }
 
                     upgradeIndex++;
@@ -705,7 +728,7 @@
                         icon: vm.clicksIcon,
                     };
 
-                    vm.upgrades.push(upgrade)
+                    vm.upgrades.push(upgrade);
                 });
             },
             generateAchievements() {

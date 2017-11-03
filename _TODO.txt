@@ -1,5 +1,4 @@
-bugs/misc todo
-- other elements I can animate/transition?
+figure out how to offload default data into an external js file without breaking shit
 
 core features TODO
 - menu
@@ -19,9 +18,10 @@ upgrade checklist
 DONE:
 - building 0 production
 - base production
-- clicking upgrades
+- clicking
+- x of every building
 NOT DONE:
-- rest of the income multipler upgrades (dark chocolate-coated cookies+)
+- rest of the income multiplers (dark chocolate-coated cookies+)
 - building 1 forms (grandma types)
 - synergies (heavenly upgrade)
 - kitten upgrades
@@ -48,3 +48,4 @@ juice/improvements
 24E = septillion
 27E = octillion
 30E = nonillion
+33E = decillion
