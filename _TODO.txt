@@ -3,6 +3,8 @@ WHY THE FUCK WON'T THE VALUES RESET TO THE FILE VALUES EVEN WHEN I COPY THE OBJE
 
 figure out how to use a single computed/method for gameMenu options
 
+look into using parent/child variables instead of events to pass certain data around
+
 core features TODO
 - menu
 -- stats page (track more data)
