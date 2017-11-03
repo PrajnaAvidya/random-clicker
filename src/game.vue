@@ -15,7 +15,7 @@
                     </v-layout>
 
                     <center>
-                        <div class="row currency" v-bind:class="{ pulse: currencyPulsing, frenzy: frenzyActive || clickFrenzyActive || luckyActive }" id="currency" @click="click">
+                        <div class="row currency" v-bind:class="{ pulse: currencyPulsing, frenzy: options.animation && (frenzyActive || clickFrenzyActive || luckyActive) }" id="currency" @click="click">
                         </div>
                     </center>
                 </v-flex>
@@ -236,8 +236,10 @@
                 this.totalCurrency = this.totalCurrency.plus(this.clickPower);
 
                 // enable pulsing
-                this.currencyPulsing = true;
-                this.currencyPulseLast = this.unixTimestamp();
+                if (this.options.animation) {
+                    this.currencyPulsing = true;
+                    this.currencyPulseLast = this.unixTimestamp();
+                }
 
                 // skip loop if cps is too high or clickPower = 1
                 if (this.clickPower == 1 || this.clickFrenzyActive || this.cps.gte(this.clickPower.times(10))) {
@@ -1107,8 +1109,10 @@
                     width: 350,
                     height: 350,
                     click() {
-                        this.spawnCurrencyParticle(this.mouse.x, this.mouse.y);
-                        this.spawnNumberParticle(this.mouse.x, this.mouse.y);
+                        if (vm.options.particles) {
+                            this.spawnCurrencyParticle(this.mouse.x, this.mouse.y);
+                            this.spawnNumberParticle(this.mouse.x, this.mouse.y);
+                        }
                     },
 
                     spawnCurrencyParticle(x, y) {

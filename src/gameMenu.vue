@@ -16,7 +16,7 @@
                     <v-list three-line subheader>
                         <v-subheader>Options</v-subheader>
 
-                        <v-list-tile avatar>
+                        <v-list-tile>
                             <v-list-tile-action>
                                 <v-checkbox v-model="alerts"></v-checkbox>
                             </v-list-tile-action>
@@ -26,13 +26,33 @@
                             </v-list-tile-content>
                         </v-list-tile>
 
-                        <v-list-tile avatar>
+                        <v-list-tile>
                             <v-list-tile-action>
                                 <v-checkbox v-model="sounds"></v-checkbox>
                             </v-list-tile-action>
                             <v-list-tile-content>
                                 <v-list-tile-title>Sounds</v-list-tile-title>
                                 <v-list-tile-sub-title>Play game sounds?</v-list-tile-sub-title>
+                            </v-list-tile-content>
+                        </v-list-tile>
+
+                        <v-list-tile>
+                            <v-list-tile-action>
+                                <v-checkbox v-model="particles"></v-checkbox>
+                            </v-list-tile-action>
+                            <v-list-tile-content>
+                                <v-list-tile-title>Particle Effects</v-list-tile-title>
+                                <v-list-tile-sub-title>Show particle effects when clicking? (may slow performance)</v-list-tile-sub-title>
+                            </v-list-tile-content>
+                        </v-list-tile>
+
+                        <v-list-tile>
+                            <v-list-tile-action>
+                                <v-checkbox v-model="animation"></v-checkbox>
+                            </v-list-tile-action>
+                            <v-list-tile-content>
+                                <v-list-tile-title>Animation</v-list-tile-title>
+                                <v-list-tile-sub-title>Enable Cracker animation?</v-list-tile-sub-title>
                             </v-list-tile-content>
                         </v-list-tile>
                     </v-list>
@@ -75,6 +95,22 @@
                 },
                 set: function(setting) {
                     this.setOption("sounds", setting);
+                }
+            },
+            particles: {
+                get: function() {
+                    return this.getOption("particles");
+                },
+                set: function(setting) {
+                    this.setOption("particles", setting);
+                }
+            },
+            animation: {
+                get: function() {
+                    return this.getOption("animation");
+                },
+                set: function(setting) {
+                    this.setOption("animation", setting);
                 }
             }
         },

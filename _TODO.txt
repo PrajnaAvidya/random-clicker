@@ -1,9 +1,10 @@
 figure out how to offload default data into an external js file without breaking shit
 WHY THE FUCK WON'T THE VALUES RESET TO THE FILE VALUES EVEN WHEN I COPY THE OBJECT
 
+figure out how to use a single computed/method for gameMenu options
+
 core features TODO
 - menu
--- particle effects on/off
 -- stats page (track more data)
 --- total crackers earned
 --- golden cracker stats/attributes
