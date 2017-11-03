@@ -89,10 +89,7 @@
                         </v-container>
                     </v-layout>
 
-                    <div class="game-utils">
-                        <v-btn default class="blue" @click.native="saveGame">Save Game</v-btn>
-                        <v-btn default class="red" @click.native="hardReset">Hard Reset</v-btn>
-                    </div>
+                    <GameMenu></GameMenu>
                 </v-flex>
             </v-layout>
 
@@ -121,11 +118,10 @@
 </template>
 
 <script>
-    import GameData from "./gameData.js";
-
-    import Words from "./words.js";
     import Big from "big.js";
     import Sketch from "sketch-js";
+    import Words from "./words.js";
+    import GameData from "./gameData.js";
 
     export default {
         data: function () {
@@ -217,6 +213,12 @@
                     clickSound: 'tick.ogg',
                     goldenSpawnSound: 'bell.ogg',
                     goldenClickSound: 'chaching.ogg',
+
+                    // TODO options
+                    options: {
+                        alerts: true,
+                        sounds: true
+                    }
                 }
             },
 
@@ -1228,8 +1230,7 @@
     .currency,
     .buildings,
     .upgrades,
-    .achievements,
-    .game-utils {
+    .achievements {
         margin-top: 30px;
         flex-direction: column;
     }

@@ -20,7 +20,9 @@ window.Event = new class {
 
 // game alerts component
 import GameAlerts from './gameAlerts.vue';
+import GameMenu from './gameMenu.vue';
 Vue.component('GameAlerts', GameAlerts);
+Vue.component('GameMenu', GameMenu);
 
 // main game
 import Game from './game.vue';

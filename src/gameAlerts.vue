@@ -40,8 +40,6 @@
                 );
             },
 
-            
-
             clearAlerts(alert) {
                 this.alerts = [];
             }
@@ -51,13 +49,12 @@
             let vm = this;
             Event.listen('addAlert', function (alert) {
                 vm.addAlert(alert);
-            })
+            });
             Event.listen('clearAlerts', function () {
                 vm.clearAlerts();
-            })
+            });
         }
-    }
-
+    };
 </script>
 
 <style>
