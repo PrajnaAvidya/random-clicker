@@ -14,6 +14,8 @@
 
                 <v-card-text>
                     <v-list three-line subheader>
+                        <v-subheader>Options</v-subheader>
+
                         <v-list-tile avatar>
                             <v-list-tile-action>
                                 <v-checkbox v-model="alerts"></v-checkbox>
@@ -35,8 +37,8 @@
                         </v-list-tile>
                     </v-list>
 
-                    <v-btn color="blue" @click.native="">Save Game</v-btn>
-                    <v-btn color="red" @click.native="">Hard Reset</v-btn>
+                    <v-btn color="blue" @click.native="saveGame()">Save Game</v-btn>
+                    <v-btn color="red" @click.native="hardReset()">Hard Reset</v-btn>
                 </v-card-text>
 
                 <div style="flex: 1 1 auto;"></div>
@@ -47,16 +49,14 @@
 </template>
 
 <script>
+    import EventBus from './eventBus.js';
+    import Options from './options.js';
+
     export default {
         data() {
             return {
                 menu: false,
-
-                // TODO link with game
-                options: {
-                    alerts: true,
-                    sounds: true,
-                }
+                options: Options,
             }
         },
 
@@ -85,7 +85,32 @@
             },
             setOption(option, value) {
                 this.options[option] = value;
+                EventBus.$emit('setOption', option, value);
+            },
+            saveGame() {
+                EventBus.$emit('saveGame');
+            },
+            hardReset() {
+                EventBus.$emit('hardReset');
+            },
+            toggleMenu() {
+                this.menu = !this.menu;
             }
+        },
+
+        mounted() {
+            // add event listeners
+            let vm = this;
+
+            // open/close menu
+            EventBus.$on('toggleMenu', this.toggleMenu);
+
+            // recieve options from game
+            EventBus.$on('sendOptions', function (options) {
+                for (let key in options) {
+                    vm.options[key] = options[key];
+                }
+            });
         }
     };
 </script>

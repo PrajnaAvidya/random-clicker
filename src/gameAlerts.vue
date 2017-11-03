@@ -14,6 +14,8 @@
 </template>
 
 <script>
+    import EventBus from './eventBus.js';
+
     export default {
         data() {
             return {
@@ -47,12 +49,10 @@
 
         mounted() {
             let vm = this;
-            Event.listen('addAlert', function (alert) {
+            EventBus.$on('addAlert', function (alert) {
                 vm.addAlert(alert);
             });
-            Event.listen('clearAlerts', function () {
-                vm.clearAlerts();
-            });
+            EventBus.$on('clearAlerts', this.clearAlerts);
         }
     };
 </script>

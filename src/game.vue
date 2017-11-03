@@ -120,7 +120,9 @@
 <script>
     import Big from "big.js";
     import Sketch from "sketch-js";
+    import EventBus from './eventBus.js';
     import Words from "./words.js";
+    import Options from './options.js';
     import GameData from "./gameData.js";
 
     export default {
@@ -214,11 +216,8 @@
                     goldenSpawnSound: 'bell.ogg',
                     goldenClickSound: 'chaching.ogg',
 
-                    // TODO options
-                    options: {
-                        alerts: true,
-                        sounds: true
-                    }
+                    // options
+                    options: Options
                 }
             },
 
@@ -228,7 +227,9 @@
 
             // clicking/cps
             click() {
-                this.clickSound.play();
+                if (this.options.sounds) {
+                    this.clickSound.play();
+                }
 
                 // add to overall stats
                 this.clicks = this.clicks.plus(this.clickPower);
@@ -548,7 +549,9 @@
                 this.achievementCount++;
                 this.showAchievements = true;
 
-                Event.fire('addAlert', achievement);
+                if (this.options.alerts) {
+                    EventBus.$emit('addAlert', achievement);
+                }
             },
 
             // tick function
@@ -805,13 +808,20 @@
             },
             hardReset() {
                 if (confirm("Are you sure?")) {
-                    Event.fire('clearAlerts');
+                    if(confirm("Are you REALLY sure? You will lose EVERYTHING for hard resetting with no prestige bonus!")) {
+                        // start new game
+                        this.newGame();
+                        this.loadSounds();
+                        this.initGolden();
 
-                    // start new game
-                    this.newGame();
-                    this.loadSounds();
-                    this.initGolden();
-                    this.saveGame();
+                        // save game
+                        this.saveGame();
+
+                        // clear alerts & toggle menu
+                        EventBus.$emit('clearAlerts');
+                        EventBus.$emit('toggleMenu');
+                        EventBus.$emit('send')
+                    }
                 }
             },
             saveGame() {
@@ -832,6 +842,7 @@
                     upgrades: this.upgrades,
                     achievements: this.achievements,
                     timestamp: this.unixTimestamp(),
+                    options: this.options,
                 };
 
                 localStorage.setItem("SaveGame", JSON.stringify(saveData));
@@ -919,6 +930,9 @@
                     vm.achievements.push(achievement);
                 });
 
+                // options
+                this.options = saveData.options;
+
                 // calculate bonus currency
                 let timeDifference = this.unixTimestamp() - saveData.timestamp;
                 this.bonusCurrency = this.cps.div(2).times(timeDifference).round();
@@ -958,7 +972,9 @@
                 this.goldenTop = randomY;
                 this.goldenActive = true;
 
-                this.goldenSpawnSound.play();
+                if (this.options.sounds) {
+                    this.goldenSpawnSound.play();
+                }
             },
             clickGolden() {
                 // 0 - 99
@@ -985,7 +1001,9 @@
                     this.loopCurrency(this.luckyAmount, 500);
                 }
 
-                this.goldenClickSound.play();
+                if (this.options.sounds) {
+                    this.goldenClickSound.play();
+                }
 
                 this.recalculateCps();
                 this.recalculateClickPower();
@@ -1216,6 +1234,17 @@
 
             // start particle effects
             this.setupParticles();
+
+            // add event listeners for other components
+            let vm = this;
+            EventBus.$on('saveGame', this.saveGame);
+            EventBus.$on('hardReset', this.hardReset);
+            EventBus.$on('setOption', function(option, value) {
+                vm.options[option] = value;
+            });
+
+            // send options to gameMenu
+            EventBus.$emit('sendOptions', this.options);
         }
     }
 

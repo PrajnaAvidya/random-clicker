@@ -1,10 +1,8 @@
 figure out how to offload default data into an external js file without breaking shit
+WHY THE FUCK WON'T THE VALUES RESET TO THE FILE VALUES EVEN WHEN I COPY THE OBJECT
 
 core features TODO
 - menu
--- save/import/export
--- hard reset
--- sounds on/off
 -- particle effects on/off
 -- stats page (track more data)
 --- total crackers earned
