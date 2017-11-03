@@ -5,61 +5,78 @@
         <v-dialog v-model="menu" fullscreen transition="dialog-bottom-transition" :overlay=false
         scrollable>
             <v-card>
-                <v-toolbar style="flex: 0 0 auto;" dark class="primary">
-                    <v-btn icon @click.native="menu = false" dark>
+                <v-toolbar style="flex: 0 0 auto;" class="primary">
+                    <v-btn icon @click.native="menu = false">
                         <v-icon>close</v-icon>
                     </v-btn>
                     <v-toolbar-title>Menu</v-toolbar-title>
                 </v-toolbar>
 
-                <v-card-text>
-                    <v-list three-line subheader>
-                        <v-subheader>Options</v-subheader>
+                <v-tabs v-model="activeTab">
+                    <v-tabs-bar class="blue">
+                        <v-tabs-slider color="red"></v-tabs-slider>
+                        <v-tabs-item href="#options">
+                            <span class="tab-heading">Options</span>
+                        </v-tabs-item>
+                        <v-tabs-item href="#stats">
+                            <span class="tab-heading">Statistics</span>
+                        </v-tabs-item>
+                        
+                    </v-tabs-bar>
 
-                        <v-list-tile>
-                            <v-list-tile-action>
-                                <v-checkbox v-model="alerts"></v-checkbox>
-                            </v-list-tile-action>
-                            <v-list-tile-content>
-                                <v-list-tile-title>Achievement Alerts</v-list-tile-title>
-                                <v-list-tile-sub-title>Show alerts when unlocking new achievements</v-list-tile-sub-title>
-                            </v-list-tile-content>
-                        </v-list-tile>
+                    <v-tabs-items>
+                        <v-tabs-content id="options">
+                            <v-card-text>
+                                <v-list three-line subheader>
+                                    <v-subheader>Options</v-subheader>
 
-                        <v-list-tile>
-                            <v-list-tile-action>
-                                <v-checkbox v-model="sounds"></v-checkbox>
-                            </v-list-tile-action>
-                            <v-list-tile-content>
-                                <v-list-tile-title>Sounds</v-list-tile-title>
-                                <v-list-tile-sub-title>Play game sounds?</v-list-tile-sub-title>
-                            </v-list-tile-content>
-                        </v-list-tile>
+                                    <v-list-tile>
+                                        <v-list-tile-action>
+                                            <v-checkbox v-model="alerts"></v-checkbox>
+                                        </v-list-tile-action>
+                                        <v-list-tile-content>
+                                            <v-list-tile-title>Achievement Alerts</v-list-tile-title>
+                                            <v-list-tile-sub-title>Show alerts when unlocking new achievements</v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                    </v-list-tile>
 
-                        <v-list-tile>
-                            <v-list-tile-action>
-                                <v-checkbox v-model="particles"></v-checkbox>
-                            </v-list-tile-action>
-                            <v-list-tile-content>
-                                <v-list-tile-title>Particle Effects</v-list-tile-title>
-                                <v-list-tile-sub-title>Show particle effects when clicking? (may slow performance)</v-list-tile-sub-title>
-                            </v-list-tile-content>
-                        </v-list-tile>
+                                    <v-list-tile>
+                                        <v-list-tile-action>
+                                            <v-checkbox v-model="sounds"></v-checkbox>
+                                        </v-list-tile-action>
+                                        <v-list-tile-content>
+                                            <v-list-tile-title>Sounds</v-list-tile-title>
+                                            <v-list-tile-sub-title>Play game sounds?</v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                    </v-list-tile>
 
-                        <v-list-tile>
-                            <v-list-tile-action>
-                                <v-checkbox v-model="animation"></v-checkbox>
-                            </v-list-tile-action>
-                            <v-list-tile-content>
-                                <v-list-tile-title>Animation</v-list-tile-title>
-                                <v-list-tile-sub-title>Enable Cracker animation?</v-list-tile-sub-title>
-                            </v-list-tile-content>
-                        </v-list-tile>
-                    </v-list>
+                                    <v-list-tile>
+                                        <v-list-tile-action>
+                                            <v-checkbox v-model="particles"></v-checkbox>
+                                        </v-list-tile-action>
+                                        <v-list-tile-content>
+                                            <v-list-tile-title>Particle Effects</v-list-tile-title>
+                                            <v-list-tile-sub-title>Show particle effects when clicking? (may slow performance)</v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                    </v-list-tile>
 
-                    <v-btn color="blue" @click.native="saveGame()">Save Game</v-btn>
-                    <v-btn color="red" @click.native="hardReset()">Hard Reset</v-btn>
-                </v-card-text>
+                                    <v-list-tile>
+                                        <v-list-tile-action>
+                                            <v-checkbox v-model="animation"></v-checkbox>
+                                        </v-list-tile-action>
+                                        <v-list-tile-content>
+                                            <v-list-tile-title>Animation</v-list-tile-title>
+                                            <v-list-tile-sub-title>Enable Cracker animation?</v-list-tile-sub-title>
+                                        </v-list-tile-content>
+                                    </v-list-tile>
+                                </v-list>
+
+                                <v-btn color="blue" @click.native="saveGame()">Save Game</v-btn>
+                                <v-btn color="red" @click.native="hardReset()">Hard Reset</v-btn>
+                            </v-card-text>
+                        </v-tabs-content>
+                    </v-tabs-items>
+                </v-tabs>
 
                 <div style="flex: 1 1 auto;"></div>
             </v-card>
@@ -76,6 +93,7 @@
         data() {
             return {
                 menu: false,
+                activeTab: null,
                 options: Options,
             }
         },
@@ -154,5 +172,8 @@
 <style>
     .game-menu {
         margin-top: 30px;
+    }
+    .tab-heading {
+        color: black;
     }
 </style>
