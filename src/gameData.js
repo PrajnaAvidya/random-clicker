@@ -165,7 +165,7 @@ export default {
         // TODO upgrade expansions e.g. "box of brand biscuits" & holiday events
     ],
 
-    // TODO X of every building upgrades
+    // X of every building upgrades
     buildingProductionUpgrades: [
         { needed: 100, cost: 1E21, multiplier: 1.1 },
         { needed: 150, cost: 1E24, multiplier: 1.1 },

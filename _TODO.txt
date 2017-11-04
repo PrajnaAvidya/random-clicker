@@ -3,6 +3,8 @@ WHY THE FUCK WON'T THE VALUES RESET TO THE FILE VALUES EVEN WHEN I COPY THE OBJE
 
 move option names/descriptions to config file & use v-for in template
 
+look into using parent/child variables instead of events to pass certain data around
+
 core features TODO
 - menu
 -- stats page (track more data)
