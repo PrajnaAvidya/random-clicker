@@ -11,6 +11,7 @@ Vue.use(Vuetify);
 
 // load css
 import 'vuetify/dist/vuetify.min.css';
+import 'material-design-icons/iconfont/material-icons.css';
 
 // components
 import GameAlerts from './gameAlerts.vue';

@@ -10,23 +10,18 @@ break up main game data (too big to fail!)
 - cps
 - ???
 
-use addCurrency/subtractCurrency for anything involving this.currency (other than loop/frontend)
-
 move options into vuex state
 
 remove any direct reference to "Cracker"
 
-core features TODO
-- menu
--- stats page (track more data)
---- total crackers earned
---- golden cracker stats/attributes
+learn about js performance profiling to find bottlenecks (game gets really laggy in later stages)
 
-performance
-- account for autoclickers and limit particle generation/updates if necessary
-- learn about js performance profiling to find bottlenecks (game gets really laggy in later stages)
+menu todo
+- stats page (track more data)
+-- total crackers earned
+-- golden cracker stats/attributes
 
-upgrade checklist
+upgrade todo
 DONE:
 - building 0 production
 - base production
@@ -41,15 +36,17 @@ NOT DONE:
 - heavenly chip upgrades
 
 achivement todo
+- everything?
 - building achievements
 - click achievements
 - click speed
 
 juice/improvements
+- animate appearance of new things (e.g. upgrades & achievements)
 - break stuff off into other components if possible 
 -- refactor new/load/save system (turn into component)
 - flavor texts - what if i sourced them from reddit thread titles or something?
-- upgrade/achievement costs based on formula instead of static? that way we could tweak it in game settings for fast/slow
+- upgrade/achievement costs based on formula instead of static? that way we could tweak it in game settings for fast/slow progress
 
 6E = million
 9E = billion
