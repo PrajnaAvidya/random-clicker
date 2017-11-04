@@ -14,7 +14,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "vue": "2.5.*",
+    "vue": "^2.5.3",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
@@ -47,13 +47,13 @@
     "url-loader": "^0.5.9",
     "vue-loader": "^11.3.4",
     "vue-style-loader": "^2.0.5",
-    "vue-template-compiler": "^2.5.2",
-    "vuetify": "0.16.*",
+    "vue-template-compiler": "^2.5.3",
+    "vuetify": "^0.16.9",
     "webpack": "^2.7.0",
     "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dev-middleware": "^1.12.0",
     "webpack-hot-middleware": "^2.20.0",
-    "webpack-merge": "^4.1.0"
+    "webpack-merge": "^4.1.1"
   },
   "engines": {
     "node": ">= 4.0.0",
