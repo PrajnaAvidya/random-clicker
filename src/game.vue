@@ -156,31 +156,31 @@
                     // for fps calculations
                     lastFrame: 0,
 
-                    // game data
+                    // in-game state
                     currencyName: null,
                     currency: Big(0), // this value is for front-end display only, buy/etc checks are done with Stats.state.currency
+                    buyAmount: 1,
                     startingCurrency: Big(0),
                     bonusCurrency: Big(0),
                     bonusDialog: false,
                     currencyPulsing: false,
                     currencyPulseLast: null,
                     currencySuffix: '',
-                    clicks: Big(0),
-                    cps: Big(0),
                     lastCps: Big(0),
                     displayedCps: Big(0),
-                    cpsTick: Big(0),
-                    clickPower: Big(1),
                     lastClickPower: Big(1),
                     displayedClickPower: Big(1),
+                    cpsTick: Big(0),
                     clickPowerTick: Big(0),
-                    buyAmount: 1,
                     showUpgrades: false,
                     showAchievements: false,
-                    achievementCount: 0,
+
+                    // TODO move to game-specific settings?
                     buildingCostMultiplier: 0.15,
+                    // TODO add multiplier for upgrade scaling once ready
 
                     // this stuff gets loaded from data files
+                    // TODO something something
                     buildingNames: [],
                     buildingIcons: [],
                     buildings: [],
@@ -236,10 +236,10 @@
                 }
 
                 // add to overall stats
-                this.clicks = this.clicks.plus(this.clickPower);
+                Stats.commit('addClicks', Stats.state.clickPower);
                 
                 // add to display/stats currency
-                this.addCurrency(this.clickPower, !this.clickFrenzyActive);
+                this.addCurrency(Stats.state.clickPower, !this.clickFrenzyActive);
 
                 // enable pulsing
                 if (this.options.animation) {
@@ -248,20 +248,20 @@
                 }
             },
             addCurrency(amount, loop = false) {
-                Stats.dispatch('addCurrency', amount);
+                Stats.commit('addCurrency', amount);
 
                 // loop in currency effect (or not)
-                if (loop && !(amount == 1 || this.cps.gte(amount.times(10)))) {
+                if (loop && !(amount == 1 || Stats.state.cps.gte(amount.times(10)))) {
                     this.loopCurrency(amount);
                 } else {
                     this.currency = this.currency.plus(amount);
                 }
             },
             subtractCurrency(amount, loop = false) {
-                Stats.dispatch('subtractCurrency', amount);
+                Stats.commit('subtractCurrency', amount);
 
                 // loop in currency effect (or not)
-                if (loop && !(amount == 1 || this.cps.gte(amount.times(10)))) {
+                if (loop && !(amount == 1 || Stats.state.cps.gte(amount.times(10)))) {
                     this.loopCurrency(amount.times(-1), 166);
                 } else {
                     this.currency = this.currency.minus(amount);
@@ -290,13 +290,16 @@
                     clickPower = clickPower.times(this.clickFrenzyAmount);
                 }
 
-                let cpsMultiplierBonus = this.upgradeMultiplier('Clicking').minus(1).times(this.cps);
+                let cpsMultiplierBonus = this.upgradeMultiplier('Clicking').minus(1).times(Stats.state.cps);
 
                 // add frenzy bonus
                 if (this.frenzyActive) {
                     cpsMultiplierBonus = cpsMultiplierBonus.times(this.frenzyAmount);
                 }
-                this.clickPower = clickPower.plus(cpsMultiplierBonus);
+
+                clickPower = clickPower.plus(cpsMultiplierBonus);
+
+                Stats.commit('setClickPower', clickPower);
             },
             recalculateCps() {
                 let cps = Big(0);
@@ -318,7 +321,7 @@
                     cps = cps.times(this.frenzyAmount);
                 }
 
-                this.cps = cps;
+                Stats.commit('setCps', cps);
             },
 
             // buildings
@@ -373,7 +376,7 @@
                     return null;
                 }
                 let buildingCps = building.currentCps * building.owned;
-                let buildingCpsPercent = 100 * buildingCps / this.cps;
+                let buildingCpsPercent = 100 * buildingCps / Stats.state.cps;
                 //let buildingText = building.description;
                 let buildingText = "Each " + building.name + " produces " + building.currentCps + " " + this.currencyName + "s per second";
                 buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " " + this.currencyName + "s per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
@@ -402,7 +405,7 @@
                         return true;
                     }
                 } else if (upgrade.type == 'Clicking') {
-                    if (this.clicks.gte(upgrade.needed)) {
+                    if (Stats.state.clicks.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
                     }
@@ -435,7 +438,7 @@
                         return true;
                     }
                 } else if (upgrade.type == 'Clicking') {
-                    if (this.clicks.gte(upgrade.needed)) {
+                    if (Stats.state.clicks.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
                     }
@@ -541,11 +544,11 @@
                 let vm = this;
                 this.lockedAchievements().forEach(function (achievement) {
                     if (achievement.cps != null) {
-                        if (vm.cps.gte(achievement.cps)) {
+                        if (Stats.state.cps.gte(achievement.cps)) {
                             vm.unlockAchievement(achievement);
                         }
                     } else if (achievement.clicks != null) {
-                        if (vm.clicks.gte(achievement.clicks)) {
+                        if (Stats.state.clicks.gte(achievement.clicks)) {
                             vm.unlockAchievement(achievement);
                         }
                     } else if (achievement.type == vm.currencyName) {
@@ -566,7 +569,6 @@
             },
             unlockAchievement(achievement) {
                 achievement.unlocked = true;
-                this.achievementCount++;
                 this.showAchievements = true;
 
                 if (this.options.alerts) {
@@ -581,7 +583,7 @@
 
                 // how much to add this frame
                 let division = 1000 / progress;
-                let currencyIncrement = this.cps.div(division);
+                let currencyIncrement = Stats.state.cps.div(division);
 
                 // check for bonus end
                 if (this.luckyActive) {
@@ -607,25 +609,25 @@
                 // increment currency
                 this.addCurrency(currencyIncrement);
 
-                if (!this.lastCps.eq(this.cps)) {
-                    this.lastCps = this.cps;
-                    this.cpsTick = this.cps.minus(this.displayedCps).div(division / 2);
+                if (!this.lastCps.eq(Stats.state.cps)) {
+                    this.lastCps = Stats.state.cps;
+                    this.cpsTick = Stats.state.cps.minus(this.displayedCps).div(division / 2);
                 }
-                if (!this.displayedCps.eq(this.cps)) {
+                if (!this.displayedCps.eq(Stats.state.cps)) {
                     this.displayedCps = this.displayedCps.plus(this.cpsTick);
-                    if (this.displayedCps.gt(this.cps)) {
-                        this.displayedCps = this.cps;
+                    if (this.displayedCps.gt(Stats.state.cps)) {
+                        this.displayedCps = Stats.state.cps;
                     }
                 }
 
-                if (!this.lastClickPower.eq(this.clickPower)) {
-                    this.lastClickPower = this.clickPower;
-                    this.clickPowerTick = this.clickPower.minus(this.displayedClickPower).div(division / 2);
+                if (!this.lastClickPower.eq(Stats.state.clickPower)) {
+                    this.lastClickPower = Stats.state.clickPower;
+                    this.clickPowerTick = Stats.state.clickPower.minus(this.displayedClickPower).div(division / 2);
                 }
-                if (!this.displayedClickPower.eq(this.clickPower)) {
+                if (!this.displayedClickPower.eq(Stats.state.clickPower)) {
                     this.displayedClickPower = this.displayedClickPower.plus(this.clickPowerTick);
-                    if (this.displayedClickPower.gt(this.clickPower)) {
-                        this.displayedClickPower = this.clickPower;
+                    if (this.displayedClickPower.gt(Stats.state.clickPower)) {
+                        this.displayedClickPower = Stats.state.clickPower;
                     }
                 }
 
@@ -805,6 +807,9 @@
                 Object.assign(this.$data, this.defaultData());
                 this._sortedUpgrades = null;
 
+                // reset state
+                Stats.commit('resetState');
+
                 // load word lists
                 this.words = JSON.parse(JSON.stringify(Words));
 
@@ -839,7 +844,7 @@
                         // clear alerts & toggle menu
                         EventBus.$emit('clearAlerts');
                         EventBus.$emit('toggleMenu');
-                        EventBus.$emit('send')
+                        EventBus.$emit('send');
                     }
                 }
             },
@@ -847,20 +852,15 @@
             // leaving broken while implementing Stats
             saveGame() {
                 let saveData = {
+                    // misc state
                     currencyName: this.currencyName,
-                    clicks: this.clicks,
-                    cps: this.cps,
-                    clickPower: this.clickPower,
-                    buyAmount: this.buyAmount,
-                    showUpgrades: this.showUpgrades,
-                    showAchievements: this.showAchievements,
-                    achievementCount: this.achievementCount,
                     buildingCostMultiplier: this.buildingCostMultiplier,
                     buildingNames: this.buildingNames,
                     buildings: this.buildings,
                     upgrades: this.upgrades,
                     achievements: this.achievements,
                     timestamp: this.unixTimestamp(),
+                    buyAmount: this.buyAmount,
 
                     options: this.options,
                     stats: Stats.state,
@@ -880,20 +880,17 @@
                 this.currencyName = saveData.currencyName;
                 document.title = this.currencyName + ' Clicker';
                 this.currency = Big(0); // this will be looped in, display only
-                this.clicks = Big(saveData.clicks);
-                this.cps = Big(saveData.cps);
                 this.displayedCps = Big(0);
-                this.clickPower = Big(saveData.clickPower);
                 this.displayedClickPower = Big(1);
-                this.buyAmount = saveData.buyAmount;
-                this.showUpgrades = saveData.showUpgrades;
-                this.showAchievements = saveData.showAchievements;
-                this.achievementCount = saveData.achievementCount;
                 this.buildingNames = saveData.buildingNames;
                 this.buildingCostMultiplier = saveData.buildingCostMultiplier;
+                this.buyAmount = saveData.buyAmount;
+
+                // TODO below stuff should be integrated with the same function as newgame?
                 
                 // parse buildings/upgrades/achievements (cast numbers to big.js)
                 this.buildings = [];
+                let showUpgrades = false;
                 saveData.buildings.forEach(function (saveBuilding) {
                     let building = {
                         name: saveBuilding.name,
@@ -907,6 +904,9 @@
                         owned: saveBuilding.owned,
                         icon: saveBuilding.icon
                     };
+                    if (building.owned > 0) {
+                        showUpgrades = true;
+                    }
                     vm.buildings.push(building);
                 });
 
@@ -927,11 +927,16 @@
                     if (saveUpgrade.multiplier != null) {
                         upgrade.multiplier = saveUpgrade.multiplier;
                     }
+                    if (upgrade.unlocked) {
+                        showUpgrades = true;
+                    }
 
                     vm.upgrades.push(upgrade);
                 });
+                this.showUpgrades = showUpgrades;
 
                 this.achievements = [];
+                let showAchievements = false;
                 saveData.achievements.forEach(function (saveAchievement) {
                     let achievement = {
                         type: saveAchievement.type,
@@ -950,15 +955,20 @@
                         achievement.clicks = Big(saveAchievement.clicks);
                     }
 
+                    if (achievement.unlocked) {
+                        showAchievements = true;
+                    }
+
                     vm.achievements.push(achievement);
                 });
+                this.showAchievements = showAchievements;
 
                 // options
                 this.options = saveData.options;
 
                 // calculate bonus currency
                 let timeDifference = this.unixTimestamp() - saveData.timestamp;
-                this.bonusCurrency = this.cps.div(2).times(timeDifference).round();
+                this.bonusCurrency = Stats.state.cps.div(2).times(timeDifference).round();
 
                 // show dialog if earned over 10% saved currency
                 if (this.bonusCurrency.gt(0) && this.bonusCurrency.gte(Big(Stats.state.currency).div(10))) {
@@ -1020,7 +1030,7 @@
                     this.frenzyEnd = this.unixTimestamp() + this.frenzyLength;
                 } else {
                     // lucky
-                    let bonus1 = this.cps.times(900);
+                    let bonus1 = Stats.state.cps.times(900);
                     let bonus2 = Stats.state.currency.times(0.15);
                     this.luckyAmount = bonus1;
                     if (bonus1.gt(bonus2)) {
@@ -1160,7 +1170,7 @@
                         }
 
                         let particle = new NumberParticle();
-                        let clickPower = vm.$options.filters.round(vm.clickPower);
+                        let clickPower = vm.$options.filters.round(Stats.state.clickPower);
                         particle.init(x, y, clickPower);
                         numberParticles.push(particle);
                     },
@@ -1239,7 +1249,7 @@
             } else {
                 this.newGame();
                 if (this.cheatMode) {
-                    this.addCurrency(1000000000);
+                    this.addCurrency(1000);
                 }
             }
             // load audio

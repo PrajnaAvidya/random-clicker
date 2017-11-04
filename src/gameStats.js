@@ -3,34 +3,47 @@ import Vuex from 'vuex';
 import Big from "big.js";
 
 Vue.use(Vuex);
-export default new Vuex.Store({
-    state: {
+
+function initialState() {
+    return {
         currency: new Big(0),
         totalCurrencyEarned: new Big(0),
         totalCurrencySpent: new Big(0),
-    },
+
+        cps: new Big(0),
+
+        clickPower: Big(1),
+        clicks: new Big(0),
+    };
+}
+
+export default new Vuex.Store({
+    state: initialState(),
     mutations: {
+        resetState(state) {
+            Object.assign(state, initialState());
+        },
+
+        // currency
         addCurrency(state, n) {
             state.currency = state.currency.plus(n);
-        },
-        addTotalCurrencyEarned(state, n) {
             state.totalCurrencyEarned = state.totalCurrencyEarned.plus(n);
         },
         subtractCurrency(state, n) {
             state.currency = state.currency.minus(n);
-        },
-        addTotalCurrencySpent(state, n) {
             state.totalCurrencySpent = state.totalCurrencySpent.plus(n);
-        }
-    },
-    actions: {
-        addCurrency (context, n) {
-            context.commit('addCurrency', n);
-            context.commit('addTotalCurrencyEarned', n);
         },
-        subtractCurrency (context, n) {
-            context.commit('subtractCurrency', n);
-            context.commit('addTotalCurrencySpent', n);
-        }
+        
+        // clicks
+        addClicks(state, n) {
+            state.clicks = state.clicks.plus(n);
+        },
+        setClickPower(state, n) {
+            state.clickPower = new Big(n);
+        },
+
+        setCps(state, n) {
+            state.cps = new Big(n);
+        },
     }
 });
