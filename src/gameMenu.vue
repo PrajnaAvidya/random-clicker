@@ -88,6 +88,7 @@
 <script>
     import EventBus from './eventBus.js';
     import Options from './options.js';
+    import Stats from "./gameStats.js";
 
     export default {
         data() {
@@ -140,7 +141,6 @@
 
             // recieve options from game
             EventBus.$on('sendOptions', function (options) {
-                console.log(options);
                 this.optionSettings = [];
                 for (let key in options) {
                     vm.options[key] = options[key];

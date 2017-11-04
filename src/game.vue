@@ -124,6 +124,7 @@
     import Words from "./words.js";
     import Options from './options.js';
     import GameData from "./gameData.js";
+    import Stats from "./gameStats.js";
 
     export default {
         data: function () {
@@ -153,9 +154,8 @@
 
                     // game data
                     currencyName: null,
-                    currency: Big(0),
+                    currency: Big(0), // this value is for front-end display only, buy/etc checks are done with Stats.state.currency
                     startingCurrency: Big(0),
-                    totalCurrency: Big(0),
                     bonusCurrency: Big(0),
                     bonusDialog: false,
                     currencyPulsing: false,
@@ -225,7 +225,7 @@
                 return Math.round((new Date()).getTime() / 1000);
             },
 
-            // clicking/cps
+            // clicking/currency/cps
             click() {
                 if (this.options.sounds) {
                     this.clickSound.play();
@@ -233,34 +233,48 @@
 
                 // add to overall stats
                 this.clicks = this.clicks.plus(this.clickPower);
-                this.totalCurrency = this.totalCurrency.plus(this.clickPower);
+                
+                // add to display/stats currency
+                this.addCurrency(this.clickPower, !this.clickFrenzyActive);
 
                 // enable pulsing
                 if (this.options.animation) {
                     this.currencyPulsing = true;
                     this.currencyPulseLast = this.unixTimestamp();
                 }
+            },
+            addCurrency(amount, loop = false) {
+                Stats.dispatch('addCurrency', amount);
 
-                // skip loop if cps is too high or clickPower = 1
-                if (this.clickPower == 1 || this.clickFrenzyActive || this.cps.gte(this.clickPower.times(10))) {
-                    this.currency = this.currency.plus(this.clickPower);
-                    return;
+                // loop in currency effect (or not)
+                if (loop && !(amount == 1 || this.cps.gte(amount.times(10)))) {
+                    this.loopCurrency(amount);
+                } else {
+                    this.currency = this.currency.plus(amount);
                 }
+            },
+            subtractCurrency(amount, loop = false) {
+                Stats.dispatch('subtractCurrency', amount);
 
-                // show currency increase animation
-                this.loopCurrency(this.clickPower);
+                // loop in currency effect (or not)
+                if (loop && !(amount == 1 || this.cps.gte(amount.times(10)))) {
+                    this.loopCurrency(amount.times(-1), 166);
+                } else {
+                    this.currency = this.currency.minus(amount);
+                }
             },
             // show currency ticking up effect (when clicking & loading)
+            // this.currency is only used for front-end display
             loopCurrency(amount, ms = 333) {
                 let vm = this;
                 let loopAmount = 10;
-                if (amount < 10) {
+                if (amount.abs().lt(10)) {
                     loopAmount = amount;
                 }
-                let clickAmount = amount.div(loopAmount);
+                let tickAmount = amount.div(loopAmount);
                 for (let i = 0; i < loopAmount; i++) {
                     setTimeout(function timer() {
-                        vm.currency = vm.currency.plus(clickAmount);
+                        vm.currency = vm.currency.plus(tickAmount);
                     }, i * ms / loopAmount);
                 }
             },
@@ -305,17 +319,17 @@
 
             // buildings
             showBuilding(building) {
-                if (building.unlocked == false && this.totalCurrency.gte(building.baseCost)) {
+                if (building.unlocked == false && Stats.state.totalCurrencyEarned.gte(building.baseCost)) {
                     building.unlocked = true;
                 }
-                return this.totalCurrency.gte(building.showAt);
+                return Stats.state.totalCurrencyEarned.gte(building.showAt);
             },
             canBuyBuilding(building) {
-                return this.currency.gte(this.buildingCost(building, this.buyAmount));
+                return Stats.state.currency.gte(this.buildingCost(building));
             },
             buyBuilding(building) {
                 if (this.canBuyBuilding(building)) {
-                    this.currency = this.currency.minus(this.buildingCost(building));
+                    this.subtractCurrency(this.buildingCost(building), true);
                     building.owned += this.buyAmount;
                     building.unlocked = true; // just in case
 
@@ -375,11 +389,11 @@
 
             // upgrades
             canAffordUpgrade(upgrade) {
-                return this.currency.gte(upgrade.cost);
+                return Stats.state.currency.gte(upgrade.cost);
             },
             canBuyUpgrade(upgrade) {
                 if (upgrade.type == this.currencyName) {
-                    if (this.currency.gte(upgrade.needed)) {
+                    if (Stats.state.currency.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
                     }
@@ -412,7 +426,7 @@
                     return false;
                 }
                 if (upgrade.type == this.currencyName) {
-                    if (this.currency.gte(upgrade.needed)) {
+                    if (Stats.state.currency.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
                     }
@@ -432,7 +446,7 @@
             },
             buyUpgrade(upgrade) {
                 if (this.canBuyUpgrade(upgrade) && this.canAffordUpgrade(upgrade)) {
-                    this.currency = this.currency.minus(upgrade.cost);
+                    this.subtractCurrency(upgrade.cost, true);
                     upgrade.active = true;
 
                     this.recalculateCps();
@@ -531,7 +545,7 @@
                             vm.unlockAchievement(achievement);
                         }
                     } else if (achievement.type == vm.currencyName) {
-                        if (vm.totalCurrency.gte(achievement.total)) {
+                        if (Stats.state.totalCurrencyEarned.gte(achievement.total)) {
                             vm.unlockAchievement(achievement);
                         }
                     } else {
@@ -587,8 +601,7 @@
                 }
 
                 // increment currency
-                this.currency = this.currency.plus(currencyIncrement);
-                this.totalCurrency = this.totalCurrency.plus(currencyIncrement);
+                this.addCurrency(currencyIncrement);
 
                 if (!this.lastCps.eq(this.cps)) {
                     this.lastCps = this.cps;
@@ -826,6 +839,8 @@
                     }
                 }
             },
+            // TODO refactor load/save to work with Stats and probably external component
+            // leaving broken while implementing Stats
             saveGame() {
                 let saveData = {
                     currencyName: this.currencyName,
@@ -951,6 +966,7 @@
                 }
 
                 console.log("Game Loaded");
+                this.saveGame();
             },
             loadSounds() {
                 this.clickSound = new Audio('/static/' + this.clickSound);
@@ -992,7 +1008,7 @@
                 } else {
                     // lucky
                     let bonus1 = this.cps.times(900);
-                    let bonus2 = this.currency.times(0.15);
+                    let bonus2 = Stats.state.currency.times(0.15);
                     this.luckyAmount = bonus1;
                     if (bonus1.gt(bonus2)) {
                         this.luckyAmount = bonus2;
@@ -1204,11 +1220,12 @@
             }
         },
         mounted() {
-            if (localStorage.getItem("SaveGame") != null) {
+            // TODO remove
+            /*if (localStorage.getItem("SaveGame") != null) {
                 this.loadGame(localStorage.getItem("SaveGame"));
-            } else {
+            } else {*/
                 this.newGame();
-            }
+            //}
 
             // load audio
             this.loadSounds();

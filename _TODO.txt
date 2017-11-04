@@ -6,6 +6,15 @@ move option names/descriptions to config file & use v-for in template
 look into using parent/child variables instead of events to pass certain data around
 
 break up main game data (too big to fail!)
+- change clicks
+- cps
+- ???
+
+use addCurrency/subtractCurrency for anything involving this.currency (other than loop/frontend)
+
+move options into vuex state
+
+remove any direct reference to "Cracker"
 
 core features TODO
 - menu
