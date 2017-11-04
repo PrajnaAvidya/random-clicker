@@ -149,6 +149,10 @@
         methods: {
             defaultData() {
                 return {
+                    // debug flags
+                    cheatMode: false, // gives extra starting currency
+                    disableLoad: false, // don't load saved games
+
                     // for fps calculations
                     lastFrame: 0,
 
@@ -844,8 +848,6 @@
             saveGame() {
                 let saveData = {
                     currencyName: this.currencyName,
-                    currency: this.currency,
-                    totalCurrency: this.totalCurrency,
                     clicks: this.clicks,
                     cps: this.cps,
                     clickPower: this.clickPower,
@@ -859,7 +861,9 @@
                     upgrades: this.upgrades,
                     achievements: this.achievements,
                     timestamp: this.unixTimestamp(),
+
                     options: this.options,
+                    stats: Stats.state,
                 };
 
                 localStorage.setItem("SaveGame", JSON.stringify(saveData));
@@ -870,10 +874,12 @@
                 let saveData = JSON.parse(saveJson);
                 let vm = this;
 
+                // load stats
+                Stats.replaceState(this.convertObjectToBig(saveData.stats));
+
                 this.currencyName = saveData.currencyName;
                 document.title = this.currencyName + ' Clicker';
-                this.currency = Big(0); // this will be looped in
-                this.totalCurrency = Big(saveData.totalCurrency);
+                this.currency = Big(0); // this will be looped in, display only
                 this.clicks = Big(saveData.clicks);
                 this.cps = Big(saveData.cps);
                 this.displayedCps = Big(0);
@@ -954,19 +960,26 @@
                 let timeDifference = this.unixTimestamp() - saveData.timestamp;
                 this.bonusCurrency = this.cps.div(2).times(timeDifference).round();
 
-                // show dialog if earned over 5% saved currency
-                if (this.bonusCurrency.gt(0) && this.bonusCurrency.gte(Big(saveData.currency).div(20))) {
+                // show dialog if earned over 10% saved currency
+                if (this.bonusCurrency.gt(0) && this.bonusCurrency.gte(Big(Stats.state.currency).div(10))) {
                     this.bonusDialog = true;
                 }
 
                 // loop in currency
-                let startingCurrency = Big(saveData.currency).plus(this.bonusCurrency);
+                let startingCurrency = Big(Stats.state.currency).plus(this.bonusCurrency);
                 if (startingCurrency.gt(0)) {
                     this.loopCurrency(startingCurrency, 500);
                 }
 
                 console.log("Game Loaded");
-                this.saveGame();
+                //this.saveGame();
+            },
+            convertObjectToBig(objectData) {
+                let bigData = {};
+                for (let key in objectData) {
+                    bigData[key] = new Big(objectData[key]);
+                }
+                return bigData;
             },
             loadSounds() {
                 this.clickSound = new Audio('/static/' + this.clickSound);
@@ -1220,13 +1233,15 @@
             }
         },
         mounted() {
-            // TODO remove
-            /*if (localStorage.getItem("SaveGame") != null) {
+            // load game or new
+            if (!this.disableLoad && localStorage.getItem("SaveGame") != null) {
                 this.loadGame(localStorage.getItem("SaveGame"));
-            } else {*/
+            } else {
                 this.newGame();
-            //}
-
+                if (this.cheatMode) {
+                    this.addCurrency(1000000000);
+                }
+            }
             // load audio
             this.loadSounds();
 
