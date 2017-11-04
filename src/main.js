@@ -1,39 +1,31 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+
+// load main stuff
 import Vue from 'vue';
+import Vuex from 'vuex';
 import Vuetify from 'vuetify';
 
-// event system
-window.Event = new class {
-    constructor() {
-        this.vue = new Vue();
-    }
+Vue.use(Vuex);
+Vue.use(Vuetify);
 
-    fire(event, data = null) {
-        this.vue.$emit(event, data);
-    }
+// load css
+import 'vuetify/dist/vuetify.min.css';
+import 'material-design-icons/iconfont/material-icons.css';
 
-    listen(event, callback) {
-        this.vue.$on(event, callback);
-    }
-}
-
-// game alerts component
+// components
 import GameAlerts from './gameAlerts.vue';
 import GameMenu from './gameMenu.vue';
 Vue.component('GameAlerts', GameAlerts);
 Vue.component('GameMenu', GameMenu);
 
-// main game
+// game
 import Game from './game.vue';
-
-// frontend package
-Vue.use(Vuetify);
 
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({
     el: '#game',
-    components: { Game, GameAlerts }
+    components: { Game }
 });
