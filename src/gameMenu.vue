@@ -32,7 +32,7 @@
 
                                     <v-list-tile>
                                         <v-list-tile-action>
-                                            <v-checkbox v-model="alerts"></v-checkbox>
+                                            <v-checkbox v-model="optionSettings" value="alerts"></v-checkbox>
                                         </v-list-tile-action>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Achievement Alerts</v-list-tile-title>
@@ -42,7 +42,7 @@
 
                                     <v-list-tile>
                                         <v-list-tile-action>
-                                            <v-checkbox v-model="sounds"></v-checkbox>
+                                            <v-checkbox v-model="optionSettings" value="sounds"></v-checkbox>
                                         </v-list-tile-action>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Sounds</v-list-tile-title>
@@ -52,7 +52,7 @@
 
                                     <v-list-tile>
                                         <v-list-tile-action>
-                                            <v-checkbox v-model="particles"></v-checkbox>
+                                            <v-checkbox v-model="optionSettings" value="particles"></v-checkbox>
                                         </v-list-tile-action>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Particle Effects</v-list-tile-title>
@@ -62,7 +62,7 @@
 
                                     <v-list-tile>
                                         <v-list-tile-action>
-                                            <v-checkbox v-model="animation"></v-checkbox>
+                                            <v-checkbox v-model="optionSettings" value="animation"></v-checkbox>
                                         </v-list-tile-action>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Animation</v-list-tile-title>
@@ -95,48 +95,22 @@
                 menu: false,
                 activeTab: null,
                 options: Options,
+                optionSettings: [],
+                allSettings: [],
             }
         },
 
-        computed: {
-            alerts: {
-                get: function() {
-                    return this.getOption("alerts");
-                },
-                set: function(setting) {
-                    this.setOption("alerts", setting);
-                }
-            },
-            sounds: {
-                get: function() {
-                    return this.getOption("sounds");
-                },
-                set: function(setting) {
-                    this.setOption("sounds", setting);
-                }
-            },
-            particles: {
-                get: function() {
-                    return this.getOption("particles");
-                },
-                set: function(setting) {
-                    this.setOption("particles", setting);
-                }
-            },
-            animation: {
-                get: function() {
-                    return this.getOption("animation");
-                },
-                set: function(setting) {
-                    this.setOption("animation", setting);
-                }
+        watch: {
+            // update options when changed
+            optionSettings: function(settings) {
+                let vm = this;
+                this.allSettings.forEach(function (setting) {
+                    vm.setOption(setting, settings.includes(setting));
+                });
             }
         },
 
         methods: {
-            getOption(option) {
-                return this.options[option];
-            },
             setOption(option, value) {
                 this.options[option] = value;
                 EventBus.$emit('setOption', option, value);
@@ -156,13 +130,23 @@
             // add event listeners
             let vm = this;
 
+            // get all setting keys from Options object
+            for (let key in Options) {
+                this.allSettings.push(key);
+            }
+
             // open/close menu
             EventBus.$on('toggleMenu', this.toggleMenu);
 
             // recieve options from game
             EventBus.$on('sendOptions', function (options) {
+                console.log(options);
+                this.optionSettings = [];
                 for (let key in options) {
                     vm.options[key] = options[key];
+                    if (options[key] == true) {
+                        vm.optionSettings.push(key);
+                    }
                 }
             });
         }
