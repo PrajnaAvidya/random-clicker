@@ -150,8 +150,8 @@
             defaultData() {
                 return {
                     // debug flags
-                    cheatMode: false, // gives extra starting currency
-                    disableLoad: false, // don't load saved games
+                    cheatMode: true, // gives extra starting currency
+                    disableLoad: true, // don't load saved games
 
                     // for fps calculations
                     lastFrame: 0,
@@ -194,7 +194,7 @@
                     cpsIcon: null,
                     clicksIcon: null,
 
-                    // golden currency
+                    // golden currency stuff
                     goldenTop: 250,
                     goldenRight: 850,
                     goldenActive: false,
@@ -459,6 +459,8 @@
                     this.recalculateCps();
                     this.recalculateClickPower();
                     this.checkAchievements();
+
+                    Stats.commit('addUpgrade');
                 }
             },
             activeUpgrades(buildingType) {
@@ -574,6 +576,8 @@
                 if (this.options.alerts) {
                     EventBus.$emit('addAlert', achievement);
                 }
+
+                Stats.commit('addAchievement');
             },
 
             // tick function
@@ -848,8 +852,6 @@
                     }
                 }
             },
-            // TODO refactor load/save to work with Stats and probably external component
-            // leaving broken while implementing Stats
             saveGame() {
                 let saveData = {
                     // misc state

@@ -16,7 +16,6 @@ learn about js performance profiling to find bottlenecks (game gets really laggy
 
 menu todo
 - stats page (track more data)
--- total crackers earned
 -- golden cracker stats/attributes
 
 upgrade todo

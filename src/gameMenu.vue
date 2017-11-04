@@ -75,6 +75,34 @@
                                 <v-btn color="red" @click.native="hardReset()">Hard Reset</v-btn>
                             </v-card-text>
                         </v-tabs-content>
+
+                        <v-tabs-content id="stats">
+                            <v-card-text>
+                                <v-list three-line subheader>
+                                    <v-subheader>Statistics</v-subheader>
+
+                                    <v-list-tile>
+                                        Total Crackers earned: {{ getStat('totalCurrencyEarned') }}
+                                    </v-list-tile>
+
+                                    <v-list-tile>
+                                        Total Crackers earned by clicking: {{ getStat('clicks') }}
+                                    </v-list-tile>
+
+                                    <v-list-tile>
+                                        Total Crackers spent: {{ getStat('totalCurrencySpent') }}
+                                    </v-list-tile>
+
+                                    <v-list-tile>
+                                        Upgrades purchased: {{ getStat('upgradeCount') }}
+                                    </v-list-tile>
+
+                                    <v-list-tile>
+                                        Achievements unlocked: {{ getStat('achievementCount') }}
+                                    </v-list-tile>
+                                </v-list>
+                            </v-card-text>
+                        </v-tabs-content>
                     </v-tabs-items>
                 </v-tabs>
 
@@ -98,6 +126,7 @@
                 options: Options,
                 optionSettings: [],
                 allSettings: [],
+                stats: {},
             }
         },
 
@@ -124,7 +153,17 @@
             },
             toggleMenu() {
                 this.menu = !this.menu;
-            }
+            },
+
+            getStat(stat) {
+                return this.stats[stat];
+            },
+            updateStats() {
+                this.stats = {};
+                for (let key in Stats.state) {
+                    this.stats[key] = Math.floor(Stats.state[key]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+            },
         },
 
         mounted() {
@@ -149,6 +188,11 @@
                     }
                 }
             });
+
+            // update stats
+            setInterval(function () {
+                this.updateStats();
+            }.bind(this), 2000);
         }
     };
 </script>

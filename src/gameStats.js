@@ -14,6 +14,9 @@ function initialState() {
 
         clickPower: Big(1),
         clicks: new Big(0),
+
+        upgradeCount: 0,
+        achievementCount: 0,
     };
 }
 
@@ -44,6 +47,14 @@ export default new Vuex.Store({
 
         setCps(state, n) {
             state.cps = new Big(n);
+        },
+
+        // upgrades/achievement tracking
+        addUpgrade(state) {
+            state.upgradeCount ++;
+        },
+        addAchievement(state) {
+            state.achievementCount ++;
         },
     }
 });
