@@ -56,38 +56,42 @@
                 </v-flex>
 
                 <v-flex sm3>
-                    <v-layout class="upgrades" v-if="showUpgrades">
-                        <h3>Upgrades</h3>
+                    <transition-group name="scale-transition" tag="div">
+                        <v-layout class="upgrades" v-if="showUpgrades" key="div">
+                            <h3>Upgrades</h3>
 
-                        <v-container class="scroll-y">
-                            <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
-                                <v-tooltip left>
-                                    <span slot="activator">
-                                        <v-icon light>{{ upgrade.icon }}</v-icon>
-                                        <span class="upgrade-link" :class="{ cantbuy:!canBuyUpgrade(upgrade), canafford:canAffordUpgrade(upgrade) }" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
-                                    </span>
-                                    <span v-html="upgradeText(upgrade)"></span>
-                                </v-tooltip>
-                                
-                            </div>
-                        </v-container>
-                    </v-layout>
+                            <v-container class="scroll-y">
+                                <div class="upgrade" v-for="upgrade in sortedUpgrades" v-if="!upgrade.active && (canBuyUpgrade(upgrade) || canSeeUpgrade(upgrade))">
+                                    <v-tooltip left>
+                                        <span slot="activator">
+                                            <v-icon light>{{ upgrade.icon }}</v-icon>
+                                            <span class="upgrade-link" :class="{ cantbuy:!canBuyUpgrade(upgrade), canafford:canAffordUpgrade(upgrade) }" @click="buyUpgrade(upgrade)">{{ upgrade.type }}: {{ upgrade.name }} ({{ upgrade.cost | currency }})</span>
+                                        </span>
+                                        <span v-html="upgradeText(upgrade)"></span>
+                                    </v-tooltip>
+                                    
+                                </div>
+                            </v-container>
+                        </v-layout>
+                    </transition-group>
 
-                    <v-layout class="achievements" v-if="showAchievements">
-                        <h3>Achievements</h3>
+                    <transition-group name="scale-transition" tag="div">
+                        <v-layout class="achievements" v-if="showAchievements" key="div">
+                            <h3>Achievements</h3>
 
-                        <v-container class="scroll-y">
-                            <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
-                                <v-tooltip left>
-                                    <span slot="activator">
-                                        <v-icon light>{{ achievement.icon }}</v-icon>
-                                        <span>{{ achievement.name }}</span>
-                                    </span>
-                                    <span v-html="achievement.description"></span>
-                                </v-tooltip>
-                            </div>
-                        </v-container>
-                    </v-layout>
+                            <v-container class="scroll-y">
+                                <div class="achievement" v-for="achievement in achievements" v-if="achievement.unlocked">
+                                    <v-tooltip left>
+                                        <span slot="activator">
+                                            <v-icon light>{{ achievement.icon }}</v-icon>
+                                            <span>{{ achievement.name }}</span>
+                                        </span>
+                                        <span v-html="achievement.description"></span>
+                                    </v-tooltip>
+                                </div>
+                            </v-container>
+                        </v-layout>
+                    </transition-group>
 
                     <GameMenu></GameMenu>
                 </v-flex>
@@ -152,7 +156,7 @@
                 return {
                     // debug flags
                     cheatMode: false, // gives extra starting currency
-                    disableLoad: false, // don't load saved games
+                    disableLoad: true, // don't load saved games
                     disableAutoSave: true, // don't auto save
                     easyGolden: false, // constant golden spawns
 

@@ -23,7 +23,6 @@ achivement todo
 - click speed
 
 juice/improvements
-- animate appearance of new things (e.g. upgrades & achievements)
 - break stuff off into other components if possible 
 -- particle system in own module
 - flavor texts - what if i sourced them from reddit thread titles or something?
