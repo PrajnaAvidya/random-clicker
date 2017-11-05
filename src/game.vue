@@ -123,13 +123,13 @@
 
 <script>
     import Big from "big.js";
-    import Sketch from "sketch-js";
     import EventBus from './eventBus.js';
     import Words from "./words.js";
     import Options from './gameOptions.js';
     import GameData from "./gameData.js";
     import Stats from "./gameStats.js";
     import Utils from "./utils.js";
+    import Particles from "./particles.js";
 
     export default {
         data: function () {
@@ -156,9 +156,9 @@
                 return {
                     // debug flags
                     cheatMode: false, // gives extra starting currency
+                    easyGolden: false, // constant golden spawns
                     disableLoad: false, // don't load saved games
                     disableAutoSave: false, // don't auto save
-                    easyGolden: false, // constant golden spawns
 
                     // for fps calculations
                     lastFrame: 0,
@@ -657,7 +657,7 @@
 
             // generate stuff
             generateBuildings() {
-                let buildingNames = this.shuffleArray(this.words.buildingNames);
+                let buildingNames = Utils.shuffleArray(this.words.buildingNames);
                 for (let i = 0; i < GameData.buildings.length; i++) {
                     let buildingName = buildingNames.pop();
                     let building = JSON.parse(JSON.stringify(GameData.buildings[i]));
@@ -813,7 +813,68 @@
                 });
             },
 
-            // setup/save
+            // golden
+            initGolden() {
+                this.goldenNext = this.unixTimestamp() + Math.floor(Math.random() * (this.goldenMaximumTime - this.goldenMinimumTime)) + this.goldenMinimumTime;
+                this.goldenDisappear = this.goldenNext + this.goldenStay;
+            },
+            spawnGolden() {
+                let x = document.body.offsetWidth;
+                let y = document.body.offsetHeight;
+
+                let randomX = Math.floor(Math.random() * x);
+                let randomY = Math.floor(Math.random() * y);
+
+                this.goldenRight = randomX;
+                this.goldenTop = randomY;
+                this.goldenActive = true;
+
+                Stats.commit('addGoldenSpawned');
+
+                if (Options.state.sounds) {
+                    this.goldenSpawnSound.play();
+                }
+            },
+            clickGolden() {
+                // 0 - 99
+                let roll = Math.floor(Math.random() * 100);
+                if (roll >= 95 && !this.clickFrenzyActive) {
+                    // click frenzy
+                    this.clickFrenzyActive = true;
+                    this.clickFrenzyEnd = this.unixTimestamp() + this.clickFrenzyLength;
+                } else if (roll >= 47 && !this.frenzyActive) {
+                    // frenzy
+                    this.frenzyActive = true;
+                    this.frenzyEnd = this.unixTimestamp() + this.frenzyLength;
+                } else {
+                    // lucky
+                    let bonus1 = Stats.state.cps.times(900);
+                    let bonus2 = Stats.state.currency.times(0.15);
+                    this.luckyAmount = bonus1;
+                    if (bonus1.gt(bonus2)) {
+                        this.luckyAmount = bonus2;
+                    }
+                    this.luckyAmount = this.luckyAmount.plus(13)
+                    this.luckyActive = true;
+                    this.luckyEnd = this.unixTimestamp() + this.luckyLength;
+
+                    this.addCurrency(this.luckyAmount, true);
+                }
+
+                if (Options.state.sounds) {
+                    this.goldenClickSound.play();
+                }
+
+                this.recalculateCps();
+                this.recalculateClickPower();
+
+                Stats.commit('addGoldenClicked');
+
+                this.goldenActive = false;
+                this.initGolden();
+            },
+
+            // new/save/load
             newGame() {
                 // load default data
                 Object.assign(this.$data, this.defaultData());
@@ -828,13 +889,13 @@
                 this.words = JSON.parse(JSON.stringify(Words));
 
                 // get currency name & adjectives
-                //this.currencyName = this.shuffleArray(GameData.currencies).pop();
+                //this.currencyName = Utils.shuffleArray(GameData.currencies).pop();
                 let currencyName = 'Cracker';
                 Stats.commit('setCurrencyName', currencyName);
                 this.currencyName = currencyName;
                 document.title = currencyName + ' Clicker';
-                this.adjectives = this.shuffleArray(this.words.adjectives);
-                this.icons = this.shuffleArray(this.words.icons);
+                this.adjectives = Utils.shuffleArray(this.words.adjectives);
+                this.icons = Utils.shuffleArray(this.words.icons);
 
                 // generate stuff
                 this.generateBuildings();
@@ -1001,208 +1062,6 @@
                 this.goldenSpawnSound = new Audio('/static/' + this.goldenSpawnSound);
                 this.goldenClickSound = new Audio('/static/' + this.goldenClickSound);
             },
-
-            // golden
-            initGolden() {
-                this.goldenNext = this.unixTimestamp() + Math.floor(Math.random() * (this.goldenMaximumTime - this.goldenMinimumTime)) + this.goldenMinimumTime;
-                this.goldenDisappear = this.goldenNext + this.goldenStay;
-            },
-            spawnGolden() {
-                let x = document.body.offsetWidth;
-                let y = document.body.offsetHeight;
-
-                let randomX = Math.floor(Math.random() * x);
-                let randomY = Math.floor(Math.random() * y);
-
-                this.goldenRight = randomX;
-                this.goldenTop = randomY;
-                this.goldenActive = true;
-
-                Stats.commit('addGoldenSpawned');
-
-                if (Options.state.sounds) {
-                    this.goldenSpawnSound.play();
-                }
-            },
-            clickGolden() {
-                // 0 - 99
-                let roll = Math.floor(Math.random() * 100);
-                if (roll >= 95 && !this.clickFrenzyActive) {
-                    // click frenzy
-                    this.clickFrenzyActive = true;
-                    this.clickFrenzyEnd = this.unixTimestamp() + this.clickFrenzyLength;
-                } else if (roll >= 47 && !this.frenzyActive) {
-                    // frenzy
-                    this.frenzyActive = true;
-                    this.frenzyEnd = this.unixTimestamp() + this.frenzyLength;
-                } else {
-                    // lucky
-                    let bonus1 = Stats.state.cps.times(900);
-                    let bonus2 = Stats.state.currency.times(0.15);
-                    this.luckyAmount = bonus1;
-                    if (bonus1.gt(bonus2)) {
-                        this.luckyAmount = bonus2;
-                    }
-                    this.luckyAmount = this.luckyAmount.plus(13)
-                    this.luckyActive = true;
-                    this.luckyEnd = this.unixTimestamp() + this.luckyLength;
-
-                    this.addCurrency(this.luckyAmount, true);
-                }
-
-                if (Options.state.sounds) {
-                    this.goldenClickSound.play();
-                }
-
-                this.recalculateCps();
-                this.recalculateClickPower();
-
-                Stats.commit('addGoldenClicked');
-
-                this.goldenActive = false;
-                this.initGolden();
-            },
-
-            // randomize array
-            shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    let j = Math.floor(Math.random() * (i + 1));
-                    let temp = array[i];
-                    array[i] = array[j];
-                    array[j] = temp;
-                }
-                return array;
-            },
-
-            // particles/canvas effects
-            setupParticles() {
-                let particleImage = new Image();
-                particleImage.src = '/static/cracker-small.png';
-
-                class CurrencyParticle {
-                    constructor(x, y) {
-                        this.init(x, y);
-                    };
-                    init(x = 0.0, y = 0.0) {
-                        this.alive = true;
-                        this.life = 1;
-
-                        this.x = x;
-                        this.y = y;
-
-                        this.wander = random(0.5, 2.0);
-                        this.drag = random(0.9, 0.99);
-
-                        this.vx = random(-5, 5);
-                        this.vy = random(-5, -2);
-                    };
-                    move() {
-                        if (this.alive) {
-                            this.x += this.vx;
-                            this.y += this.vy;
-
-                            this.vx *= this.drag;
-                            this.vy += 0.5;
-
-                            this.life *= 0.98;
-                            this.alive = this.life > 0.05;
-                        }
-                    };
-                    draw(ctx) {
-                        if (this.alive) {
-                            ctx.drawImage(particleImage, this.x, this.y, 40, 40);
-                        }
-                    };
-                }
-
-                class NumberParticle {
-                    constructor(x, y) {
-                        this.init(x, y);
-                    };
-                    init(x = 0.0, y = 0.0, clickPower = 1) {
-                        this.alive = true;
-                        this.life = 1;
-
-                        this.x = x + random(-10.0, 10.0);
-                        this.y = y;
-
-                        this.clickPower = clickPower;
-                    };
-                    move() {
-                        if (this.alive) {
-                            this.y -= 0.75;
-                            this.life -= 0.015;
-                            this.alive = this.life > 0.05;
-                        }
-                    };
-                    draw(ctx) {
-                        if (this.alive) {
-                            ctx.font = "bold 22px Helvetica Neue";
-                            ctx.fillStyle = "rgba(0, 0, 0, " + this.life + ")";
-                            ctx.fillText("+" + this.clickPower, this.x, this.y);
-                        }
-                    };
-                }
-
-                let currencyParticles = [];
-                let currencyPool = [];
-                let numberParticles = [];
-                let numberPool = [];
-                let maxParticles = 33;
-
-                Sketch.create({
-                    container: document.getElementById('currency'),
-                    fullscreen: false,
-                    width: 350,
-                    height: 350,
-                    click() {
-                        if (Options.state.particles) {
-                            this.spawnCurrencyParticle(this.mouse.x, this.mouse.y);
-                            this.spawnNumberParticle(this.mouse.x, this.mouse.y);
-                        }
-                    },
-
-                    spawnCurrencyParticle(x, y) {
-                        if (currencyParticles.length >= maxParticles) {
-                            currencyPool.push(currencyParticles.shift());
-                        }
-
-                        let particle = new CurrencyParticle();
-                        particle.init(x, y);
-                        currencyParticles.push(particle);
-                    },
-
-                    spawnNumberParticle(x, y) {
-                        if (numberParticles.length >= maxParticles) {
-                            numberPool.push(numberParticles.shift());
-                        }
-
-                        let particle = new NumberParticle();
-                        let clickPower = Utils.round(Stats.state.clickPower);
-                        particle.init(x, y, clickPower);
-                        numberParticles.push(particle);
-                    },
-
-                    update() {
-                        let i, particle;
-                        for (i = currencyParticles.length - 1; i >= 0; i--) {
-                            currencyParticles[i].move();
-                        }
-                        for (i = numberParticles.length - 1; i >= 0; i--) {
-                            numberParticles[i].move();
-                        }
-                    },
-
-                    draw() {
-                        for (let i = currencyParticles.length - 1; i >= 0; i--) {
-                            currencyParticles[i].draw(this);
-                        }
-                        for (let i = numberParticles.length - 1; i >= 0; i--) {
-                            numberParticles[i].draw(this);
-                        }
-                    }
-                });
-            },
         },
         filters: {
             round(value) {
@@ -1251,15 +1110,14 @@
             window.requestAnimationFrame(this.tick);
 
             // start particle effects
-            this.setupParticles();
+            Particles.setupParticles();
 
             // add event listeners for other components
             let vm = this;
             EventBus.$on('saveGame', this.saveGame);
             EventBus.$on('hardReset', this.hardReset);
         }
-    }
-
+    };
 </script>
 
 <style>
