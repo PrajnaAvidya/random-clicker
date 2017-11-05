@@ -32,7 +32,7 @@
 
                                     <v-list-tile>
                                         <v-list-tile-action>
-                                            <v-checkbox v-model="optionSettings" value="alerts"></v-checkbox>
+                                            <v-checkbox v-model="options" value="alerts"></v-checkbox>
                                         </v-list-tile-action>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Achievement Alerts</v-list-tile-title>
@@ -42,7 +42,7 @@
 
                                     <v-list-tile>
                                         <v-list-tile-action>
-                                            <v-checkbox v-model="optionSettings" value="sounds"></v-checkbox>
+                                            <v-checkbox v-model="options" value="sounds"></v-checkbox>
                                         </v-list-tile-action>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Sounds</v-list-tile-title>
@@ -52,7 +52,7 @@
 
                                     <v-list-tile>
                                         <v-list-tile-action>
-                                            <v-checkbox v-model="optionSettings" value="particles"></v-checkbox>
+                                            <v-checkbox v-model="options" value="particles"></v-checkbox>
                                         </v-list-tile-action>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Particle Effects</v-list-tile-title>
@@ -62,7 +62,7 @@
 
                                     <v-list-tile>
                                         <v-list-tile-action>
-                                            <v-checkbox v-model="optionSettings" value="animation"></v-checkbox>
+                                            <v-checkbox v-model="options" value="animation"></v-checkbox>
                                         </v-list-tile-action>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Animation</v-list-tile-title>
@@ -115,7 +115,7 @@
 
 <script>
     import EventBus from './eventBus.js';
-    import Options from './options.js';
+    import Options from './gameOptions.js';
     import Stats from "./gameStats.js";
     import Utils  from "./utils.js";
 
@@ -124,28 +124,26 @@
             return {
                 menu: false,
                 activeTab: null,
-                options: Options,
-                optionSettings: [],
-                allSettings: [],
+                options: [],
                 stats: {},
+                watchOptions: true,
             }
         },
 
         watch: {
             // update options when changed
-            optionSettings: function(settings) {
-                let vm = this;
-                this.allSettings.forEach(function (setting) {
-                    vm.setOption(setting, settings.includes(setting));
-                });
+            options: function(settings) {
+                if (this.watchOptions) {
+                    let optionsObject = {};
+                    for (let setting in Options.state) {
+                        optionsObject[setting] = settings.includes(setting);
+                    }
+                    Options.replaceState(optionsObject);
+                }
             }
         },
 
         methods: {
-            setOption(option, value) {
-                this.options[option] = value;
-                EventBus.$emit('setOption', option, value);
-            },
             saveGame() {
                 EventBus.$emit('saveGame');
             },
@@ -165,35 +163,30 @@
                     this.stats[key] = Utils.currency(Stats.state[key]);
                 }
             },
+            updateOptions() {
+                this.watchOptions = false;
+                this.options = [];
+                for (let key in Options.state) {
+                    if (Options.state[key] == true) {
+                        this.options.push(key);
+                    }
+                }
+                this.watchOptions = true;
+            }
         },
 
         mounted() {
-            // add event listeners
+            // events
             let vm = this;
-
-            // get all setting keys from Options object
-            for (let key in Options) {
-                this.allSettings.push(key);
-            }
-
-            // open/close menu
             EventBus.$on('toggleMenu', this.toggleMenu);
-
-            // recieve options from game
-            EventBus.$on('sendOptions', function (options) {
-                this.optionSettings = [];
-                for (let key in options) {
-                    vm.options[key] = options[key];
-                    if (options[key] == true) {
-                        vm.optionSettings.push(key);
-                    }
-                }
+            EventBus.$on('updateOptions', function () {
+                vm.updateOptions();
             });
 
-            // update stats
+            // update stats every few seconds
             setInterval(function () {
                 this.updateStats();
-            }.bind(this), 2000);
+            }.bind(this), 5000);
         }
     };
 </script>

@@ -15,7 +15,7 @@
                     </v-layout>
 
                     <center>
-                        <div class="row currency" v-bind:class="{ pulse: currencyPulsing, frenzy: options.animation && (frenzyActive || clickFrenzyActive || luckyActive) }" id="currency" @click="click">
+                        <div class="row currency" v-bind:class="{ pulse: currencyPulsing, frenzy: getOption('animation') && (frenzyActive || clickFrenzyActive || luckyActive) }" id="currency" @click="click">
                         </div>
                     </center>
                 </v-flex>
@@ -122,7 +122,7 @@
     import Sketch from "sketch-js";
     import EventBus from './eventBus.js';
     import Words from "./words.js";
-    import Options from './options.js';
+    import Options from './gameOptions.js';
     import GameData from "./gameData.js";
     import Stats from "./gameStats.js";
     import Utils from "./utils.js";
@@ -220,10 +220,11 @@
                     clickSound: 'tick.ogg',
                     goldenSpawnSound: 'bell.ogg',
                     goldenClickSound: 'chaching.ogg',
-
-                    // options
-                    options: Options
                 }
+            },
+
+            getOption(option) {
+                return Options.state[option];
             },
 
             unixTimestamp() {
@@ -232,7 +233,7 @@
 
             // clicking/currency/cps
             click() {
-                if (this.options.sounds) {
+                if (Options.state.sounds) {
                     this.clickSound.play();
                 }
 
@@ -243,7 +244,7 @@
                 this.addCurrency(Stats.state.clickPower, !this.clickFrenzyActive);
 
                 // enable pulsing
-                if (this.options.animation) {
+                if (Options.state.animation) {
                     this.currencyPulsing = true;
                     this.currencyPulseLast = this.unixTimestamp();
                 }
@@ -380,7 +381,7 @@
                 let buildingCpsPercent = 100 * buildingCps / Stats.state.cps;
                 //let buildingText = building.description;
                 let buildingText = "Each " + building.name + " produces " + building.currentCps + " " + this.currencyName + "s per second";
-                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + this.$options.filters.round(buildingCps) + " " + this.currencyName + "s per second (" + this.$options.filters.round(buildingCpsPercent) + "% of total)";
+                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + Utils.round(buildingCps) + " " + this.currencyName + "s per second (" + Utils.round(buildingCpsPercent) + "% of total)";
                 return buildingText;
             },
             setBuyAmount(amount) {
@@ -574,7 +575,7 @@
                 achievement.unlocked = true;
                 this.showAchievements = true;
 
-                if (this.options.alerts) {
+                if (Options.state.alerts) {
                     EventBus.$emit('addAlert', achievement);
                 }
 
@@ -812,8 +813,10 @@
                 Object.assign(this.$data, this.defaultData());
                 this._sortedUpgrades = null;
 
-                // reset state
+                // reset stats/options
                 Stats.commit('resetState');
+                Options.commit('resetState');
+                EventBus.$emit('updateOptions');
 
                 // load word lists
                 this.words = JSON.parse(JSON.stringify(Words));
@@ -865,7 +868,7 @@
                     timestamp: this.unixTimestamp(),
                     buyAmount: this.buyAmount,
 
-                    options: this.options,
+                    options: Options.state,
                     stats: Stats.state,
                 };
 
@@ -877,7 +880,9 @@
                 let saveData = JSON.parse(saveJson);
                 let vm = this;
 
-                // load stats
+                // load stats/options
+                Options.replaceState(saveData.options);
+                EventBus.$emit('updateOptions');
                 Stats.replaceState(Utils.convertObjectToBig(saveData.stats));
 
                 this.currencyName = saveData.currencyName;
@@ -966,9 +971,6 @@
                 });
                 this.showAchievements = showAchievements;
 
-                // options
-                this.options = saveData.options;
-
                 // calculate bonus currency
                 let timeDifference = this.unixTimestamp() - saveData.timestamp;
                 this.bonusCurrency = Stats.state.cps.div(2).times(timeDifference).round();
@@ -1009,7 +1011,7 @@
                 this.goldenTop = randomY;
                 this.goldenActive = true;
 
-                if (this.options.sounds) {
+                if (Options.state.sounds) {
                     this.goldenSpawnSound.play();
                 }
             },
@@ -1038,7 +1040,7 @@
                     this.loopCurrency(this.luckyAmount, 500);
                 }
 
-                if (this.options.sounds) {
+                if (Options.state.sounds) {
                     this.goldenClickSound.play();
                 }
 
@@ -1144,7 +1146,7 @@
                     width: 350,
                     height: 350,
                     click() {
-                        if (vm.options.particles) {
+                        if (Options.state.particles) {
                             this.spawnCurrencyParticle(this.mouse.x, this.mouse.y);
                             this.spawnNumberParticle(this.mouse.x, this.mouse.y);
                         }
@@ -1166,7 +1168,7 @@
                         }
 
                         let particle = new NumberParticle();
-                        let clickPower = vm.$options.filters.round(Stats.state.clickPower);
+                        let clickPower = Utils.round(Stats.state.clickPower);
                         particle.init(x, y, clickPower);
                         numberParticles.push(particle);
                     },
@@ -1243,12 +1245,6 @@
             let vm = this;
             EventBus.$on('saveGame', this.saveGame);
             EventBus.$on('hardReset', this.hardReset);
-            EventBus.$on('setOption', function(option, value) {
-                vm.options[option] = value;
-            });
-
-            // send options to gameMenu
-            EventBus.$emit('sendOptions', this.options);
         }
     }
 
