@@ -11,7 +11,7 @@
                         <h4 class="red bonusMessage" v-show="frenzyActive">FRENZY! (x{{ frenzyAmount }} production)</h4>
 
                         <h4>Per click: {{ displayedClickPower | currency }}</h4>
-                        <h5 class="red bonusMessage" v-show="clickFrenzyActive">CLICK FRENZY!!! (x{{ this.clickFrenzyAmount }} clicks)</h5>
+                        <h5 class="red bonusMessage" v-show="clickFrenzyActive">CLICK FRENZY!!! (x{{ clickFrenzyAmount }} clicks)</h5>
                     </v-layout>
 
                     <center>
@@ -25,9 +25,9 @@
                         <h3>Buildings</h3>
 
                         <div class="buy-sell-buttons">
-                            <v-btn default class="green" :class="{ active:this.buyAmount == 1 }" @click.native="setBuyAmount(1)">Buy 1</v-btn>
-                            <v-btn default class="green" :class="{ active:this.buyAmount == 10 }" @click.native="setBuyAmount(10)">Buy 10</v-btn>
-                            <v-btn default class="green" :class="{ active:this.buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
+                            <v-btn default class="green" :class="{ active:buyAmount == 1 }" @click.native="setBuyAmount(1)">Buy 1</v-btn>
+                            <v-btn default class="green" :class="{ active:buyAmount == 10 }" @click.native="setBuyAmount(10)">Buy 10</v-btn>
+                            <v-btn default class="green" :class="{ active:buyAmount == 100 }" @click.native="setBuyAmount(100)">Buy 100</v-btn>
                         </div>
 
                         <v-layout class="building" v-for="(building, buildingIndex) in buildings" :key="buildingIndex" v-if="building.owned > 0 || showBuilding(building)">
@@ -156,8 +156,8 @@
                 return {
                     // debug flags
                     cheatMode: false, // gives extra starting currency
-                    disableLoad: true, // don't load saved games
-                    disableAutoSave: true, // don't auto save
+                    disableLoad: false, // don't load saved games
+                    disableAutoSave: false, // don't auto save
                     easyGolden: false, // constant golden spawns
 
                     // for fps calculations
@@ -292,11 +292,6 @@
             recalculateClickPower() {
                 let clickPower = this.upgradeMultiplier(this.buildingNames[0]).plus(this.upgradeAddition());
 
-                // add click frenzy bonus
-                if (this.clickFrenzyActive) {
-                    clickPower = clickPower.times(this.clickFrenzyAmount);
-                }
-
                 let cpsMultiplierBonus = this.upgradeMultiplier('Clicking').minus(1).times(Stats.state.cps);
 
                 // add frenzy bonus
@@ -304,7 +299,13 @@
                     cpsMultiplierBonus = cpsMultiplierBonus.times(this.frenzyAmount);
                 }
 
+                // add multiplier bonus
                 clickPower = clickPower.plus(cpsMultiplierBonus);
+
+                // add click frenzy bonus
+                if (this.clickFrenzyActive) {
+                    clickPower = clickPower.times(this.clickFrenzyAmount);
+                }
 
                 Stats.commit('setClickPower', clickPower);
             },
@@ -1075,8 +1076,6 @@
 
             // particles/canvas effects
             setupParticles() {
-                let vm = this;
-
                 let particleImage = new Image();
                 particleImage.src = '/static/cracker-small.png';
 
