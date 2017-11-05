@@ -66,7 +66,7 @@
                                         </v-list-tile-action>
                                         <v-list-tile-content>
                                             <v-list-tile-title>Animation</v-list-tile-title>
-                                            <v-list-tile-sub-title>Enable Cracker animation?</v-list-tile-sub-title>
+                                            <v-list-tile-sub-title>Enable {{ getStat('currencyName') }} animation?</v-list-tile-sub-title>
                                         </v-list-tile-content>
                                     </v-list-tile>
                                 </v-list>
@@ -82,15 +82,15 @@
                                     <v-subheader>Statistics</v-subheader>
 
                                     <v-list-tile>
-                                        Total Crackers earned: {{ getStat('totalCurrencyEarned') }}
+                                        Total {{ getStat('currencyName') }}s earned: {{ getStat('totalCurrencyEarned') }}
                                     </v-list-tile>
 
                                     <v-list-tile>
-                                        Total Crackers earned by clicking: {{ getStat('clicks') }}
+                                        Total {{ getStat('currencyName') }}s earned by clicking: {{ getStat('clicks') }}
                                     </v-list-tile>
 
                                     <v-list-tile>
-                                        Total Crackers spent: {{ getStat('totalCurrencySpent') }}
+                                        Total {{ getStat('currencyName') }}s spent: {{ getStat('totalCurrencySpent') }}
                                     </v-list-tile>
 
                                     <v-list-tile>
@@ -102,11 +102,11 @@
                                     </v-list-tile>
 
                                     <v-list-tile>
-                                        Golden Crackers spawned: {{ getStat('goldenCurrencySpawned') }}
+                                        Golden {{ getStat('currencyName') }}s spawned: {{ getStat('goldenCurrencySpawned') }}
                                     </v-list-tile>
 
                                     <v-list-tile>
-                                        Golden Crackers clicked: {{ getStat('goldenCurrencyClicked') }}
+                                        Golden {{ getStat('currencyName') }}s clicked: {{ getStat('goldenCurrencyClicked') }}
                                     </v-list-tile>
                                 </v-list>
                             </v-card-text>
@@ -168,7 +168,11 @@
             updateStats() {
                 this.stats = {};
                 for (let key in Stats.state) {
-                    this.stats[key] = Utils.currency(Stats.state[key]);
+                    if (key == 'currencyName') {
+                        this.stats[key] = Stats.state[key];
+                    } else {
+                        this.stats[key] = Utils.currency(Stats.state[key]);
+                    }
                 }
             },
             updateOptions() {

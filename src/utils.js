@@ -51,7 +51,11 @@ export default {
     convertObjectToBig: function(objectData) {
         let bigData = {};
         for (let key in objectData) {
-            bigData[key] = new Big(objectData[key]);
+            if (isNaN(objectData[key])) {
+                bigData[key] = objectData[key];
+            } else {
+                bigData[key] = new Big(objectData[key]);
+            }
         }
         return bigData;
     },

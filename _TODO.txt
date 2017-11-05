@@ -1,7 +1,5 @@
 move option names/descriptions to config file & use v-for in template
 
-remove any direct reference to "Cracker"
-
 learn about js performance profiling to find bottlenecks (game gets really laggy in later stages)
 
 upgrade todo

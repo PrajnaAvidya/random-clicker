@@ -6,6 +6,8 @@ Vue.use(Vuex);
 
 function initialState() {
     return {
+        currencyName: null,
+
         currency: new Big(0),
         totalCurrencyEarned: new Big(0),
         totalCurrencySpent: new Big(0),
@@ -31,6 +33,9 @@ export default new Vuex.Store({
         },
 
         // currency
+        setCurrencyName(state, n) {
+            state.currencyName = n;
+        },
         addCurrency(state, n) {
             state.currency = state.currency.plus(n);
             state.totalCurrencyEarned = state.totalCurrencyEarned.plus(n);

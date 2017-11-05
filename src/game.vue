@@ -4,11 +4,11 @@
             <v-layout>
                 <v-flex sm5>
                     <v-layout class="totals">
-                        <h2>{{ currency | currency }} {{ currencyName}}s</h2>
+                        <h2>{{ currency | currency }} {{ currencyName }}s</h2>
                         <h3 class="red bonusMessage" v-show="luckyActive">Lucky! ({{ luckyAmount | currency }} bonus)</h3>
 
                         <h3>Per second: {{ displayedCps | round }}</h3>
-                        <h4 class="red bonusMessage" v-show="frenzyActive">FRENZY! (x{{ this.frenzyAmount }} production)</h4>
+                        <h4 class="red bonusMessage" v-show="frenzyActive">FRENZY! (x{{ frenzyAmount }} production)</h4>
 
                         <h4>Per click: {{ displayedClickPower | currency }}</h4>
                         <h5 class="red bonusMessage" v-show="clickFrenzyActive">CLICK FRENZY!!! (x{{ this.clickFrenzyAmount }} clicks)</h5>
@@ -153,31 +153,31 @@
                     // debug flags
                     cheatMode: false, // gives extra starting currency
                     disableLoad: false, // don't load saved games
+                    disableAutoSave: true, // don't auto save
                     easyGolden: false, // constant golden spawns
 
                     // for fps calculations
                     lastFrame: 0,
 
                     // in-game state
-                    currencyName: null,
+                    currencyName: null, // this is saved in Stats, data.currencyName is used for front-end display only
                     currency: Big(0), // this value is for front-end display only, buy/etc checks are done with Stats.state.currency
-                    buyAmount: 1,
-                    startingCurrency: Big(0),
-                    bonusCurrency: Big(0),
-                    bonusDialog: false,
-                    currencyPulsing: false,
-                    currencyPulseLast: null,
-                    currencySuffix: '',
-                    lastCps: Big(0),
-                    displayedCps: Big(0),
-                    lastClickPower: Big(1),
-                    displayedClickPower: Big(1),
-                    cpsTick: Big(0),
-                    clickPowerTick: Big(0),
-                    showUpgrades: false,
-                    showAchievements: false,
+                    buyAmount: 1, // how many buildings to buy at a time
+                    bonusCurrency: Big(0), // idle bonus
+                    bonusDialog: false, // show idle bonus dialog?
+                    currencyPulsing: false, // show currency pulsing effect
+                    currencyPulseLast: null, // timestamp when effect last started
+                    lastCps: Big(0), // last cps amount (used in tick)
+                    displayedCps: Big(0), // displayed cps amount (used in tick)
+                    lastClickPower: Big(1), // last click power (used in tick)
+                    displayedClickPower: Big(1), // displayed click power (used in tick)
+                    cpsTick: Big(0), // cps to add per tick
+                    clickPowerTick: Big(0), // click power to add per tick
+                    showUpgrades: false, // show upgrade panel?
+                    showAchievements: false, // show achievements panel?
 
                     // TODO move to game-specific settings?
+                    startingCurrency: Big(0),
                     buildingCostMultiplier: 0.15,
                     // TODO add multiplier for upgrade scaling once ready
 
@@ -381,8 +381,8 @@
                 let buildingCps = building.currentCps * building.owned;
                 let buildingCpsPercent = 100 * buildingCps / Stats.state.cps;
                 //let buildingText = building.description;
-                let buildingText = "Each " + building.name + " produces " + building.currentCps + " " + this.currencyName + "s per second";
-                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + Utils.round(buildingCps) + " " + this.currencyName + "s per second (" + Utils.round(buildingCpsPercent) + "% of total)";
+                let buildingText = "Each " + building.name + " produces " + building.currentCps + " " + Stats.state.currencyName + "s per second";
+                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + Utils.round(buildingCps) + " " +  Stats.state.currencyName + "s per second (" + Utils.round(buildingCpsPercent) + "% of total)";
                 return buildingText;
             },
             setBuyAmount(amount) {
@@ -402,7 +402,7 @@
                 return Stats.state.currency.gte(upgrade.cost);
             },
             canBuyUpgrade(upgrade) {
-                if (upgrade.type == this.currencyName) {
+                if (upgrade.type == Stats.state.currencyName) {
                     if (Stats.state.currency.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
@@ -432,10 +432,10 @@
                     return true;
                 }
 
-                if (upgrade.type != 'Clicking' && upgrade.type != 'Buildings' && upgrade.type != this.currencyName && this.buildingCount(upgrade.type) == 0) {
+                if (upgrade.type != 'Clicking' && upgrade.type != 'Buildings' && upgrade.type != Stats.state.currencyName && this.buildingCount(upgrade.type) == 0) {
                     return false;
                 }
-                if (upgrade.type == this.currencyName) {
+                if (upgrade.type == Stats.state.currencyName) {
                     if (Stats.state.currency.gte(upgrade.needed)) {
                         upgrade.unlocked = true;
                         return true;
@@ -498,7 +498,7 @@
             },
             upgradeProduction() {
                 let production = 1;
-                this.activeUpgrades(this.currencyName).forEach(function (upgrade) {
+                this.activeUpgrades(Stats.state.currencyName).forEach(function (upgrade) {
                     if (upgrade.multiplier != null) {
                         production *= upgrade.multiplier;
                     }
@@ -514,14 +514,14 @@
                 let description = '';
 
                 // production upgrade
-                if (upgrade.type == this.currencyName || upgrade.type == "Buildings") {
-                    description += "Multiplies " + this.currencyName + " production by " + upgrade.multiplier + "x";
+                if (upgrade.type == Stats.state.currencyName || upgrade.type == "Buildings") {
+                    description += "Multiplies " + Stats.state.currencyName + " production by " + upgrade.multiplier + "x";
                     return description;
                 }
 
                 // clicking upgrade
                 if (upgrade.type == "Clicking") {
-                    description += 'Clicking gains 1% of your ' + this.currencyName + ' per second';
+                    description += 'Clicking gains 1% of your ' + Stats.state.currencyName + ' per second';
                     return description;
                 }
 
@@ -532,7 +532,7 @@
                         description += "<br /><strong>Also multiplies clicks</strong>";
                     }
                 } else if (upgrade.addition > 0) {
-                    description += "Adds " + upgrade.addition + " " + this.currencyName + " production for every non-" + upgrade.type + " building owned";
+                    description += "Adds " + upgrade.addition + " " + Stats.state.currencyName + " production for every non-" + upgrade.type + " building owned";
                     if (upgrade.type == this.buildingNames[0]) {
                         description += "<br /><strong>Also adds to clicks</strong>";
                     }
@@ -556,7 +556,7 @@
                         if (Stats.state.clicks.gte(achievement.clicks)) {
                             vm.unlockAchievement(achievement);
                         }
-                    } else if (achievement.type == vm.currencyName) {
+                    } else if (achievement.type == Stats.state.currencyName) {
                         if (Stats.state.totalCurrencyEarned.gte(achievement.total)) {
                             vm.unlockAchievement(achievement);
                         }
@@ -683,8 +683,8 @@
                 this.cpsIcon = this.icons.pop();
                 GameData.productionUpgrades.forEach(function (productionUpgrade) {
                     let upgrade = {
-                        type: vm.currencyName,
-                        name: vm.adjectives.pop() + " " + vm.currencyName + "s",
+                        type: Stats.state.currencyName,
+                        name: vm.adjectives.pop() + " " + Stats.state.currencyName + "s",
                         needed: Big(productionUpgrade.needed),
                         cost: Big(productionUpgrade.cost),
                         multiplier: productionUpgrade.multiplier,
@@ -700,7 +700,7 @@
                 GameData.buildingProductionUpgrades.forEach(function (buildingUpgrade) {
                     let upgrade = {
                         type: 'Buildings',
-                        name: vm.adjectives.pop() + " " + vm.currencyName + "s",
+                        name: vm.adjectives.pop() + " " + Stats.state.currencyName + "s",
                         needed: Big(buildingUpgrade.needed),
                         cost: Big(buildingUpgrade.cost),
                         multiplier: buildingUpgrade.multiplier,
@@ -770,23 +770,23 @@
                 this.totalIcon = this.icons.pop();
                 GameData.productionAchievements.forEach(function (productionAchievement) {
                     let achievement = {
-                        type: vm.currencyName,
-                        name: vm.adjectives.pop() + " " + vm.currencyName + "s",
+                        type: Stats.state.currencyName,
+                        name: vm.adjectives.pop() + " " + Stats.state.currencyName + "s",
                         unlocked: false,
                     };
 
                     if (productionAchievement.total != null) {
                         achievement.total = Big(productionAchievement.total);
                         achievement.icon = vm.totalIcon;
-                        achievement.description = "Generated a total of " + productionAchievement.total + " " + vm.currencyName + "s";
+                        achievement.description = "Generated a total of " + productionAchievement.total + " " + Stats.state.currencyName + "s";
                     } else if (productionAchievement.cps != null) {
                         achievement.cps = Big(productionAchievement.cps);
                         achievement.icon = vm.cpsIcon;
-                        achievement.description = "Reached a total of " + productionAchievement.cps + " " + vm.currencyName + "/sec";
+                        achievement.description = "Reached a total of " + productionAchievement.cps + " " + Stats.state.currencyName + "/sec";
                     } else if (productionAchievement.clicks != null) {
                         achievement.clicks = Big(productionAchievement.clicks);
                         achievement.icon = vm.clicksIcon;
-                        achievement.description = "Generated a total of " + productionAchievement.clicks + " " + vm.currencyName + "s using clicks";
+                        achievement.description = "Generated a total of " + productionAchievement.clicks + " " + Stats.state.currencyName + "s using clicks";
                     }
 
                     vm.achievements.push(achievement);
@@ -824,8 +824,10 @@
 
                 // get currency name & adjectives
                 //this.currencyName = this.shuffleArray(GameData.currencies).pop();
-                this.currencyName = 'Cracker';
-                document.title = this.currencyName + ' Clicker';
+                let currencyName = 'Cracker';
+                Stats.commit('setCurrencyName', currencyName);
+                this.currencyName = currencyName;
+                document.title = currencyName + ' Clicker';
                 this.adjectives = this.shuffleArray(this.words.adjectives);
                 this.icons = this.shuffleArray(this.words.icons);
 
@@ -860,7 +862,6 @@
             saveGame() {
                 let saveData = {
                     // misc state
-                    currencyName: this.currencyName,
                     buildingCostMultiplier: this.buildingCostMultiplier,
                     buildingNames: this.buildingNames,
                     buildings: this.buildings,
@@ -886,8 +887,8 @@
                 EventBus.$emit('updateOptions');
                 Stats.replaceState(Utils.convertObjectToBig(saveData.stats));
 
-                this.currencyName = saveData.currencyName;
-                document.title = this.currencyName + ' Clicker';
+                this.currencyName = Stats.state.currencyName;
+                document.title = Stats.state.currencyName + ' Clicker';
                 this.currency = Big(0); // this will be looped in, display only
                 this.displayedCps = Big(0);
                 this.displayedClickPower = Big(1);
@@ -1228,7 +1229,9 @@
 
             // auto save every 30 seconds
             setInterval(function () {
-                this.saveGame();
+                if (!this.disableAutoSave) {
+                    this.saveGame();
+                }
             }.bind(this), 30000);
 
             // check for currency pulse end every second
