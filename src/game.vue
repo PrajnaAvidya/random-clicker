@@ -153,6 +153,7 @@
                     // debug flags
                     cheatMode: false, // gives extra starting currency
                     disableLoad: false, // don't load saved games
+                    easyGolden: false, // constant golden spawns
 
                     // for fps calculations
                     lastFrame: 0,
@@ -637,7 +638,7 @@
                     }
                 }
 
-                if (!this.goldenActive && this.unixTimestamp() >= this.goldenNext) {
+                if (!this.goldenActive && (this.easyGolden || this.unixTimestamp() >= this.goldenNext)) {
                     this.spawnGolden();
                 } else if (this.goldenActive) {
                     if (this.unixTimestamp() > this.goldenDisappear) {
@@ -835,7 +836,7 @@
 
                 // loop in starting currency (if any)
                 if (this.startingCurrency.gt(0)) {
-                    this.loopCurrency(this.startingCurrency, 500);
+                    this.addCurrency(this.startingCurrency, true);
                 }
             },
             hardReset() {
@@ -980,7 +981,7 @@
                     this.bonusDialog = true;
                 }
 
-                // loop in currency
+                // loop in currency (already added to Stats so don't use addCurrency)
                 let startingCurrency = Big(Stats.state.currency).plus(this.bonusCurrency);
                 if (startingCurrency.gt(0)) {
                     this.loopCurrency(startingCurrency, 500);
@@ -1011,6 +1012,8 @@
                 this.goldenTop = randomY;
                 this.goldenActive = true;
 
+                Stats.commit('addGoldenSpawned');
+
                 if (Options.state.sounds) {
                     this.goldenSpawnSound.play();
                 }
@@ -1037,7 +1040,8 @@
                     this.luckyAmount = this.luckyAmount.plus(13)
                     this.luckyActive = true;
                     this.luckyEnd = this.unixTimestamp() + this.luckyLength;
-                    this.loopCurrency(this.luckyAmount, 500);
+
+                    this.addCurrency(this.luckyAmount, true);
                 }
 
                 if (Options.state.sounds) {
@@ -1046,6 +1050,8 @@
 
                 this.recalculateCps();
                 this.recalculateClickPower();
+
+                Stats.commit('addGoldenClicked');
 
                 this.goldenActive = false;
                 this.initGolden();

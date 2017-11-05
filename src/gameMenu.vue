@@ -100,6 +100,14 @@
                                     <v-list-tile>
                                         Achievements unlocked: {{ getStat('achievementCount') }}
                                     </v-list-tile>
+
+                                    <v-list-tile>
+                                        Golden Crackers spawned: {{ getStat('goldenCurrencySpawned') }}
+                                    </v-list-tile>
+
+                                    <v-list-tile>
+                                        Golden Crackers clicked: {{ getStat('goldenCurrencyClicked') }}
+                                    </v-list-tile>
                                 </v-list>
                             </v-card-text>
                         </v-tabs-content>

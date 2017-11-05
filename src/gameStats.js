@@ -12,11 +12,14 @@ function initialState() {
 
         cps: new Big(0),
 
-        clickPower: Big(1),
+        clickPower: new Big(1),
         clicks: new Big(0),
 
         upgradeCount: 0,
         achievementCount: 0,
+
+        goldenCurrencySpawned: 0,
+        goldenCurrencyClicked: 0,
     };
 }
 
@@ -55,6 +58,14 @@ export default new Vuex.Store({
         },
         addAchievement(state) {
             state.achievementCount ++;
+        },
+
+        // golden currency
+        addGoldenSpawned(state) {
+            state.goldenCurrencySpawned ++;
+        },
+        addGoldenClicked(state) {
+            state.goldenCurrencyClicked ++;
         },
     }
 });

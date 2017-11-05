@@ -1,6 +1,3 @@
-figure out how to offload default data into an external js file without breaking shit
-WHY THE FUCK WON'T THE VALUES RESET TO THE FILE VALUES EVEN WHEN I COPY THE OBJECT
-
 move option names/descriptions to config file & use v-for in template
 
 break up main game data (too big to fail!)
