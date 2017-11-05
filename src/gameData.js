@@ -158,7 +158,6 @@ export default {
         { needed: 2.5E24, cost: 50E24, multiplier: 1.04 },
         { needed: 5E24, cost: 100E24, multiplier: 1.04 },
         { needed: 25E24, cost: 500E24, multiplier: 1.04 },
-        // TODO upgrade expansions e.g. "box of brand biscuits" & holiday events
     ],
 
     productionAchievements: [
