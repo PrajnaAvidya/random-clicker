@@ -4,27 +4,27 @@ look into load/save when golden bonus is active
 
 learn about js performance profiling to find bottlenecks (game gets really laggy in later stages)
 
-upgrade todo
-DONE:
-- building 0 production
-- base production
-- clicking
-- x of every building
-NOT DONE:
-- rest of the income multiplers (dark chocolate-coated cookies+) - do we really need the expansions?
-- building 1 forms (grandma types)
-- synergies (heavenly upgrade)
-- kitten upgrades
-- golden cracker upgrades
-- heavenly chip upgrades
+add more upgrades (todo in gameData)
 
 add more achievements
+- X of every building
+- total buildings owned
+- total upgrades purchased
+- golden clicked
 
 juice/improvements
-- break stuff off into other components if possible 
+- component for new/save/load/generation?
 - flavor texts - what if i sourced them from reddit thread titles or something?
-- upgrade/achievement costs based on formula instead of static? that way we could tweak it in game settings for fast/slow progress
+- buy/upgrade costs based on formula instead of static? that way we could tweak it in game settings for fast/slow progress
 
+original features
+- more achievements
+- something involving achievements * cps
+-- equivalent of kittens upgrades
+- some kind of meta/prestige mechanic & currency
+- equivalent of cookie clicker prestige features
+-- golden cracker upgrades
+-- misc heavenly chip upgrades
 
 6E = million
 9E = billion

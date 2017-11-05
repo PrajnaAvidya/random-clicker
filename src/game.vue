@@ -588,7 +588,7 @@
                 Stats.commit('addAchievement');
             },
 
-            // tick function
+            // tick/cps function
             tick(timestamp) {
                 let progress = timestamp - this.lastFrame;
                 this.lastFrame = timestamp;
@@ -655,7 +655,68 @@
                 window.requestAnimationFrame(this.tick);
             },
 
-            // generate stuff
+            // golden bonuses
+            initGolden() {
+                this.goldenNext = this.unixTimestamp() + Math.floor(Math.random() * (this.goldenMaximumTime - this.goldenMinimumTime)) + this.goldenMinimumTime;
+                this.goldenDisappear = this.goldenNext + this.goldenStay;
+            },
+            spawnGolden() {
+                let x = document.body.offsetWidth;
+                let y = document.body.offsetHeight;
+
+                let randomX = Math.floor(Math.random() * x);
+                let randomY = Math.floor(Math.random() * y);
+
+                this.goldenRight = randomX;
+                this.goldenTop = randomY;
+                this.goldenActive = true;
+
+                Stats.commit('addGoldenSpawned');
+
+                if (Options.state.sounds) {
+                    this.goldenSpawnSound.play();
+                }
+            },
+            clickGolden() {
+                // 0 - 99
+                let roll = Math.floor(Math.random() * 100);
+                if (roll >= 95 && !this.clickFrenzyActive) {
+                    // click frenzy
+                    this.clickFrenzyActive = true;
+                    this.clickFrenzyEnd = this.unixTimestamp() + this.clickFrenzyLength;
+                } else if (roll >= 47 && !this.frenzyActive) {
+                    // frenzy
+                    this.frenzyActive = true;
+                    this.frenzyEnd = this.unixTimestamp() + this.frenzyLength;
+                } else {
+                    // lucky
+                    let bonus1 = Stats.state.cps.times(900);
+                    let bonus2 = Stats.state.currency.times(0.15);
+                    this.luckyAmount = bonus1;
+                    if (bonus1.gt(bonus2)) {
+                        this.luckyAmount = bonus2;
+                    }
+                    this.luckyAmount = this.luckyAmount.plus(13)
+                    this.luckyActive = true;
+                    this.luckyEnd = this.unixTimestamp() + this.luckyLength;
+
+                    this.addCurrency(this.luckyAmount, true);
+                }
+
+                if (Options.state.sounds) {
+                    this.goldenClickSound.play();
+                }
+
+                this.recalculateCps();
+                this.recalculateClickPower();
+
+                Stats.commit('addGoldenClicked');
+
+                this.goldenActive = false;
+                this.initGolden();
+            },
+
+            // generate stuff for new game
             generateBuildings() {
                 let buildingNames = Utils.shuffleArray(this.words.buildingNames);
                 for (let i = 0; i < GameData.buildings.length; i++) {
@@ -772,6 +833,7 @@
             generateAchievements() {
                 let vm = this;
 
+                // production achievements
                 this.totalIcon = this.icons.pop();
                 GameData.productionAchievements.forEach(function (productionAchievement) {
                     let achievement = {
@@ -797,9 +859,9 @@
                     vm.achievements.push(achievement);
                 });
 
-                GameData.buildingAchievements.forEach(function (buildingAchivement) {
-                    let upgradeIndex = buildingAchivement.type;
-
+                // building achievements
+                GameData.buildingAchievements.firstBuilding.forEach(function (buildingAchivement) {
+                    let upgradeIndex = 0;
                     let achievement = {
                         type: vm.buildingNames[upgradeIndex],
                         name: vm.adjectives.pop() + " " + vm.buildingNames[upgradeIndex],
@@ -811,67 +873,20 @@
 
                     vm.achievements.push(achievement);
                 });
-            },
+                GameData.buildingAchievements.otherBuildings.forEach(function (buildingAchivement) {
+                    for (let upgradeIndex = 1; upgradeIndex < vm.buildings.length; upgradeIndex ++) {
+                        let achievement = {
+                            type: vm.buildingNames[upgradeIndex],
+                            name: vm.adjectives.pop() + " " + vm.buildingNames[upgradeIndex],
+                            total: Big(buildingAchivement.total),
+                            unlocked: false,
+                            icon: vm.buildingIcons[upgradeIndex],
+                            description: "Built a total of " + buildingAchivement.total + " " + vm.buildingNames[upgradeIndex],
+                        };
 
-            // golden
-            initGolden() {
-                this.goldenNext = this.unixTimestamp() + Math.floor(Math.random() * (this.goldenMaximumTime - this.goldenMinimumTime)) + this.goldenMinimumTime;
-                this.goldenDisappear = this.goldenNext + this.goldenStay;
-            },
-            spawnGolden() {
-                let x = document.body.offsetWidth;
-                let y = document.body.offsetHeight;
-
-                let randomX = Math.floor(Math.random() * x);
-                let randomY = Math.floor(Math.random() * y);
-
-                this.goldenRight = randomX;
-                this.goldenTop = randomY;
-                this.goldenActive = true;
-
-                Stats.commit('addGoldenSpawned');
-
-                if (Options.state.sounds) {
-                    this.goldenSpawnSound.play();
-                }
-            },
-            clickGolden() {
-                // 0 - 99
-                let roll = Math.floor(Math.random() * 100);
-                if (roll >= 95 && !this.clickFrenzyActive) {
-                    // click frenzy
-                    this.clickFrenzyActive = true;
-                    this.clickFrenzyEnd = this.unixTimestamp() + this.clickFrenzyLength;
-                } else if (roll >= 47 && !this.frenzyActive) {
-                    // frenzy
-                    this.frenzyActive = true;
-                    this.frenzyEnd = this.unixTimestamp() + this.frenzyLength;
-                } else {
-                    // lucky
-                    let bonus1 = Stats.state.cps.times(900);
-                    let bonus2 = Stats.state.currency.times(0.15);
-                    this.luckyAmount = bonus1;
-                    if (bonus1.gt(bonus2)) {
-                        this.luckyAmount = bonus2;
+                        vm.achievements.push(achievement);
                     }
-                    this.luckyAmount = this.luckyAmount.plus(13)
-                    this.luckyActive = true;
-                    this.luckyEnd = this.unixTimestamp() + this.luckyLength;
-
-                    this.addCurrency(this.luckyAmount, true);
-                }
-
-                if (Options.state.sounds) {
-                    this.goldenClickSound.play();
-                }
-
-                this.recalculateCps();
-                this.recalculateClickPower();
-
-                Stats.commit('addGoldenClicked');
-
-                this.goldenActive = false;
-                this.initGolden();
+                });
             },
 
             // new/save/load
@@ -1078,7 +1093,7 @@
             } else {
                 this.newGame();
                 if (this.cheatMode) {
-                    this.addCurrency(1000);
+                    this.addCurrency(100000);
                 }
             }
             // load audio
