@@ -125,6 +125,7 @@
     import Options from './options.js';
     import GameData from "./gameData.js";
     import Stats from "./gameStats.js";
+    import Utils from "./utils.js";
 
     export default {
         data: function () {
@@ -150,8 +151,8 @@
             defaultData() {
                 return {
                     // debug flags
-                    cheatMode: true, // gives extra starting currency
-                    disableLoad: true, // don't load saved games
+                    cheatMode: false, // gives extra starting currency
+                    disableLoad: false, // don't load saved games
 
                     // for fps calculations
                     lastFrame: 0,
@@ -877,7 +878,7 @@
                 let vm = this;
 
                 // load stats
-                Stats.replaceState(this.convertObjectToBig(saveData.stats));
+                Stats.replaceState(Utils.convertObjectToBig(saveData.stats));
 
                 this.currencyName = saveData.currencyName;
                 document.title = this.currencyName + ' Clicker';
@@ -985,13 +986,6 @@
 
                 console.log("Game Loaded");
                 //this.saveGame();
-            },
-            convertObjectToBig(objectData) {
-                let bigData = {};
-                for (let key in objectData) {
-                    bigData[key] = new Big(objectData[key]);
-                }
-                return bigData;
             },
             loadSounds() {
                 this.clickSound = new Audio('/static/' + this.clickSound);
@@ -1200,48 +1194,10 @@
         },
         filters: {
             round(value) {
-                if (isNaN(value)) {
-                    return 0;
-                }
-                if (value < 10) {
-                    return Number((value).toFixed(1));
-                } else if (value <= 999999) {
-                    return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    // display pretty formatted number
-                    let displayedValue = new Big(value);
-                    let suffixes = ["", "", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"];
-                    let index = Math.floor((displayedValue.e) / 3);
-                    if (index >= suffixes.length) {
-                        // outside of range
-                        return value.toExponential(3);
-                    }
-                    let suffix = suffixes[Math.floor((displayedValue.e) / 3)];
-                    let sigFig = (displayedValue.e % 3);
-                    displayedValue.e = 3 + sigFig;
-                    return displayedValue.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
-                }
+                return Utils.round(value);
             },
             currency(value) {
-                if (isNaN(value)) {
-                    return 0;
-                }
-                if (value <= 999999) {
-                    return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    // display pretty formatted number
-                    let displayedValue = new Big(value);
-                    let suffixes = ["", "", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"];
-                    let index = Math.floor((displayedValue.e) / 3);
-                    if (index >= suffixes.length) {
-                        // outside of range
-                        return value.toExponential(3);
-                    }
-                    let suffix = suffixes[Math.floor((displayedValue.e) / 3)];
-                    let sigFig = (displayedValue.e % 3);
-                    displayedValue.e = 3 + sigFig;
-                    return displayedValue.div(1000).toPrecision(4 + sigFig) + ' ' + suffix;
-                }
+                return Utils.currency(value);
             }
         },
         mounted() {

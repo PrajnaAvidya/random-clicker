@@ -117,6 +117,7 @@
     import EventBus from './eventBus.js';
     import Options from './options.js';
     import Stats from "./gameStats.js";
+    import Utils  from "./utils.js";
 
     export default {
         data() {
@@ -161,7 +162,7 @@
             updateStats() {
                 this.stats = {};
                 for (let key in Stats.state) {
-                    this.stats[key] = Math.floor(Stats.state[key]).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    this.stats[key] = Utils.currency(Stats.state[key]);
                 }
             },
         },

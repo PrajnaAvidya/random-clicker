@@ -12,9 +12,8 @@ remove any direct reference to "Cracker"
 
 learn about js performance profiling to find bottlenecks (game gets really laggy in later stages)
 
-menu todo
-- stats page (track more data)
--- golden cracker stats/attributes
+stats page todo
+- golden cracker stats/attributes
 
 upgrade todo
 DONE:
@@ -23,7 +22,7 @@ DONE:
 - clicking
 - x of every building
 NOT DONE:
-- rest of the income multiplers (dark chocolate-coated cookies+)
+- rest of the income multiplers (dark chocolate-coated cookies+) - do we really need the expansions?
 - building 1 forms (grandma types)
 - synergies (heavenly upgrade)
 - kitten upgrades
@@ -40,7 +39,6 @@ juice/improvements
 - animate appearance of new things (e.g. upgrades & achievements)
 - break stuff off into other components if possible 
 -- particle system in own module
--- refactor new/load/save system (turn into component)
 - flavor texts - what if i sourced them from reddit thread titles or something?
 - upgrade/achievement costs based on formula instead of static? that way we could tweak it in game settings for fast/slow progress
 
