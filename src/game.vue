@@ -923,7 +923,6 @@
                     if(confirm("Are you REALLY sure? You will lose EVERYTHING for hard resetting with no prestige bonus!")) {
                         // start new game
                         this.newGame();
-                        this.loadSounds();
                         this.initGolden();
 
                         // save game
