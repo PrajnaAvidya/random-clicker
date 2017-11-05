@@ -26,7 +26,6 @@ achivement todo
 
 juice/improvements
 - break stuff off into other components if possible 
--- particle system in own module
 - flavor texts - what if i sourced them from reddit thread titles or something?
 - upgrade/achievement costs based on formula instead of static? that way we could tweak it in game settings for fast/slow progress
 

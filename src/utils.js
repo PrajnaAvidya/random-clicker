@@ -1,7 +1,6 @@
 import Big from "big.js";
 
 export default {
-
     round: function(value) {
         if (isNaN(value)) {
             return 0;
@@ -60,4 +59,13 @@ export default {
         return bigData;
     },
 
-}
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            let temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+        return array;
+    },
+};
