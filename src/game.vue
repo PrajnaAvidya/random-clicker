@@ -1064,6 +1064,7 @@
                 saveData.buildings.forEach(function (saveBuilding) {
                     let building = {
                         name: saveBuilding.name,
+                        flavorText: saveBuilding.flavorText,
                         baseCost: Big(saveBuilding.baseCost),
                         buyCost: Big(saveBuilding.buyCost),
                         baseCps: Big(saveBuilding.baseCps),
