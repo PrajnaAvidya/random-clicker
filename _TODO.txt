@@ -18,11 +18,7 @@ NOT DONE:
 - golden cracker upgrades
 - heavenly chip upgrades
 
-achivement todo
-- everything?
-- building achievements
-- click achievements
-- click speed
+add more achievements
 
 juice/improvements
 - break stuff off into other components if possible 
