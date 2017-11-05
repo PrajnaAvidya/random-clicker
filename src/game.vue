@@ -130,6 +130,7 @@
     import Stats from "./gameStats.js";
     import Utils from "./utils.js";
     import Particles from "./particles.js";
+    import Sounds from "./sounds.js";
 
     export default {
         data: function () {
@@ -220,11 +221,6 @@
                     clickFrenzyAmount: 777,
                     clickFrenzyLength: 13,
                     frenzyEnd: 0,
-
-                    // audio (gets loaded)
-                    clickSound: 'tick.ogg',
-                    goldenSpawnSound: 'bell.ogg',
-                    goldenClickSound: 'chaching.ogg',
                 }
             },
 
@@ -239,7 +235,7 @@
             // clicking/currency/cps
             click() {
                 if (Options.state.sounds) {
-                    this.clickSound.play();
+                    Sounds.dispatch('play', 'clickSound');
                 }
 
                 // add to overall stats
@@ -674,7 +670,7 @@
                 Stats.commit('addGoldenSpawned');
 
                 if (Options.state.sounds) {
-                    this.goldenSpawnSound.play();
+                    Sounds.dispatch('play', 'goldenSpawnSound');
                 }
             },
             clickGolden() {
@@ -704,7 +700,7 @@
                 }
 
                 if (Options.state.sounds) {
-                    this.goldenClickSound.play();
+                    Sounds.dispatch('play', 'goldenClickSound');
                 }
 
                 this.recalculateCps();
@@ -1070,12 +1066,6 @@
                 }
 
                 console.log("Game Loaded");
-                //this.saveGame();
-            },
-            loadSounds() {
-                this.clickSound = new Audio('/static/' + this.clickSound);
-                this.goldenSpawnSound = new Audio('/static/' + this.goldenSpawnSound);
-                this.goldenClickSound = new Audio('/static/' + this.goldenClickSound);
             },
         },
         filters: {
@@ -1096,8 +1086,6 @@
                     this.addCurrency(100000);
                 }
             }
-            // load audio
-            this.loadSounds();
 
             // check achievements every couple seconds
             setInterval(function () {
