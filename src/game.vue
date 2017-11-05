@@ -990,7 +990,7 @@
                     }
 
                     if (this.cheatMode) {
-                        this.addCurrency(100000);
+                        this.addCurrency(Big(1000), true);
                     }
 
                     console.log("New Game");
@@ -1137,16 +1137,17 @@
                 // calculate bonus currency
                 let timeDifference = this.unixTimestamp() - saveData.timestamp;
                 this.bonusCurrency = Stats.state.cps.div(2).times(timeDifference).round();
-
-                // show dialog if earned over 10% saved currency
-                if (this.bonusCurrency.gt(0) && this.bonusCurrency.gte(Big(Stats.state.currency).div(10))) {
-                    this.bonusDialog = true;
+                if (this.bonusCurrency.gt(0)) {
+                    Stats.commit('addCurrency', this.bonusCurrency);
+                    if (this.bonusCurrency.gte(Big(Stats.state.currency).div(5))) {
+                        // show dialog if earned enough bonus currency
+                        this.bonusDialog = true;
+                    }
                 }
 
-                // loop in currency (already added to Stats so don't use addCurrency)
-                let startingCurrency = Big(Stats.state.currency).plus(this.bonusCurrency);
-                if (startingCurrency.gt(0)) {
-                    this.loopCurrency(startingCurrency, 500);
+                // loop in starting currency (visual only)
+                if (Stats.state.currency.gt(0)) {
+                    this.loopCurrency(Stats.state.currency, 500);
                 }
 
                 console.log("Game Loaded");

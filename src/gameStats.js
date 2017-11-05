@@ -8,14 +8,14 @@ function initialState() {
     return {
         currencyName: null,
 
-        currency: new Big(0),
-        totalCurrencyEarned: new Big(0),
-        totalCurrencySpent: new Big(0),
+        currency: Big(0),
+        totalCurrencyEarned: Big(0),
+        totalCurrencySpent: Big(0),
 
-        cps: new Big(0),
+        cps: Big(0),
 
-        clickPower: new Big(1),
-        clicks: new Big(0),
+        clickPower: Big(1),
+        clicks: Big(0),
 
         upgradeCount: 0,
         achievementCount: 0,
@@ -50,11 +50,11 @@ export default new Vuex.Store({
             state.clicks = state.clicks.plus(n);
         },
         setClickPower(state, n) {
-            state.clickPower = new Big(n);
+            state.clickPower = Big(n);
         },
 
         setCps(state, n) {
-            state.cps = new Big(n);
+            state.cps = Big(n);
         },
 
         // upgrades/achievement tracking

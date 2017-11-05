@@ -11,7 +11,7 @@ export default {
             return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         } else {
             // display pretty formatted number
-            let displayedValue = new Big(value);
+            let displayedValue = Big(value);
             let suffixes = ["", "", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"];
             let index = Math.floor((displayedValue.e) / 3);
             if (index >= suffixes.length) {
@@ -33,7 +33,7 @@ export default {
             return Math.floor(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         } else {
             // display pretty formatted number
-            let displayedValue = new Big(value);
+            let displayedValue = Big(value);
             let suffixes = ["", "", "million", "billion", "trillion", "quadrillion", "quintillion", "sextillion", "septillion", "octillion", "nonillion", "decillion"];
             let index = Math.floor((displayedValue.e) / 3);
             if (index >= suffixes.length) {
@@ -53,7 +53,7 @@ export default {
             if (isNaN(objectData[key])) {
                 bigData[key] = objectData[key];
             } else {
-                bigData[key] = new Big(objectData[key]);
+                bigData[key] = Big(objectData[key]);
             }
         }
         return bigData;

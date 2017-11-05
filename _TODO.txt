@@ -1,7 +1,5 @@
 buy/upgrade costs based on formula instead of static? so we tweak it in game settings for fast/slow progress
 
-more flavor texts!
-
 original features
 - more achievements
 - something involving achievements * cps
