@@ -1,14 +1,8 @@
 move option names/descriptions to config file & use v-for in template
 
-break up main game data (too big to fail!)
-- ??
-
 remove any direct reference to "Cracker"
 
 learn about js performance profiling to find bottlenecks (game gets really laggy in later stages)
-
-stats page todo
-- golden cracker stats/attributes
 
 upgrade todo
 DONE:
@@ -36,6 +30,7 @@ juice/improvements
 -- particle system in own module
 - flavor texts - what if i sourced them from reddit thread titles or something?
 - upgrade/achievement costs based on formula instead of static? that way we could tweak it in game settings for fast/slow progress
+
 
 6E = million
 9E = billion
