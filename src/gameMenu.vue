@@ -198,7 +198,7 @@
             // update stats every few seconds
             setInterval(function () {
                 this.updateStats();
-            }.bind(this), 5000);
+            }.bind(this), 3000);
         }
     };
 </script>

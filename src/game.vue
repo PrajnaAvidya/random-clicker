@@ -122,6 +122,7 @@
 </template>
 
 <script>
+    import axios from 'axios';
     import Big from "big.js";
     import EventBus from './eventBus.js';
     import Words from "./words.js";
@@ -384,6 +385,7 @@
                 //let buildingText = building.description;
                 let buildingText = "Each " + building.name + " produces " + building.currentCps + " " + Stats.state.currencyName + "s per second";
                 buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + Utils.round(buildingCps) + " " +  Stats.state.currencyName + "s per second (" + Utils.round(buildingCpsPercent) + "% of total)";
+                buildingText += "<br /><i>" + building.flavorText +"</i>";
                 return buildingText;
             },
             setBuyAmount(amount) {
@@ -713,29 +715,52 @@
             },
 
             // generate stuff for new game
-            generateBuildings() {
-                let buildingNames = Utils.shuffleArray(this.words.buildingNames);
-                for (let i = 0; i < GameData.buildings.length; i++) {
-                    let buildingName = buildingNames.pop();
-                    let building = JSON.parse(JSON.stringify(GameData.buildings[i]));
-                    let buildingIcon = this.icons.pop();
-                    building.baseCost = Big(building.baseCost);
-                    building.buyCost = Big(building.baseCost);
-                    building.baseCps = Big(building.baseCps);
-                    building.currentCps = Big(building.baseCps);
-                    building.unlocked = false;
-                    building.name = buildingName;
-                    building.owned = 0;
-                    if (i >= 2) {
-                        building.showAt = Big(GameData.buildings[(i - 2)].baseCost);
-                    } else {
-                        building.showAt = Big(0);
-                    }
-                    building.icon = buildingIcon;
+            async generateBuildings() {
+                // try to get some random flavor texts from reddit
+                let redditRequest = await axios.get('https://www.reddit.com/r/SubredditSimulator.json?after=t3_3g9ioz');
+                let flavorTexts = [];
+                let ready = false;
+                if (redditRequest.status == 200) {
+                    redditRequest.data.data.children.forEach(function (redditThread) {
+                        if (redditThread.data.author != "Deimorz" && redditThread.data.title.length > 20) {
+                            flavorTexts.push(redditThread.data.title);
+                        }
+                    });
+                    flavorTexts = Utils.shuffleArray(flavorTexts);
+                    ready = true;
+                } else {
+                    console.log("WARNING: Can't connect to Reddit api");
+                    ready = true;
+                }
 
-                    this.buildings.push(building);
-                    this.buildingNames.push(buildingName);
-                    this.buildingIcons.push(buildingIcon);
+                if (ready) {
+                    let buildingNames = Utils.shuffleArray(this.words.buildingNames);
+                    for (let i = 0; i < GameData.buildings.length; i++) {
+                        let buildingName = buildingNames.pop();
+                        let building = JSON.parse(JSON.stringify(GameData.buildings[i]));
+                        let buildingIcon = this.icons.pop();
+                        building.baseCost = Big(building.baseCost);
+                        building.buyCost = Big(building.baseCost);
+                        building.baseCps = Big(building.baseCps);
+                        building.currentCps = Big(building.baseCps);
+                        building.unlocked = false;
+                        building.name = buildingName;
+                        let flavorText = Utils.splitLines(flavorTexts.pop());
+                        building.flavorText = flavorText.join("<br />");
+                        building.owned = 0;
+                        if (i >= 2) {
+                            building.showAt = Big(GameData.buildings[(i - 2)].baseCost);
+                        } else {
+                            building.showAt = Big(0);
+                        }
+                        building.icon = buildingIcon;
+
+                        this.buildings.push(building);
+                        this.buildingNames.push(buildingName);
+                        this.buildingIcons.push(buildingIcon);
+                    }
+
+                    return true;
                 }
             },
             generateUpgrades() {
@@ -886,7 +911,51 @@
             },
 
             // new/save/load
-            newGame() {
+            async setupGame() {
+                // load game or new
+                let loaded = false;
+                if (!this.disableLoad && localStorage.getItem("SaveGame") != null) {
+                    loaded = await this.loadGame(localStorage.getItem("SaveGame"));
+                } else {
+                    loaded = await this.newGame();
+                }
+
+                // wait for game ready
+                if (loaded) {
+                    // check achievements every couple seconds
+                    setInterval(function () {
+                        this.checkAchievements();
+                    }.bind(this), 2000);
+
+                    // auto save every 30 seconds
+                    setInterval(function () {
+                        if (!this.disableAutoSave) {
+                            this.saveGame();
+                        }
+                    }.bind(this), 30000);
+
+                    // check for currency pulse end every second
+                    setInterval(function() {
+                        if (this.currencyPulseLast && this.unixTimestamp() > this.currencyPulseLast) {
+                            this.currencyPulsing = false;
+                        }
+                    }.bind(this), 1000);
+
+                    // init next golden currency
+                    this.initGolden();
+
+                    // start update loop (dynamic fps)
+                    window.requestAnimationFrame(this.tick);
+
+                    // start particle effects
+                    Particles.setupParticles();
+
+                    // add event listeners for other components
+                    EventBus.$on('saveGame', this.saveGame);
+                    EventBus.$on('hardReset', this.hardReset);
+                }
+            },
+            async newGame() {
                 // load default data
                 Object.assign(this.$data, this.defaultData());
                 this._sortedUpgrades = null;
@@ -909,33 +978,47 @@
                 this.icons = Utils.shuffleArray(this.words.icons);
 
                 // generate stuff
-                this.generateBuildings();
-                this.generateUpgrades();
-                this.generateAchievements();
+                let waitForBuildings = await this.generateBuildings();
+                // buildings uses reddit api so wait for it to finish
+                if (waitForBuildings) {
+                    this.generateUpgrades();
+                    this.generateAchievements();
 
-                // loop in starting currency (if any)
-                if (this.startingCurrency.gt(0)) {
-                    this.addCurrency(this.startingCurrency, true);
+                    // loop in starting currency (if any)
+                    if (this.startingCurrency.gt(0)) {
+                        this.addCurrency(this.startingCurrency, true);
+                    }
+
+                    if (this.cheatMode) {
+                        this.addCurrency(100000);
+                    }
+
+                    console.log("New Game");
+                    return true;
                 }
             },
-            hardReset() {
+            async hardReset() {
                 if (confirm("Are you sure?")) {
                     if(confirm("Are you REALLY sure? You will lose EVERYTHING for hard resetting with no prestige bonus!")) {
                         // start new game
-                        this.newGame();
-                        this.initGolden();
+                        let newGame = await this.newGame();
+                        if (newGame) {
+                            this.initGolden();
 
-                        // save game
-                        this.saveGame();
+                            // save game
+                            this.saveGame();
 
-                        // clear alerts & toggle menu
-                        EventBus.$emit('clearAlerts');
-                        EventBus.$emit('toggleMenu');
-                        EventBus.$emit('send');
+                            // clear alerts & toggle menu
+                            EventBus.$emit('clearAlerts');
+                            EventBus.$emit('toggleMenu');
+                            EventBus.$emit('send');
+
+                            return true;
+                        }
                     }
                 }
             },
-            saveGame() {
+            async saveGame() {
                 let saveData = {
                     // misc state
                     buildingCostMultiplier: this.buildingCostMultiplier,
@@ -953,8 +1036,9 @@
                 localStorage.setItem("SaveGame", JSON.stringify(saveData));
 
                 console.log("Game Saved");
+                return true;
             },
-            loadGame(saveJson) {
+            async loadGame(saveJson) {
                 let saveData = JSON.parse(saveJson);
                 let vm = this;
 
@@ -1065,6 +1149,7 @@
                 }
 
                 console.log("Game Loaded");
+                return true;
             },
         },
         filters: {
@@ -1076,48 +1161,7 @@
             }
         },
         mounted() {
-            // load game or new
-            if (!this.disableLoad && localStorage.getItem("SaveGame") != null) {
-                this.loadGame(localStorage.getItem("SaveGame"));
-            } else {
-                this.newGame();
-                if (this.cheatMode) {
-                    this.addCurrency(100000);
-                }
-            }
-
-            // check achievements every couple seconds
-            setInterval(function () {
-                this.checkAchievements();
-            }.bind(this), 2000);
-
-            // auto save every 30 seconds
-            setInterval(function () {
-                if (!this.disableAutoSave) {
-                    this.saveGame();
-                }
-            }.bind(this), 30000);
-
-            // check for currency pulse end every second
-            setInterval(function() {
-                if (this.currencyPulseLast && this.unixTimestamp() > this.currencyPulseLast) {
-                    this.currencyPulsing = false;
-                }
-            }.bind(this), 1000);
-
-            // init next golden currency
-            this.initGolden();
-
-            // start update loop (dynamic fps)
-            window.requestAnimationFrame(this.tick);
-
-            // start particle effects
-            Particles.setupParticles();
-
-            // add event listeners for other components
-            let vm = this;
-            EventBus.$on('saveGame', this.saveGame);
-            EventBus.$on('hardReset', this.hardReset);
+            this.setupGame();
         }
     };
 </script>

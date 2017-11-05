@@ -68,4 +68,19 @@ export default {
         }
         return array;
     },
+
+    splitLines(input, len = 100) {
+        let curr = len, prev = 0, output = [];
+        
+        while (input[curr]) {
+            if (input[curr++] == ' ') {
+                output.push(input.substring(prev,curr));
+                prev = curr;
+                curr += len;
+            }
+        }
+        output.push(input.substr(prev));
+        
+        return output;
+    }
 };

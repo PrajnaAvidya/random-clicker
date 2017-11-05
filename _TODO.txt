@@ -1,8 +1,6 @@
-component for new/save/load/generation?
+buy/upgrade costs based on formula instead of static? so we tweak it in game settings for fast/slow progress
 
-buy/upgrade costs based on formula instead of static? that way we could tweak it in game settings for fast/slow progress
-
-flavor texts - what if i sourced them from reddit thread titles or something?
+more flavor texts!
 
 original features
 - more achievements
