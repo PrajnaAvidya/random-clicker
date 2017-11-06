@@ -82,5 +82,9 @@ export default {
         output.push(input.substr(prev));
         
         return output.join("<br />");
-    }
+    },
+
+    unixTimestamp() {
+        return Math.round((new Date()).getTime() / 1000);
+    },
 };

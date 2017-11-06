@@ -218,8 +218,7 @@ export default {
     ],
 
     // fusion upgrades
-    // requires 15 type:buildingType & 1 type:1 building.
-    // doubles type1 production & buildingType gains +1% per tierOneForCpsUpgrade*type:1 building
+    // requires 15 type:buildingType & 1 type:1 building === doubles type1 production & buildingType gains +1% per tierOneForCpsUpgrade*type:1 building
     fusionUpgradeTypes: [
         { 'buildingType': 2, cost: 55000, tierOneForCpsUpgrade: 1 },
         { 'buildingType': 3, cost: 600000, tierOneForCpsUpgrade: 2 },

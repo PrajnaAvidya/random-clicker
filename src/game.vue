@@ -237,8 +237,12 @@
                 return Options.state[option];
             },
 
-            unixTimestamp() {
-                return Math.round((new Date()).getTime() / 1000);
+            updateTitle() {
+                if (this.goldenActive) {
+                    document.title = '[G] ' + Stats.state.currencyName + ' Clickerr';
+                } else {
+                    document.title = Stats.state.currencyName + ' Clickerr';
+                }
             },
 
             // clicking/currency/cps
@@ -256,7 +260,7 @@
                 // enable pulsing
                 if (Options.state.animation) {
                     this.currencyPulsing = true;
-                    this.currencyPulseLast = this.unixTimestamp();
+                    this.currencyPulseLast = Utils.unixTimestamp();
                 }
             },
             addCurrency(amount, loop = false) {
@@ -625,19 +629,19 @@
 
                 // check for bonus end
                 if (this.luckyActive) {
-                    if (this.unixTimestamp() > this.luckyEnd) {
+                    if (Utils.unixTimestamp() > this.luckyEnd) {
                         this.luckyActive = false;
                     }
                 }
                 if (this.clickFrenzyActive) {
-                    if (this.unixTimestamp() > this.clickFrenzyEnd) {
+                    if (Utils.unixTimestamp() > this.clickFrenzyEnd) {
                         this.clickFrenzyActive = false;
                         this.recalculateCps();
                         this.recalculateClickPower();
                     }
                 }
                 if (this.frenzyActive) {
-                    if (this.unixTimestamp() > this.frenzyEnd) {
+                    if (Utils.unixTimestamp() > this.frenzyEnd) {
                         this.frenzyActive = false;
                         this.recalculateCps();
                         this.recalculateClickPower();
@@ -669,10 +673,10 @@
                     }
                 }
 
-                if (!this.goldenActive && (this.easyGolden || this.unixTimestamp() >= this.goldenNext)) {
+                if (!this.goldenActive && (this.easyGolden || Utils.unixTimestamp() >= this.goldenNext)) {
                     this.spawnGolden();
                 } else if (this.goldenActive) {
-                    if (this.unixTimestamp() > this.goldenDisappear) {
+                    if (Utils.unixTimestamp() > this.goldenDisappear) {
                         this.goldenActive = false;
                         this.initGolden();
                     }
@@ -683,7 +687,7 @@
 
             // golden bonuses
             initGolden() {
-                this.goldenNext = this.unixTimestamp() + Math.floor(Math.random() * (this.goldenMaximumTime - this.goldenMinimumTime)) + this.goldenMinimumTime;
+                this.goldenNext = Utils.unixTimestamp() + Math.floor(Math.random() * (this.goldenMaximumTime - this.goldenMinimumTime)) + this.goldenMinimumTime;
                 this.goldenDisappear = this.goldenNext + this.goldenStay;
             },
             spawnGolden() {
@@ -709,11 +713,11 @@
                 if (roll >= 95 && !this.clickFrenzyActive) {
                     // click frenzy
                     this.clickFrenzyActive = true;
-                    this.clickFrenzyEnd = this.unixTimestamp() + this.clickFrenzyLength;
+                    this.clickFrenzyEnd = Utils.unixTimestamp() + this.clickFrenzyLength;
                 } else if (roll >= 47 && !this.frenzyActive) {
                     // frenzy
                     this.frenzyActive = true;
-                    this.frenzyEnd = this.unixTimestamp() + this.frenzyLength;
+                    this.frenzyEnd = Utils.unixTimestamp() + this.frenzyLength;
                 } else {
                     // lucky
                     let bonus1 = Stats.state.cps.times(900);
@@ -724,7 +728,7 @@
                     }
                     this.luckyAmount = this.luckyAmount.plus(13)
                     this.luckyActive = true;
-                    this.luckyEnd = this.unixTimestamp() + this.luckyLength;
+                    this.luckyEnd = Utils.unixTimestamp() + this.luckyLength;
 
                     this.addCurrency(this.luckyAmount, true);
                 }
@@ -989,26 +993,33 @@
                     await this.newGame();
                 }
 
-                // check achievements every couple seconds
+                // check for currency pulse end
+                setInterval(function() {
+                    if (this.currencyPulseLast && Utils.unixTimestamp() > this.currencyPulseLast) {
+                        this.currencyPulsing = false;
+                    }
+                }.bind(this), 1000);
+
+                // check achievements
                 setInterval(function () {
                     this.checkAchievements();
                 }.bind(this), 2000);
 
-                // auto save every 30 seconds
+                // update titlebar
+                setInterval(function () {
+                    if (!this.disableAutoSave) {
+                        this.updateTitle();
+                    }
+                }.bind(this), 3000);
+
+                // auto save
                 setInterval(function () {
                     if (!this.disableAutoSave) {
                         this.saveGame();
                     }
                 }.bind(this), 30000);
 
-                // check for currency pulse end every second
-                setInterval(function() {
-                    if (this.currencyPulseLast && this.unixTimestamp() > this.currencyPulseLast) {
-                        this.currencyPulsing = false;
-                    }
-                }.bind(this), 1000);
-
-                // init next golden currency
+                // init golden currency
                 this.initGolden();
 
                 // start update loop (dynamic fps)
@@ -1017,7 +1028,7 @@
                 // start particle effects
                 Particles.setupParticles();
 
-                // add event listeners for other components
+                // add event listeners
                 EventBus.$on('saveGame', this.saveGame);
                 EventBus.$on('hardReset', this.hardReset);
 
@@ -1090,7 +1101,7 @@
                     buildings: this.buildings,
                     upgrades: this.upgrades,
                     achievements: this.achievements,
-                    timestamp: this.unixTimestamp(),
+                    timestamp: Utils.unixTimestamp(),
                     buyAmount: this.buyAmount,
 
                     options: Options.state,
@@ -1208,7 +1219,7 @@
                 this.showAchievements = showAchievements;
 
                 // calculate bonus currency
-                let timeDifference = this.unixTimestamp() - saveData.timestamp;
+                let timeDifference = Utils.unixTimestamp() - saveData.timestamp;
                 this.bonusCurrency = Stats.state.cps.div(2).times(timeDifference).round();
                 if (this.bonusCurrency.gt(0)) {
                     Stats.commit('addCurrency', this.bonusCurrency);
