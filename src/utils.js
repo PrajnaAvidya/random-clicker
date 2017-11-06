@@ -69,7 +69,7 @@ export default {
         return array;
     },
 
-    splitLines(input, len = 100) {
+    addLineBreaks(input, len = 100) {
         let curr = len, prev = 0, output = [];
         
         while (input[curr]) {
@@ -81,6 +81,6 @@ export default {
         }
         output.push(input.substr(prev));
         
-        return output;
+        return output.join("<br />");
     }
 };
