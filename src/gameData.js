@@ -217,11 +217,22 @@ export default {
         { clicks: 1E18 },
     ],
 
-    // TODO equivalent to grandma types
-    // requires 15 buildingType & 1 tier1 building.
-    tierOneUpgradeTypes: [
-        // makes tier1 twice as efficient and +1% CpS per n/tier1 where n is upgrade #
-        { 'buildingType': 2, cost: 55000 }
+    // fusion upgrades
+    // requires 15 type:buildingType & 1 type:1 building.
+    // doubles type1 production & buildingType gains +1% per tierOneForCpsUpgrade*type:1 building
+    fusionUpgradeTypes: [
+        { 'buildingType': 2, cost: 55000, tierOneForCpsUpgrade: 1 },
+        { 'buildingType': 3, cost: 600000, tierOneForCpsUpgrade: 2 },
+        { 'buildingType': 4, cost: 6.5E6, tierOneForCpsUpgrade: 3 },
+        { 'buildingType': 5, cost: 70E6, tierOneForCpsUpgrade: 4 },
+        { 'buildingType': 6, cost: 1E9, tierOneForCpsUpgrade: 5 },
+        { 'buildingType': 7, cost: 16.5E9, tierOneForCpsUpgrade: 6 },
+        { 'buildingType': 8, cost: 225E9, tierOneForCpsUpgrade: 7 },
+        { 'buildingType': 9, cost: 3.75E12, tierOneForCpsUpgrade: 8 },
+        { 'buildingType': 10, cost: 50E12, tierOneForCpsUpgrade: 9 },
+        { 'buildingType': 11, cost: 700E12, tierOneForCpsUpgrade: 10 },
+        { 'buildingType': 12, cost: 8.5E15, tierOneForCpsUpgrade: 11 },
+        { 'buildingType': 13, cost: 105E15, tierOneForCpsUpgrade: 12 },
     ],
 
     // TODO synergies

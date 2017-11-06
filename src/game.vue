@@ -309,10 +309,23 @@
             recalculateCps() {
                 let cps = Big(0);
                 let vm = this;
+
+                // get building cps with bonuses
                 this.ownedBuildings().forEach(function (building) {
-                    let buildingCps = building.baseCps.times(vm.upgradeMultiplier(building.name));
-                    building.currentCps = buildingCps;
-                    cps = cps.plus(buildingCps.times(building.owned));
+                    building.currentCps = building.baseCps.times(vm.upgradeMultiplier(building.name));
+                });
+
+                // fusion upgrades
+                let tierOneCount = this.buildingCount(this.buildingNames[1]);
+                this.activeUpgrades("Fusion").forEach(function (upgrade) {
+                    console.log(upgrade);
+                    vm.buildings[1].currentCps = vm.buildings[1].currentCps.times(2);
+                    vm.buildings[upgrade.buildingType].currentCps = vm.buildings[upgrade.buildingType].currentCps.times(Big(1.01).pow(tierOneCount));
+                });
+
+                // add building cps to overall cps
+                this.ownedBuildings().forEach(function (building) {
+                    cps = cps.plus(building.currentCps.times(building.owned));
                 });
 
                 // add finger additive upgrades
@@ -382,8 +395,7 @@
                 }
                 let buildingCps = building.currentCps * building.owned;
                 let buildingCpsPercent = 100 * buildingCps / Stats.state.cps;
-                //let buildingText = building.description;
-                let buildingText = "Each " + building.name + " produces " + building.currentCps + " " + Stats.state.currencyName + "s per second";
+                let buildingText = "Each " + building.name + " produces " + Utils.round(building.currentCps) + " " + Stats.state.currencyName + "s per second";
                 buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + Utils.round(buildingCps) + " " +  Stats.state.currencyName + "s per second (" + Utils.round(buildingCpsPercent) + "% of total)";
                 buildingText += "<br /><i>" + building.flavorText +"</i>";
                 return buildingText;
@@ -423,6 +435,11 @@
                         }
                     });
                     return canBuy;
+                } else if (upgrade.type == 'Fusion') {
+                    if (this.buildingCount(this.buildingNames[1]) > 0 && this.buildingCount(this.buildingNames[upgrade.buildingType]) >= 15) {
+                        upgrade.unlocked = true;
+                        return true;
+                    }
                 } else if (this.buildingCount(upgrade.type) >= upgrade.needed) {
                     upgrade.unlocked = true;
                     return true;
@@ -435,27 +452,26 @@
                     return true;
                 }
 
-                if (upgrade.type != 'Clicking' && upgrade.type != 'Buildings' && upgrade.type != Stats.state.currencyName && this.buildingCount(upgrade.type) == 0) {
+                // check for building count for building upgrades
+                if (upgrade.buildingUpgrade && this.buildingCount(upgrade.type) == 0) {
                     return false;
                 }
+
                 if (upgrade.type == Stats.state.currencyName) {
-                    if (Stats.state.currency.gte(upgrade.needed)) {
-                        upgrade.unlocked = true;
-                        return true;
-                    }
+                    // currency upgrades requier you to have enough to afford
+                    upgrade.unlocked = Stats.state.currency.gte(upgrade.needed);
                 } else if (upgrade.type == 'Clicking') {
-                    if (Stats.state.clicks.gte(upgrade.needed)) {
-                        upgrade.unlocked = true;
-                        return true;
-                    }
-                } else if (upgrade.type == 'Buildings') {
-                    return this.canBuyUpgrade(upgrade);
-                } else if (upgrade.cost == this.nextUpgrade(upgrade.type).cost) {
-                    upgrade.unlocked = true;
-                    return true;
+                    // clicking upgrade have a minimum # of clicks required
+                    upgrade.unlocked = Stats.state.clicks.gte(upgrade.needed);
+                } else if (upgrade.buildingUpgrade) {
+                    // building upgrades require cost == next upgrade cost
+                    upgrade.unlocked = upgrade.cost == this.nextUpgrade(upgrade.type).cost;
+                } else {
+                    // everything else goes off if can buy upgrade
+                    upgrade.unlocked = this.canBuyUpgrade(upgrade);
                 }
 
-                return false;
+                return upgrade.unlocked;
             },
             buyUpgrade(upgrade) {
                 if (this.canBuyUpgrade(upgrade) && this.canAffordUpgrade(upgrade)) {
@@ -469,9 +485,9 @@
                     Stats.commit('addUpgrade');
                 }
             },
-            activeUpgrades(buildingType) {
+            activeUpgrades(upgradeType) {
                 return this.upgrades.filter(function (upgrade) {
-                    return upgrade.active && upgrade.type == buildingType;
+                    return upgrade.active && upgrade.type == upgradeType;
                 });
             },
             nextUpgrade(buildingType) {
@@ -481,7 +497,6 @@
                 });
             },
             upgradeMultiplier(buildingType) {
-
                 let multiplier = Big(1);
                 this.activeUpgrades(buildingType).forEach(function (upgrade) {
                     if (upgrade.multiplier != null) {
@@ -525,6 +540,12 @@
                 // clicking upgrade
                 if (upgrade.type == "Clicking") {
                     description += 'Clicking gains 1% of your ' + Stats.state.currencyName + ' per second';
+                    return description;
+                }
+
+                // fusion upgrade
+                if (upgrade.type == 'Fusion') {
+                    description += 'Doubles ' + this.buildingNames[1] + ' production &amp; gain +1% ' + this.buildingNames[upgrade.buildingType] + ' production for every ' + upgrade.tierOneForCpsUpgrade + ' ' + this.buildingNames[1] + ' owned';
                     return description;
                 }
 
@@ -813,12 +834,13 @@
                     for (let i = 0; i < upgradeNeeds.length; i++) {
                         let upgrade = {
                             type: vm.buildingNames[upgradeIndex],
+                            buildingUpgrade: true,
                             name: vm.adjectives.pop() + " " + vm.buildingNames[upgradeIndex] + "s",
                             needed: upgradeNeeds[i],
                             cost: Big(upgradeCosts[i]),
                             unlocked: false,
                             active: false,
-                            icon: vm.buildingIcons[upgradeIndex]
+                            icon: vm.buildingIcons[upgradeIndex],
                         };
 
                         // parse amount
@@ -832,6 +854,23 @@
                     }
 
                     upgradeIndex++;
+                });
+
+                // tier 1 building upgrades
+                GameData.fusionUpgradeTypes.forEach(function (tierOneUpgrade) {
+                    let upgrade = {
+                        type: 'Fusion',
+                        name: vm.buildingNames[1] + "-" + vm.buildingNames[tierOneUpgrade.buildingType] + " Fusion",
+                        buildingType: tierOneUpgrade.buildingType,
+                        needed: 15,
+                        cost: Big(tierOneUpgrade.cost),
+                        tierOneForCpsUpgrade: tierOneUpgrade.tierOneForCpsUpgrade,
+                        unlocked: false,
+                        active: false,
+                        icon: vm.buildingIcons[1],
+                    };
+
+                    vm.upgrades.push(upgrade);
                 });
 
                 // clicking upgrades
@@ -990,7 +1029,7 @@
                     }
 
                     if (this.cheatMode) {
-                        this.addCurrency(Big(1000), true);
+                        this.addCurrency(Big(1E7), true);
                     }
 
                     console.log("New Game");
