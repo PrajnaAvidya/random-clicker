@@ -239,9 +239,9 @@
 
             updateTitle() {
                 if (this.goldenActive) {
-                    document.title = '[G] ' + Stats.state.currencyName + ' Clickerr';
+                    document.title = '[G] ' + Stats.state.currencyName + ' Clicker';
                 } else {
-                    document.title = Stats.state.currencyName + ' Clickerr';
+                    document.title = Stats.state.currencyName + ' Clicker';
                 }
             },
 
