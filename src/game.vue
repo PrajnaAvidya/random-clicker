@@ -1,6 +1,13 @@
 <template>
     <v-app>
-        <v-container fluid="fluid">
+        <v-dialog v-model="showLoading" persistent>
+            <v-card>
+                <v-card-title class="headline">Loading game assets</v-card-title>
+                <v-card-text>Please wait a moment, game is loading...</v-card-text>
+            </v-card>
+        </v-dialog>
+
+        <v-container fluid="fluid" v-bind:class="{ hide: showLoading }">
             <v-layout>
                 <v-flex sm5>
                     <v-layout class="totals">
@@ -122,12 +129,12 @@
 </template>
 
 <script>
-    import axios from 'axios';
     import Big from "big.js";
     import EventBus from './eventBus.js';
     import Words from "./words.js";
     import Options from './options.js';
     import GameData from "./gameDAta.js";
+    import FlavorText from "./flavorText.js";
     import Stats from "./stats.js";
     import Utils from "./utils.js";
     import Particles from "./particles.js";
@@ -166,6 +173,7 @@
                     lastFrame: 0,
 
                     // in-game state
+                    showLoading: true,
                     currencyName: null, // this is saved in Stats, data.currencyName is used for front-end display only
                     currency: Big(0), // this value is for front-end display only, buy/etc checks are done with Stats.state.currency
                     buyAmount: 1, // how many buildings to buy at a time
@@ -531,38 +539,37 @@
             upgradeText(upgrade) {
                 let description = '';
 
-                // production upgrade
                 if (upgrade.type == Stats.state.currencyName || upgrade.type == "Buildings") {
+                    // production upgrade
                     description += "Multiplies " + Stats.state.currencyName + " production by " + upgrade.multiplier + "x";
-                    return description;
-                }
-
-                // clicking upgrade
-                if (upgrade.type == "Clicking") {
+                } else if (upgrade.type == "Clicking") {
+                    // clicking upgrade
                     description += 'Clicking gains 1% of your ' + Stats.state.currencyName + ' per second';
-                    return description;
-                }
-
-                // fusion upgrade
-                if (upgrade.type == 'Fusion') {
+                } else if (upgrade.type == 'Fusion') {
+                    // fusion upgrade
                     description += 'Doubles ' + this.buildingNames[1] + ' production &amp; gain +1% ' + this.buildingNames[upgrade.buildingType] + ' production for every ' + upgrade.tierOneForCpsUpgrade + ' ' + this.buildingNames[1] + ' owned';
-                    return description;
-                }
-
-                // building upgrade
-                if (upgrade.multiplier > 0) {
+                } else if (upgrade.multiplier > 0) {
+                    // multiplier upgrade
                     description += "Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
                     if (upgrade.type == this.buildingNames[0]) {
                         description += "<br /><strong>Also multiplies clicks</strong>";
                     }
                 } else if (upgrade.addition > 0) {
+                    // addition upgrade
                     description += "Adds " + upgrade.addition + " " + Stats.state.currencyName + " production for every non-" + upgrade.type + " building owned";
                     if (upgrade.type == this.buildingNames[0]) {
                         description += "<br /><strong>Also adds to clicks</strong>";
                     }
                 }
+
+                // requirement not met
                 if (this.buildingCount(upgrade.type) < upgrade.needed) {
                     description += "<br /><strong>Requires: " + upgrade.needed + " " + upgrade.type + "</strong>";
+                }
+
+                // add flavor text
+                if (upgrade.flavorText) {
+                    description += "<br /><i>" + upgrade.flavorText +"</i>";
                 }
                 
                 return description;
@@ -736,52 +743,33 @@
             },
 
             // generate stuff for new game
-            async generateBuildings() {
-                // try to get some random flavor texts from reddit
-                let redditRequest = await axios.get('https://www.reddit.com/r/SubredditSimulator.json?after=t3_3g9ioz');
-                let flavorTexts = [];
-                let ready = false;
-                if (redditRequest.status == 200) {
-                    redditRequest.data.data.children.forEach(function (redditThread) {
-                        if (redditThread.data.author != "Deimorz" && redditThread.data.title.length > 20) {
-                            flavorTexts.push(redditThread.data.title);
-                        }
-                    });
-                    flavorTexts = Utils.shuffleArray(flavorTexts);
-                    ready = true;
-                } else {
-                    console.log("WARNING: Can't connect to Reddit api");
-                    ready = true;
-                }
-
-                if (ready) {
-                    let buildingNames = Utils.shuffleArray(this.words.buildingNames);
-                    for (let i = 0; i < GameData.buildings.length; i++) {
-                        let buildingName = buildingNames.pop();
-                        let building = JSON.parse(JSON.stringify(GameData.buildings[i]));
-                        let buildingIcon = this.icons.pop();
-                        building.baseCost = Big(building.baseCost);
-                        building.buyCost = Big(building.baseCost);
-                        building.baseCps = Big(building.baseCps);
-                        building.currentCps = Big(building.baseCps);
-                        building.unlocked = false;
-                        building.name = buildingName;
-                        let flavorText = Utils.splitLines(flavorTexts.pop());
-                        building.flavorText = flavorText.join("<br />");
-                        building.owned = 0;
-                        if (i >= 2) {
-                            building.showAt = Big(GameData.buildings[(i - 2)].baseCost);
-                        } else {
-                            building.showAt = Big(0);
-                        }
-                        building.icon = buildingIcon;
-
-                        this.buildings.push(building);
-                        this.buildingNames.push(buildingName);
-                        this.buildingIcons.push(buildingIcon);
+            generateBuildings() {
+                let buildingNames = Utils.shuffleArray(this.words.buildingNames);
+                for (let i = 0; i < GameData.buildings.length; i++) {
+                    let buildingName = buildingNames.pop();
+                    let building = JSON.parse(JSON.stringify(GameData.buildings[i]));
+                    let buildingIcon = this.icons.pop();
+                    building.baseCost = Big(building.baseCost);
+                    building.buyCost = Big(building.baseCost);
+                    building.baseCps = Big(building.baseCps);
+                    building.currentCps = Big(building.baseCps);
+                    building.unlocked = false;
+                    building.name = buildingName;
+                    let flavorText = this.flavorTexts.pop();
+                    if (flavorText) {
+                        building.flavorText = Utils.addLineBreaks(flavorText);
                     }
+                    building.owned = 0;
+                    if (i >= 2) {
+                        building.showAt = Big(GameData.buildings[(i - 2)].baseCost);
+                    } else {
+                        building.showAt = Big(0);
+                    }
+                    building.icon = buildingIcon;
 
-                    return true;
+                    this.buildings.push(building);
+                    this.buildingNames.push(buildingName);
+                    this.buildingIcons.push(buildingIcon);
                 }
             },
             generateUpgrades() {
@@ -801,6 +789,11 @@
                         icon: vm.cpsIcon,
                     };
 
+                    let flavorText = vm.flavorTexts.pop();
+                    if (flavorText) {
+                        upgrade.flavorText = Utils.addLineBreaks(flavorText);
+                    }
+
                     vm.upgrades.push(upgrade);
                 });
 
@@ -816,6 +809,11 @@
                         active: false,
                         icon: vm.cpsIcon,
                     };
+
+                    let flavorText = vm.flavorTexts.pop();
+                    if (flavorText) {
+                        upgrade.flavorText = Utils.addLineBreaks(flavorText);
+                    }
 
                     vm.upgrades.push(upgrade);
                 });
@@ -850,6 +848,11 @@
                             upgrade.addition = parseFloat(upgradeAmounts[i].substr(1));
                         }
 
+                        let flavorText = vm.flavorTexts.pop();
+                        if (flavorText) {
+                            upgrade.flavorText = Utils.addLineBreaks(flavorText);
+                        }
+
                         vm.upgrades.push(upgrade);
                     }
 
@@ -870,6 +873,11 @@
                         icon: vm.buildingIcons[1],
                     };
 
+                    let flavorText = vm.flavorTexts.pop();
+                    if (flavorText) {
+                        upgrade.flavorText = Utils.addLineBreaks(flavorText);
+                    }
+
                     vm.upgrades.push(upgrade);
                 });
 
@@ -886,6 +894,11 @@
                         active: false,
                         icon: vm.clicksIcon,
                     };
+
+                    let flavorText = vm.flavorTexts.pop();
+                    if (flavorText) {
+                        upgrade.flavorText = Utils.addLineBreaks(flavorText);
+                    }
 
                     vm.upgrades.push(upgrade);
                 });
@@ -916,6 +929,11 @@
                         achievement.description = "Generated a total of " + productionAchievement.clicks + " " + Stats.state.currencyName + "s using clicks";
                     }
 
+                    let flavorText = vm.flavorTexts.pop();
+                    if (flavorText) {
+                        achievement.description += '<br /><i>' + Utils.addLineBreaks(flavorText) + '</i>';
+                    }
+
                     vm.achievements.push(achievement);
                 });
 
@@ -931,6 +949,11 @@
                         description: "Built a total of " + buildingAchivement.total + " " + vm.buildingNames[upgradeIndex],
                     };
 
+                    let flavorText = vm.flavorTexts.pop();
+                    if (flavorText) {
+                        achievement.description += '<br /><i>' + Utils.addLineBreaks(flavorText) + '</i>';
+                    }
+
                     vm.achievements.push(achievement);
                 });
                 GameData.buildingAchievements.otherBuildings.forEach(function (buildingAchivement) {
@@ -944,6 +967,11 @@
                             description: "Built a total of " + buildingAchivement.total + " " + vm.buildingNames[upgradeIndex],
                         };
 
+                        let flavorText = vm.flavorTexts.pop();
+                        if (flavorText) {
+                            achievement.description += '<br /><i>' + Utils.addLineBreaks(flavorText) + '</i>';
+                        }
+
                         vm.achievements.push(achievement);
                     }
                 });
@@ -951,48 +979,50 @@
 
             // new/save/load
             async setupGame() {
+                // loading screen is showing by default
+
                 // load game or new
                 let loaded = false;
                 if (!this.disableLoad && localStorage.getItem("SaveGame") != null) {
-                    loaded = await this.loadGame(localStorage.getItem("SaveGame"));
+                    await this.loadGame(localStorage.getItem("SaveGame"));
                 } else {
-                    loaded = await this.newGame();
+                    await this.newGame();
                 }
 
-                // wait for game ready
-                if (loaded) {
-                    // check achievements every couple seconds
-                    setInterval(function () {
-                        this.checkAchievements();
-                    }.bind(this), 2000);
+                // check achievements every couple seconds
+                setInterval(function () {
+                    this.checkAchievements();
+                }.bind(this), 2000);
 
-                    // auto save every 30 seconds
-                    setInterval(function () {
-                        if (!this.disableAutoSave) {
-                            this.saveGame();
-                        }
-                    }.bind(this), 30000);
+                // auto save every 30 seconds
+                setInterval(function () {
+                    if (!this.disableAutoSave) {
+                        this.saveGame();
+                    }
+                }.bind(this), 30000);
 
-                    // check for currency pulse end every second
-                    setInterval(function() {
-                        if (this.currencyPulseLast && this.unixTimestamp() > this.currencyPulseLast) {
-                            this.currencyPulsing = false;
-                        }
-                    }.bind(this), 1000);
+                // check for currency pulse end every second
+                setInterval(function() {
+                    if (this.currencyPulseLast && this.unixTimestamp() > this.currencyPulseLast) {
+                        this.currencyPulsing = false;
+                    }
+                }.bind(this), 1000);
 
-                    // init next golden currency
-                    this.initGolden();
+                // init next golden currency
+                this.initGolden();
 
-                    // start update loop (dynamic fps)
-                    window.requestAnimationFrame(this.tick);
+                // start update loop (dynamic fps)
+                window.requestAnimationFrame(this.tick);
 
-                    // start particle effects
-                    Particles.setupParticles();
+                // start particle effects
+                Particles.setupParticles();
 
-                    // add event listeners for other components
-                    EventBus.$on('saveGame', this.saveGame);
-                    EventBus.$on('hardReset', this.hardReset);
-                }
+                // add event listeners for other components
+                EventBus.$on('saveGame', this.saveGame);
+                EventBus.$on('hardReset', this.hardReset);
+
+                // hide loading screen
+                this.showLoading = false;
             },
             async newGame() {
                 // load default data
@@ -1016,48 +1046,43 @@
                 this.adjectives = Utils.shuffleArray(this.words.adjectives);
                 this.icons = Utils.shuffleArray(this.words.icons);
 
-                // generate stuff
-                let waitForBuildings = await this.generateBuildings();
-                // buildings uses reddit api so wait for it to finish
-                if (waitForBuildings) {
-                    this.generateUpgrades();
-                    this.generateAchievements();
+                this.flavorTexts = await FlavorText.getTitles();
 
-                    // loop in starting currency (if any)
-                    if (this.startingCurrency.gt(0)) {
-                        this.addCurrency(this.startingCurrency, true);
-                    }
+                this.generateBuildings();
+                this.generateUpgrades();
+                this.generateAchievements();
 
-                    if (this.cheatMode) {
-                        this.addCurrency(Big(1000), true);
-                    }
-
-                    console.log("New Game");
-                    return true;
+                // loop in starting currency (if any)
+                if (this.startingCurrency.gt(0)) {
+                    this.addCurrency(this.startingCurrency, true);
                 }
+
+                if (this.cheatMode) {
+                    this.addCurrency(Big(1000), true);
+                }
+
+                console.log("New Game");
             },
             async hardReset() {
                 if (confirm("Are you sure?")) {
                     if(confirm("Are you REALLY sure? You will lose EVERYTHING for hard resetting with no prestige bonus!")) {
                         // start new game
-                        let newGame = await this.newGame();
-                        if (newGame) {
-                            this.initGolden();
+                        await this.newGame();
+                        this.initGolden();
 
-                            // save game
-                            this.saveGame();
+                        // save game
+                        this.saveGame();
 
-                            // clear alerts & toggle menu
-                            EventBus.$emit('clearAlerts');
-                            EventBus.$emit('toggleMenu');
-                            EventBus.$emit('send');
+                        // clear alerts & toggle menu
+                        EventBus.$emit('clearAlerts');
+                        EventBus.$emit('toggleMenu');
+                        EventBus.$emit('send');
 
-                            return true;
-                        }
+                        this.showLoading = false;
                     }
                 }
             },
-            async saveGame() {
+            saveGame() {
                 let saveData = {
                     // misc state
                     buildingCostMultiplier: this.buildingCostMultiplier,
@@ -1075,7 +1100,6 @@
                 localStorage.setItem("SaveGame", JSON.stringify(saveData));
 
                 console.log("Game Saved");
-                return true;
             },
             async loadGame(saveJson) {
                 let saveData = JSON.parse(saveJson);
@@ -1112,7 +1136,7 @@
                         unlocked: saveBuilding.unlocked,
                         showAt: saveBuilding.showAt,
                         owned: saveBuilding.owned,
-                        icon: saveBuilding.icon
+                        icon: saveBuilding.icon,
                     };
                     if (building.owned > 0) {
                         showUpgrades = true;
@@ -1125,11 +1149,12 @@
                     let upgrade = {
                         type: saveUpgrade.type,
                         name: saveUpgrade.name,
+                        flavorText: saveUpgrade.flavorText,
                         needed: saveUpgrade.needed,
                         cost: Big(saveUpgrade.cost),
                         icon: saveUpgrade.icon,
                         unlocked: saveUpgrade.unlocked,
-                        active: saveUpgrade.active
+                        active: saveUpgrade.active,
                     };
                     if (saveUpgrade.buildingUpgrade == true) {
                         upgrade.buildingUpgrade = true;
@@ -1199,7 +1224,6 @@
                 }
 
                 console.log("Game Loaded");
-                return true;
             },
         },
         filters: {
@@ -1282,6 +1306,10 @@
 
     .bonusMessage {
         padding: 5px;
+    }
+
+    .hide {
+        display: none;
     }
 
     /* "spoiler" effect */
