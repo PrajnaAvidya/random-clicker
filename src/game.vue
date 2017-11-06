@@ -1029,7 +1029,7 @@
                     }
 
                     if (this.cheatMode) {
-                        this.addCurrency(Big(1E7), true);
+                        this.addCurrency(Big(1000), true);
                     }
 
                     console.log("New Game");
@@ -1131,6 +1131,15 @@
                         unlocked: saveUpgrade.unlocked,
                         active: saveUpgrade.active
                     };
+                    if (saveUpgrade.buildingUpgrade == true) {
+                        upgrade.buildingUpgrade = true;
+                    }
+                    if (saveUpgrade.buildingType) {
+                        upgrade.buildingType = saveUpgrade.buildingType;
+                    }
+                    if (saveUpgrade.tierOneForCpsUpgrade) {
+                        upgrade.tierOneForCpsUpgrade = saveUpgrade.tierOneForCpsUpgrade;
+                    }
                     if (saveUpgrade.addition != null) {
                         upgrade.addition = saveUpgrade.addition;
                     }
