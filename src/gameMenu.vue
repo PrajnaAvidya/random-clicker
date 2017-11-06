@@ -123,8 +123,8 @@
 
 <script>
     import EventBus from './eventBus.js';
-    import Options from './gameOptions.js';
-    import Stats from "./gameStats.js";
+    import Options from './options.js';
+    import Stats from "./stats.js";
     import Utils  from "./utils.js";
 
     export default {

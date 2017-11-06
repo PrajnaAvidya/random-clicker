@@ -126,9 +126,9 @@
     import Big from "big.js";
     import EventBus from './eventBus.js';
     import Words from "./words.js";
-    import Options from './gameOptions.js';
-    import GameData from "./gameData.js";
-    import Stats from "./gameStats.js";
+    import Options from './options.js';
+    import GameData from "./gameDAta.js";
+    import Stats from "./stats.js";
     import Utils from "./utils.js";
     import Particles from "./particles.js";
     import Sounds from "./sounds.js";
