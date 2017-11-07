@@ -5,7 +5,7 @@
                 <v-alert dismissible color="info" transition="scale-transition" v-for="(alert, alertIndex) in alerts" :key="alertIndex" v-model="alert.show">
                     <v-tooltip top>
                         <span slot="activator">{{ alert.name }}</span>
-                        <span>{{ alert.description }}</span>
+                        <span v-html="alert.description"></span>
                     </v-tooltip>
                 </v-alert>
             </div>
