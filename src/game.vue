@@ -975,7 +975,6 @@
             async newGame() {
                 // load default data
                 Object.assign(this.$data, DefaultData.data());
-                this._sortedUpgrades = null;
 
                 // reset stats/options
                 Stats.commit('resetState');
@@ -999,6 +998,10 @@
                 this.generateUpgrades();
                 this.generateAchievements();
 
+                // clear alerts & toggle menu
+                EventBus.$emit('clearAlerts');
+                EventBus.$emit('closeMenu');
+
                 // loop in starting currency (if any)
                 if (this.startingCurrency.gt(0)) {
                     this.addCurrency(this.startingCurrency, true);
@@ -1013,15 +1016,12 @@
             async hardReset() {
                 // start new game
                 await this.newGame();
+
+                EventBus.$emit('updateOptions');
                 this.initGolden();
 
                 // save game
                 this.saveGame();
-
-                // clear alerts & toggle menu
-                EventBus.$emit('clearAlerts');
-                EventBus.$emit('toggleMenu');
-                EventBus.$emit('send');
 
                 this.showLoading = false;
             },
