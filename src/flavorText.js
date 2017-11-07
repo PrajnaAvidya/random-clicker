@@ -2,7 +2,7 @@ import axios from 'axios';
 import Utils from './utils.js';
 
 export default {
-    getTitles: async function(titleCount=400) {
+    async getTitles(titleCount=400) {
         let redditRequest = await axios.get('https://www.reddit.com/r/SubredditSimulator.json?limit=100');
         if (redditRequest.status != 200) {
             console.log("Warning: couldn't connect to reddit API");

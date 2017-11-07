@@ -72,4 +72,4 @@ export default {
             frenzyEnd: 0,
         }
     },
-}
+};

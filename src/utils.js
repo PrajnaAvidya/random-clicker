@@ -1,7 +1,7 @@
 import Big from "big.js";
 
 export default {
-    round: function(value) {
+    round(value) {
         if (isNaN(value)) {
             return 0;
         }
@@ -25,7 +25,7 @@ export default {
         }
     },
 
-    currency: function(value) {
+    currency(value) {
         if (isNaN(value)) {
             return 0;
         }
@@ -47,7 +47,7 @@ export default {
         }
     },
 
-    convertObjectToBig: function(objectData) {
+    convertObjectToBig(objectData) {
         let bigData = {};
         for (let key in objectData) {
             if (isNaN(objectData[key])) {
