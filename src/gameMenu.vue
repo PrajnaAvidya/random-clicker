@@ -156,7 +156,11 @@
                 EventBus.$emit('saveGame');
             },
             hardReset() {
-                EventBus.$emit('hardReset');
+                if (confirm("Are you sure?")) {
+                    if(confirm("Are you REALLY sure? You will lose EVERYTHING for hard resetting with no prestige bonus!")) {
+                        EventBus.$emit('hardReset');
+                    }
+                }
             },
             toggleMenu() {
                 this.menu = !this.menu;

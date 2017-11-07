@@ -1079,23 +1079,19 @@
                 console.log("New Game");
             },
             async hardReset() {
-                if (confirm("Are you sure?")) {
-                    if(confirm("Are you REALLY sure? You will lose EVERYTHING for hard resetting with no prestige bonus!")) {
-                        // start new game
-                        await this.newGame();
-                        this.initGolden();
+                // start new game
+                await this.newGame();
+                this.initGolden();
 
-                        // save game
-                        this.saveGame();
+                // save game
+                this.saveGame();
 
-                        // clear alerts & toggle menu
-                        EventBus.$emit('clearAlerts');
-                        EventBus.$emit('toggleMenu');
-                        EventBus.$emit('send');
+                // clear alerts & toggle menu
+                EventBus.$emit('clearAlerts');
+                EventBus.$emit('toggleMenu');
+                EventBus.$emit('send');
 
-                        this.showLoading = false;
-                    }
-                }
+                this.showLoading = false;
             },
             saveGame() {
                 let saveData = {
