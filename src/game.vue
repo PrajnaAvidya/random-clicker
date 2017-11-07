@@ -125,6 +125,11 @@
             </div>
 
         </v-container>
+
+        <v-footer class="pa-3">
+            <v-spacer></v-spacer>
+            <div>Alpha 1.0</div>
+          </v-footer>
     </v-app>
 </template>
 
