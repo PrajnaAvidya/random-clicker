@@ -162,10 +162,9 @@
                     }
                 }
             },
-            toggleMenu() {
-                this.menu = !this.menu;
+            closeMenu() {
+                this.menu = false;
             },
-
             getStat(stat) {
                 return this.stats[stat];
             },
@@ -194,7 +193,7 @@
         mounted() {
             // events
             let vm = this;
-            EventBus.$on('toggleMenu', this.toggleMenu);
+            EventBus.$on('closeMenu', this.closeMenu);
             EventBus.$on('updateOptions', function () {
                 vm.updateOptions();
             });

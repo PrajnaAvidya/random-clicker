@@ -6,8 +6,8 @@ export default {
             // debug flags
             cheatMode: false, // gives extra starting currency
             easyGolden: false, // constant golden spawns
-            disableLoad: false, // don't load saved games
-            disableAutoSave: false, // don't auto save
+            disableAutoLoad: false,
+            disableAutoSave: false,
 
             // for fps calculations
             lastFrame: 0,
@@ -72,4 +72,4 @@ export default {
             frenzyEnd: 0,
         }
     },
-}
+};
