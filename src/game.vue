@@ -984,7 +984,7 @@
                 this.words = JSON.parse(JSON.stringify(Words));
 
                 // get currency name & adjectives
-                //this.currencyName = Utils.shuffleArray(GameData.currencies).pop();
+                //this.currencyName = Utils.shuffleArray(Words.currencies).pop();
                 let currencyName = 'Cracker';
                 Stats.commit('setCurrencyName', currencyName);
                 this.currencyName = currencyName;
