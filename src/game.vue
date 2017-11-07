@@ -478,6 +478,8 @@
                 } else if (upgrade.buildingUpgrade) {
                     // building upgrades require cost == next upgrade cost
                     upgrade.unlocked = upgrade.cost == this.nextUpgrade(upgrade.type).cost;
+                } else if (upgrade.type == 'Building') {
+                    upgrade.unlocked = this.canAffordUpgrade(upgrade);
                 } else {
                     // everything else goes off if can buy upgrade
                     upgrade.unlocked = this.canBuyUpgrade(upgrade);
@@ -566,9 +568,11 @@
                     }
                 }
 
-                // requirement not met
-                if (this.buildingCount(upgrade.type) < upgrade.needed) {
+                // add message if requirements not met
+                if (upgrade.buildingUpgrade && this.buildingCount(upgrade.type) < upgrade.needed) {
                     description += "<br /><strong>Requires: " + upgrade.needed + " " + upgrade.type + "</strong>";
+                } else if (upgrade.type == 'Buildings' && !this.canBuyUpgrade(upgrade)) {
+                    description += "<br /><strong>Requires " + upgrade.needed + " of every building</strong>";
                 }
 
                 // add flavor text
