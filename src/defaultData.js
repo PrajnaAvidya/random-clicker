@@ -7,7 +7,7 @@ export default {
             cheatMode: false, // gives extra starting currency
             easyGolden: false, // constant golden spawns
             disableAutoLoad: false,
-            disableAutoSave: true,
+            disableAutoSave: false,
 
             // for fps calculations
             lastFrame: 0,
