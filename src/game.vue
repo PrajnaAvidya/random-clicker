@@ -140,6 +140,7 @@
     import Utils from "./utils.js";
     import Particles from "./particles.js";
     import Sounds from "./sounds.js";
+    import SaveLoad from "./saveLoad.js";
 
     export default {
         data: function () {
@@ -914,17 +915,20 @@
                 });
             },
 
-            // new/save/load
+            // new/save/load functions
             async setupGame() {
                 // loading screen is showing by default
 
                 // load game or new
                 let loaded = false;
-                if (!this.disableLoad && localStorage.getItem("SaveGame") != null) {
-                    await this.loadGame(localStorage.getItem("SaveGame"));
+                if (!this.disableAutoLoad && localStorage.getItem("SaveGame") != null) {
+                    await this.loadGame();
                 } else {
                     await this.newGame();
                 }
+
+                // update options in menu
+                EventBus.$emit('updateOptions');
 
                 // check for currency pulse end
                 setInterval(function() {
@@ -976,7 +980,6 @@
                 // reset stats/options
                 Stats.commit('resetState');
                 Options.commit('resetState');
-                EventBus.$emit('updateOptions');
 
                 // load word lists
                 this.words = JSON.parse(JSON.stringify(Words));
@@ -1023,140 +1026,12 @@
                 this.showLoading = false;
             },
             saveGame() {
-                let saveData = {
-                    // misc state
-                    buildingCostMultiplier: this.buildingCostMultiplier,
-                    buildingNames: this.buildingNames,
-                    buildings: this.buildings,
-                    upgrades: this.upgrades,
-                    achievements: this.achievements,
-                    timestamp: Utils.unixTimestamp(),
-                    buyAmount: this.buyAmount,
-
-                    options: Options.state,
-                    stats: Stats.state,
-                };
-
-                localStorage.setItem("SaveGame", JSON.stringify(saveData));
+                SaveLoad.save(this.$data);
 
                 console.log("Game Saved");
             },
-            async loadGame(saveJson) {
-                let saveData = JSON.parse(saveJson);
-                let vm = this;
-
-                // load stats/options
-                Options.replaceState(saveData.options);
-                EventBus.$emit('updateOptions');
-                Stats.replaceState(Utils.convertObjectToBig(saveData.stats));
-
-                this.currencyName = Stats.state.currencyName;
-                document.title = Stats.state.currencyName + ' Clicker';
-                this.currency = Big(0); // this will be looped in, display only
-                this.displayedCps = Big(0);
-                this.displayedClickPower = Big(1);
-                this.buildingNames = saveData.buildingNames;
-                this.buildingCostMultiplier = saveData.buildingCostMultiplier;
-                this.buyAmount = saveData.buyAmount;
-
-                // TODO below stuff should be integrated with the same function as newgame?
-                
-                // parse buildings/upgrades/achievements (cast numbers to big.js)
-                this.buildings = [];
-                let showUpgrades = false;
-                saveData.buildings.forEach(function (saveBuilding) {
-                    let building = {
-                        name: saveBuilding.name,
-                        flavorText: saveBuilding.flavorText,
-                        baseCost: Big(saveBuilding.baseCost),
-                        buyCost: Big(saveBuilding.buyCost),
-                        baseCps: Big(saveBuilding.baseCps),
-                        currentCps: Big(saveBuilding.currentCps),
-                        description: saveBuilding.description,
-                        unlocked: saveBuilding.unlocked,
-                        showAt: saveBuilding.showAt,
-                        owned: saveBuilding.owned,
-                        icon: saveBuilding.icon,
-                    };
-                    if (building.owned > 0) {
-                        showUpgrades = true;
-                    }
-                    vm.buildings.push(building);
-                });
-
-                this.upgrades = [];
-                saveData.upgrades.forEach(function (saveUpgrade) {
-                    let upgrade = {
-                        type: saveUpgrade.type,
-                        name: saveUpgrade.name,
-                        flavorText: saveUpgrade.flavorText,
-                        needed: saveUpgrade.needed,
-                        cost: Big(saveUpgrade.cost),
-                        icon: saveUpgrade.icon,
-                        unlocked: saveUpgrade.unlocked,
-                        active: saveUpgrade.active,
-                    };
-                    if (saveUpgrade.buildingUpgrade == true) {
-                        upgrade.buildingUpgrade = true;
-                    }
-                    if (saveUpgrade.buildingType) {
-                        upgrade.buildingType = saveUpgrade.buildingType;
-                    }
-                    if (saveUpgrade.tierOneForCpsUpgrade) {
-                        upgrade.tierOneForCpsUpgrade = saveUpgrade.tierOneForCpsUpgrade;
-                    }
-                    if (saveUpgrade.addition != null) {
-                        upgrade.addition = saveUpgrade.addition;
-                    }
-                    if (saveUpgrade.multiplier != null) {
-                        upgrade.multiplier = saveUpgrade.multiplier;
-                    }
-                    if (upgrade.unlocked) {
-                        showUpgrades = true;
-                    }
-
-                    vm.upgrades.push(upgrade);
-                });
-                this.showUpgrades = showUpgrades;
-
-                this.achievements = [];
-                let showAchievements = false;
-                saveData.achievements.forEach(function (saveAchievement) {
-                    let achievement = {
-                        type: saveAchievement.type,
-                        name: saveAchievement.name,
-                        unlocked: saveAchievement.unlocked,
-                        icon: saveAchievement.icon,
-                        description: saveAchievement.description,
-                    };
-                    if (saveAchievement.total != null) {
-                        achievement.total = Big(saveAchievement.total);
-                    }
-                    if (saveAchievement.cps != null) {
-                        achievement.cps = Big(saveAchievement.cps);
-                    }
-                    if (saveAchievement.clicks != null) {
-                        achievement.clicks = Big(saveAchievement.clicks);
-                    }
-
-                    if (achievement.unlocked) {
-                        showAchievements = true;
-                    }
-
-                    vm.achievements.push(achievement);
-                });
-                this.showAchievements = showAchievements;
-
-                // calculate bonus currency
-                let timeDifference = Utils.unixTimestamp() - saveData.timestamp;
-                this.bonusCurrency = Stats.state.cps.div(2).times(timeDifference).round();
-                if (this.bonusCurrency.gt(0)) {
-                    Stats.commit('addCurrency', this.bonusCurrency);
-                    if (this.bonusCurrency.gte(Big(Stats.state.currency).div(5))) {
-                        // show dialog if earned enough bonus currency
-                        this.bonusDialog = true;
-                    }
-                }
+            loadGame() {
+                Object.assign(this.$data, SaveLoad.load());
 
                 // loop in starting currency (visual only)
                 if (Stats.state.currency.gt(0)) {
