@@ -265,7 +265,6 @@
                 // fusion upgrades
                 let tierOneCount = this.buildingCount(this.buildingNames[1]);
                 this.activeUpgrades("Fusion").forEach(function (upgrade) {
-                    console.log(upgrade);
                     vm.buildings[1].currentCps = vm.buildings[1].currentCps.times(2);
                     vm.buildings[upgrade.buildingType].currentCps = vm.buildings[upgrade.buildingType].currentCps.times(Big(1.01).pow(tierOneCount));
                 });
@@ -311,6 +310,9 @@
                     this.recalculateClickPower();
                     this.recalculateBuyCosts();
                     this.checkAchievements();
+
+                    this.updateBuildingTexts();
+                    this.updateUpgradeTexts();
                 }
             },
             buildingCost(building) {
@@ -337,15 +339,23 @@
                 });
             },
             buildingText(building) {
-                if (building.unlocked == false) {
-                    return null;
+                if (this.buildingTexts) {
+                    return this.buildingTexts[building.name];
+                } else {
+                    return '';
                 }
-                let buildingCps = building.currentCps * building.owned;
-                let buildingCpsPercent = 100 * buildingCps / Stats.state.cps;
-                let buildingText = "Each " + building.name + " produces " + Utils.round(building.currentCps) + " " + Stats.state.currencyName + "s per second";
-                buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + Utils.round(buildingCps) + " " +  Stats.state.currencyName + "s per second (" + Utils.round(buildingCpsPercent) + "% of total)";
-                buildingText += "<br /><i>" + building.flavorText +"</i>";
-                return buildingText;
+            },
+            updateBuildingTexts() {
+                let buildingTexts = {};
+                this.buildings.forEach(function (building) {
+                    let buildingCps = building.currentCps * building.owned;
+                    let buildingCpsPercent = 100 * buildingCps / Stats.state.cps;
+                    let buildingText = "Each " + building.name + " produces " + Utils.round(building.currentCps) + " " + Stats.state.currencyName + "s per second";
+                    buildingText += "<br />" + building.owned + " " + building.name + " owned producing " + Utils.round(buildingCps) + " " +  Stats.state.currencyName + "s per second (" + Utils.round(buildingCpsPercent) + "% of total)";
+                    buildingText += "<br /><i>" + building.flavorText +"</i>";
+                    buildingTexts[building.name] = buildingText;
+                });
+                this.buildingTexts = buildingTexts;
             },
             setBuyAmount(amount) {
                 this.buyAmount = amount;
@@ -431,6 +441,9 @@
                     this.recalculateClickPower();
                     this.checkAchievements();
 
+                    this.updateBuildingTexts();
+                    this.updateUpgradeTexts();
+
                     Stats.commit('addUpgrade');
                 }
             },
@@ -478,44 +491,59 @@
                 return production;
             },
             upgradeText(upgrade) {
-                let description = '';
+                if (this.upgradeTexts) {
+                    return this.upgradeTexts[upgrade.id];
+                } else {
+                    return '';
+                }
+            },
+            updateUpgradeTexts() {
+                let upgradeTexts = {};
+                let vm = this;
 
-                if (upgrade.type == Stats.state.currencyName || upgrade.type == "Buildings") {
-                    // production upgrade
-                    description += "Multiplies " + Stats.state.currencyName + " production by " + upgrade.multiplier + "x";
-                } else if (upgrade.type == "Clicking") {
-                    // clicking upgrade
-                    description += 'Clicking gains 1% of your ' + Stats.state.currencyName + ' per second';
-                } else if (upgrade.type == 'Fusion') {
-                    // fusion upgrade
-                    description += 'Doubles ' + this.buildingNames[1] + ' production &amp; gain +1% ' + this.buildingNames[upgrade.buildingType] + ' production for every ' + upgrade.tierOneForCpsUpgrade + ' ' + this.buildingNames[1] + ' owned';
-                } else if (upgrade.multiplier > 0) {
-                    // multiplier upgrade
-                    description += "Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
-                    if (upgrade.type == this.buildingNames[0]) {
-                        description += "<br /><strong>Also multiplies clicks</strong>";
+                this.upgrades.forEach(function(upgrade) {
+                    let description = '';
+                    
+
+                    if (upgrade.type == Stats.state.currencyName || upgrade.type == "Buildings") {
+                        // production upgrade
+                        description += "Multiplies " + Stats.state.currencyName + " production by " + upgrade.multiplier + "x";
+                    } else if (upgrade.type == "Clicking") {
+                        // clicking upgrade
+                        description += 'Clicking gains 1% of your ' + Stats.state.currencyName + ' per second';
+                    } else if (upgrade.type == 'Fusion') {
+                        // fusion upgrade
+                        description += 'Doubles ' + vm.buildingNames[1] + ' production &amp; gain +1% ' + vm.buildingNames[upgrade.buildingType] + ' production for every ' + upgrade.tierOneForCpsUpgrade + ' ' + vm.buildingNames[1] + ' owned';
+                    } else if (upgrade.multiplier > 0) {
+                        // multiplier upgrade
+                        description += "Multiplies " + upgrade.type + " production by " + upgrade.multiplier + "x";
+                        if (upgrade.type == vm.buildingNames[0]) {
+                            description += "<br /><strong>Also multiplies clicks</strong>";
+                        }
+                    } else if (upgrade.addition > 0) {
+                        // addition upgrade
+                        description += "Adds " + upgrade.addition + " " + Stats.state.currencyName + " production for every non-" + upgrade.type + " building owned";
+                        if (upgrade.type == vm.buildingNames[0]) {
+                            description += "<br /><strong>Also adds to clicks</strong>";
+                        }
                     }
-                } else if (upgrade.addition > 0) {
-                    // addition upgrade
-                    description += "Adds " + upgrade.addition + " " + Stats.state.currencyName + " production for every non-" + upgrade.type + " building owned";
-                    if (upgrade.type == this.buildingNames[0]) {
-                        description += "<br /><strong>Also adds to clicks</strong>";
+
+                    // add message if requirements not met
+                    if (upgrade.buildingUpgrade && vm.buildingCount(upgrade.type) < upgrade.needed) {
+                        description += "<br /><strong>Requires: " + upgrade.needed + " " + upgrade.type + "</strong>";
+                    } else if (upgrade.type == 'Buildings' && !vm.canBuyUpgrade(upgrade)) {
+                        description += "<br /><strong>Requires " + upgrade.needed + " of every building</strong>";
                     }
-                }
 
-                // add message if requirements not met
-                if (upgrade.buildingUpgrade && this.buildingCount(upgrade.type) < upgrade.needed) {
-                    description += "<br /><strong>Requires: " + upgrade.needed + " " + upgrade.type + "</strong>";
-                } else if (upgrade.type == 'Buildings' && !this.canBuyUpgrade(upgrade)) {
-                    description += "<br /><strong>Requires " + upgrade.needed + " of every building</strong>";
-                }
+                    // add flavor text
+                    if (upgrade.flavorText) {
+                        description += "<br /><i>" + upgrade.flavorText +"</i>";
+                    }
 
-                // add flavor text
-                if (upgrade.flavorText) {
-                    description += "<br /><i>" + upgrade.flavorText +"</i>";
-                }
-                
-                return description;
+                    upgradeTexts[upgrade.id] = description;
+                });
+
+                this.upgradeTexts = upgradeTexts;
             },
 
             // achievements
@@ -720,8 +748,11 @@
 
                 // cps upgrades
                 this.cpsIcon = this.icons.pop();
+                let upgradeId = 0;
                 GameData.productionUpgrades.forEach(function (productionUpgrade) {
+                    upgradeId ++;
                     let upgrade = {
+                        id: upgradeId,
                         type: Stats.state.currencyName,
                         name: vm.adjectives.pop() + " " + Stats.state.currencyName + "s",
                         needed: Big(productionUpgrade.needed),
@@ -742,7 +773,9 @@
 
                 // X of every building production upgrades
                 GameData.buildingProductionUpgrades.forEach(function (buildingUpgrade) {
+                    upgradeId ++;
                     let upgrade = {
+                        id: upgradeId,
                         type: 'Buildings',
                         name: vm.adjectives.pop() + " " + Stats.state.currencyName + "s",
                         needed: Big(buildingUpgrade.needed),
@@ -773,7 +806,9 @@
                     }
 
                     for (let i = 0; i < upgradeNeeds.length; i++) {
+                        upgradeId ++;
                         let upgrade = {
+                            id: upgradeId,
                             type: vm.buildingNames[upgradeIndex],
                             buildingUpgrade: true,
                             name: vm.adjectives.pop() + " " + vm.buildingNames[upgradeIndex] + "s",
@@ -804,7 +839,9 @@
 
                 // tier 1 building upgrades
                 GameData.fusionUpgradeTypes.forEach(function (tierOneUpgrade) {
+                    upgradeId ++;
                     let upgrade = {
+                        id: upgradeId,
                         type: 'Fusion',
                         name: vm.buildingNames[1] + "-" + vm.buildingNames[tierOneUpgrade.buildingType] + " Fusion",
                         buildingType: tierOneUpgrade.buildingType,
@@ -827,7 +864,9 @@
                 // clicking upgrades
                 this.clicksIcon = this.icons.pop();
                 GameData.clickingUpgrades.forEach(function (upgradeParams) {
+                    upgradeId ++;
                     let upgrade = {
+                        id: upgradeId,
                         type: 'Clicking',
                         name: vm.adjectives.pop() + " Mouse",
                         multiplier: upgradeParams.multiplier,
@@ -932,6 +971,10 @@
                     await this.newGame();
                 }
 
+                // generate building/upgrade texts
+                this.updateBuildingTexts();
+                this.updateUpgradeTexts();
+
                 // update options in menu
                 EventBus.$emit('updateOptions');
 
@@ -1013,7 +1056,7 @@
                 }
 
                 if (this.cheatMode) {
-                    this.addCurrency(Big(1000), true);
+                    this.addCurrency(Big(1E15), true);
                 }
 
                 console.log("New Game");
