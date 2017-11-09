@@ -397,7 +397,7 @@
                         upgrade.unlocked = true;
                         return true;
                     }
-                } else if (this.buildingCount(upgrade.type) >= upgrade.needed) {
+                } else if (upgrade.buildingUpgrade && this.buildingCount(upgrade.type) >= upgrade.needed) {
                     upgrade.unlocked = true;
                     return true;
                 }
@@ -1056,7 +1056,7 @@
                 }
 
                 if (this.cheatMode) {
-                    this.addCurrency(Big(1E15), true);
+                    this.addCurrency(Big(1E9), true);
                 }
 
                 console.log("New Game");
