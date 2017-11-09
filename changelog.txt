@@ -1,0 +1,8 @@
+Alpha 1.1.1
+Fixed upgrade bug
+
+Alpha 1.1 (breaks savegames)
+Cached upgrade/building texts
+
+Alpha 1.0
+First versioned release
