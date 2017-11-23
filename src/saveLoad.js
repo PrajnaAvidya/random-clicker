@@ -5,7 +5,7 @@ import DefaultData from './defaultData.js';
 import Big from "big.js";
 
 function getSaveVersion() {
-    return '0.1';
+    return '1';
 }
 
 export default  {
@@ -43,7 +43,7 @@ export default  {
         let saveData = JSON.parse(localStorage.getItem("SaveGame"));
 
         // TODO migrate old save version
-        // if (saveData.version != "0.1") etc
+        // if (saveData.version != "1") etc
 
         // load stats/options
         Options.replaceState(saveData.options);

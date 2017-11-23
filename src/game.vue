@@ -128,7 +128,7 @@
 
         <v-footer class="pa-3">
             <v-spacer></v-spacer>
-            <div>Alpha 1.1.1</div>
+            <div>Alpha 1.2</div>
           </v-footer>
     </v-app>
 </template>
@@ -588,6 +588,11 @@
             // tick/cps function
             tick(timestamp) {
                 let progress = timestamp - this.lastFrame;
+                // limit framerate to 30 fps
+                if (progress < 33.33) {
+                    window.requestAnimationFrame(this.tick);
+                    return;
+                }
                 this.lastFrame = timestamp;
 
                 // how much to add this frame
@@ -964,7 +969,6 @@
                 // loading screen is showing by default
 
                 // load game or new
-                let loaded = false;
                 if (!this.disableAutoLoad && localStorage.getItem("SaveGame") != null) {
                     await this.loadGame();
                 } else {
