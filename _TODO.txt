@@ -1,6 +1,10 @@
+missing cookie clicker features
+
+implement currencies other than crackers
+
 buy/upgrade costs based on formula instead of static? so we tweak it in game settings for fast/slow progress
 
-original features
+original feature ideas:
 - more achievements
 - something involving achievements * cps
 -- equivalent of kittens upgrades
@@ -8,14 +12,3 @@ original features
 - equivalent of cookie clicker prestige features
 -- golden cracker upgrades
 -- misc heavenly chip upgrades
-
-6E = million
-9E = billion
-12E = trillion
-15E = quadrillion
-18E = quintillion
-21E = sextillion
-24E = septillion
-27E = octillion
-30E = nonillion
-33E = decillion
