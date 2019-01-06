@@ -1,3 +1,6 @@
+Alpha 1.2
+Limit framerate to 30fps
+
 Alpha 1.1.1
 Fixed upgrade bug
 
